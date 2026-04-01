@@ -1,0 +1,12 @@
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "module": "CommonJS",        // ✅ important
+    "moduleResolution": "Node",  // ✅ important
+
+    "esModuleInterop": true,     // ✅ allows import express
+    "strict": true,
+    "skipLibCheck": true
+  },
+  "include": ["src"]
+}

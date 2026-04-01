@@ -1,0 +1,175 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model user {
+  id             String   @id @unique @default(uuid()) @db.VarChar(36)
+  email          String   @unique @map("email") @db.VarChar(255)
+  code           Int      @default(autoincrement()) @map("code")
+  createdAt      DateTime @default(now()) @map("created_at")
+  createdById    String?  @map("created_by") @db.VarChar(255)
+  isActive       Boolean  @default(true) @map("is_active")
+  passwordHashed String   @map("password_hashed") @db.VarChar(255)
+  passwordTemp   String   @map("password_temp") @db.VarChar(255)
+  roleId         String?  @map("role_id") @db.VarChar(36)
+  updatedAt      DateTime @updatedAt @map("updated_at")
+  updatedById    String?  @map("updated_by") @db.VarChar(255)
+  userName       String   @unique @map("user_name") @db.VarChar(15)
+  role           Roles?   @relation(fields: [roleId], references: [id])
+
+  @@index([code])
+}
+
+model Roles {
+  id          String   @id @default(uuid()) @db.VarChar(36)
+  code        Int      @default(autoincrement()) @map("code")
+  name        String   @map("name") @db.VarChar(255)
+  description String   @map("description") @db.VarChar(255)
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+  createdById String?  @map("created_by") @db.VarChar(255)
+  updatedById String?  @map("updated_by") @db.VarChar(255)
+  isActive    Boolean  @default(true) @map("is_active")
+  users       user[]
+
+  @@index([code])
+}
+
+model District {
+  id          String    @id @default(uuid()) @db.VarChar(36)
+  code        Int       @unique @map("code")
+  name        String    @map("name") @db.VarChar(255)
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+  createdById String?   @map("created_by") @db.VarChar(255)
+  updatedById String?   @map("updated_by") @db.VarChar(255)
+  isActive    Boolean   @default(true) @map("is_active")
+  projects    project[]
+
+  @@index([code])
+  @@map("districts")
+}
+
+model specialUnits {
+  id          String   @id @default(uuid()) @db.VarChar(36)
+  code        Int      @default(autoincrement()) @map("code")
+  name        String   @map("name") @db.VarChar(255)
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+  createdById String?  @map("created_by") @db.VarChar(255)
+  updatedById String?  @map("updated_by") @db.VarChar(255)
+  isActive    Boolean  @default(true) @map("is_active")
+
+  projects project[]
+
+  @@index([code])
+  @@map("special_units")
+}
+
+model project {
+  id   String @id @default(uuid()) @db.VarChar(36)
+  code Int    @default(autoincrement()) @map("code")
+
+  // Common
+  districtId String
+  district   District @relation(fields: [districtId], references: [id])
+
+  // Either Department OR Special Unit
+  department    DepartmentEnum? // ENUM
+  specialUnitId String? // FK
+
+  specialUnit specialUnits? @relation(fields: [specialUnitId], references: [id])
+
+  // Common
+  officers     OfficersEnum
+  locationName String
+  projectName  String
+
+  stage StageEnum
+  status status @default(AssignedProjects)  // ✅ default here
+
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+  createdById String?  @map("created_by") @db.VarChar(255)
+  updatedById String?  @map("updated_by") @db.VarChar(255)
+  isActive    Boolean  @default(true) @map("is_active")
+}
+
+
+model AuditLog {
+  id   String @id @default(uuid()) @db.VarChar(36)
+  code Int    @unique @default(autoincrement())
+
+  tableName String @map("table_name") @db.VarChar(100)
+  recordId  String @map("record_id") @db.VarChar(36)
+
+  action String @db.VarChar(20) // CREATE | UPDATE | DELETE
+
+  oldValue Json? @map("old_value")
+  newValue Json? @map("new_value")
+
+  userId    String? @map("user_id") @db.VarChar(36)
+  roleId    String? @map("role_id") @db.VarChar(36)
+  ipAddress String? @map("ip_address") @db.VarChar(45)
+
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @default(now()) @updatedAt @map("updated_at")
+  createdById String?  @map("created_by_id") @db.VarChar(36)
+  updatedById String?  @map("updated_by_id") @db.VarChar(36)
+  isActive    Boolean  @default(true) @map("is_active")
+
+  @@index([tableName])
+  @@index([recordId])
+  @@map("audit_logs")
+}
+
+
+model stage{
+    id   String @id @default(uuid()) @db.VarChar(36)
+    code Int    @default(autoincrement()) @map("code")
+    name String @map("name") @db.VarChar(255)
+    createdAt   DateTime @default(now()) @map("created_at")
+    updatedAt   DateTime @updatedAt @map("updated_at")
+    createdById String?  @map("created_by") @db.VarChar(255)
+    updatedById String?  @map("updated_by") @db.VarChar(255)
+    isActive    Boolean  @default(true) @map("is_active")
+
+}
+
+
+
+enum DepartmentEnum {
+  POLICE
+  PRISON
+  FRS
+}
+
+enum OfficersEnum {
+  LEVEL1
+  LEVEL2
+  LEVEL3
+}
+
+enum StageEnum {
+LandSiteInspectionStage
+PreConstructionStage
+FoundationStage
+PlinthStage
+SuperStructureStage
+InteriorsStage
+ExteriorsStage
+DevelopmentWorksStage
+TakeOverStage
+}
+
+enum status {
+  TotalProjects
+  CompletedProjects
+  OngoingProjects
+  AssignedProjects
+}
