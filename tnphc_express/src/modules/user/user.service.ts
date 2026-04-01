@@ -1,6 +1,7 @@
 import prisma from "../../shared/prisma";
 import bcrypt from "bcrypt";
-import jwt from "jsonwebtoken";
+// import jwt from "jsonwebtoken";
+import { generateTokens } from "../../utils/jwt";
 
 type CreateUserInput = {
   userName: string;
@@ -112,7 +113,7 @@ export const loginService = async (data: {
   userName: string;
   password: string;
 }) => {
-  // ✅ Find user
+
   const user = await prisma.user.findFirst({
     where: {
       userName: data.userName,
@@ -125,12 +126,10 @@ export const loginService = async (data: {
     throw new Error("User not found");
   }
 
-  // ❗ Check if password exists
   if (!user.passwordHashed) {
     throw new Error("Password not set");
   }
 
-  // ✅ Compare password
   const isMatch = await bcrypt.compare(
     data.password,
     user.passwordHashed
@@ -140,25 +139,24 @@ export const loginService = async (data: {
     throw new Error("Invalid credentials");
   }
 
-  // ✅ Generate JWT
-  const token = jwt.sign(
-    {
-      id: user.id,
-      userName: user.userName,
-      role: user.role?.name,
-    },
-    process.env.JWT_SECRET as string,
-    { expiresIn: "1d" }
-  );
+  // ✅ NEW TOKEN SYSTEM
+  const { accessToken, refreshToken } = generateTokens({
+    id: user.id,
+    email: user.email,
+    userName: user.userName,
+    roleId: user.roleId,
+    role: user.role?.name,
+    isActive: user.isActive
+  });
 
   return {
-
     user: {
       id: user.id,
       userName: user.userName,
       email: user.email,
       role: user.role,
     },
-    token
+    accessToken,
+    refreshToken
   };
 };

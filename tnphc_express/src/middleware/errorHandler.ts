@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import { AppError } from "../utils/errorHandler/appError";
 import { validateRequest } from "./validateRequest";
-import baseAuth from "./auth/baseAuth";
+import {baseAuth} from "./auth/baseAuth";
 import responses from "../utils/responses";
 
 // 🔹 Centralized Error Handler

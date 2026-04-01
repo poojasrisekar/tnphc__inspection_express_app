@@ -90,7 +90,9 @@ model project {
   locationName String
   projectName  String
 
-  stage StageEnum
+
+  stageId String?
+  stage   stage? @relation(fields: [stageId], references: [id])
   status status @default(AssignedProjects)  // ✅ default here
 
   createdAt   DateTime @default(now()) @map("created_at")
@@ -129,7 +131,8 @@ model AuditLog {
 }
 
 
-model stage{
+
+model stage {
     id   String @id @default(uuid()) @db.VarChar(36)
     code Int    @default(autoincrement()) @map("code")
     name String @map("name") @db.VarChar(255)
@@ -138,10 +141,9 @@ model stage{
     createdById String?  @map("created_by") @db.VarChar(255)
     updatedById String?  @map("updated_by") @db.VarChar(255)
     isActive    Boolean  @default(true) @map("is_active")
+    projects project[]
 
 }
-
-
 
 enum DepartmentEnum {
   POLICE
@@ -155,17 +157,6 @@ enum OfficersEnum {
   LEVEL3
 }
 
-enum StageEnum {
-LandSiteInspectionStage
-PreConstructionStage
-FoundationStage
-PlinthStage
-SuperStructureStage
-InteriorsStage
-ExteriorsStage
-DevelopmentWorksStage
-TakeOverStage
-}
 
 enum status {
   TotalProjects
@@ -173,3 +164,10 @@ enum status {
   OngoingProjects
   AssignedProjects
 }
+
+enum YesNo {
+  Yes
+  No
+}
+
+
