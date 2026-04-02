@@ -18,7 +18,7 @@ export const getAllSpecialUnitsService = async (query: any) => {
   const { skip, take } = pageConfig({
     pageNumber,
     pageSize
-  });3
+  });
 
   const whereCondition = {
     isActive: true,

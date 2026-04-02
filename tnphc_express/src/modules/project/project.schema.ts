@@ -7,18 +7,7 @@ export const createProjectSchema = Joi.object({
   officers: Joi.string().valid("LEVEL1", "LEVEL2", "LEVEL3") .required(),
   locationName: Joi.string().required(),
   projectName: Joi.string().required(),
-  stage: Joi.string()
-    .valid(
-      "LandSiteInspectionStage",
-      "PreConstructionStage",
-      "FoundationStage",
-      "PlinthStage",
-      "SuperStructureStage",
-      "InteriorsStage",
-      "ExteriorsStage",
-      "DevelopmentWorksStage",
-      "TakeOverStage"
-    ).required(),
+  stageId: Joi.string().required()
 });
 
 export const updateProjectSchema = Joi.object({

@@ -1,4 +1,4 @@
-import { status, DepartmentEnum, OfficersEnum, StageEnum  } from "@prisma/client";
+import { status, DepartmentEnum, OfficersEnum  } from "@prisma/client";
 import { pageConfig } from "../../utils/query.helper";
 import prisma from "../../shared/prisma";
 
@@ -7,17 +7,16 @@ export const createProjectService = async (data: any) => {
     data: {
       districtId: data.districtId,
 
-      // ✅ Enum usage
       department: DepartmentEnum[data.department as keyof typeof DepartmentEnum],
       specialUnitId: data.specialUnitId,
       officers: OfficersEnum[data.officers as keyof typeof OfficersEnum],
       locationName: data.locationName,
       projectName: data.projectName,
-      stage: StageEnum[data.stage as keyof typeof StageEnum],
 
-      // ✅ Default status
+      // ✅ Use FK instead of enum
+      stageId: data.stageId,
+
       status: status.AssignedProjects,
-
       createdById: data.createdById
     }
   });
@@ -59,13 +58,34 @@ export const getAllProjectsService = async (query: any) => {
   };
 };
 export const getProjectByIdService = async (id: string) => {
-  return prisma.project.findUnique({
+  const project = await prisma.project.findUnique({
     where: { id },
-    // include: {
-    //   district: true,
-    //   specialUnit: true
-    // }
+    include: {
+      district: true,
+      specialUnit: true,
+      stage: true
+    }
   });
+
+  if (!project) throw new Error("Project not found");
+
+  return {
+    id: project.id,
+    code: project.code,
+    projectName: project.projectName,
+    locationName: project.locationName,
+    department: project.department,
+    officers: project.officers,
+    status: project.status,
+
+    // ✅ Flattened names
+    districtName: project.district?.name,
+    specialUnitName: project.specialUnit?.name,
+    stageName: project.stage?.name,
+
+    createdAt: project.createdAt,
+    updatedAt: project.updatedAt
+  };
 };
 
 export const updateProjectService = async (id: string, data: any) => {
@@ -83,4 +103,4 @@ export const deleteProjectService = async (id: string) => {
     where: { id },
     data: { isActive: false }
   });
-};    
+};

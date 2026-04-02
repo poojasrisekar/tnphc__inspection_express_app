@@ -2,11 +2,9 @@ import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
 import responses from "../../utils/responses";
 
-const JWT_SECRET = process.env.JWT_SECRET as string; // from .env
+const JWT_SECRET = process.env.JWT_SECRET as string;
 
-
-
-// Extend Express Request to include user
+// Extend Express Request
 declare global {
   namespace Express {
     interface Request {
@@ -15,64 +13,56 @@ declare global {
   }
 }
 
-/**
- * Middleware: Verify JWT and attach decoded user
- */
 export const baseAuth = (req: Request, res: Response, next: NextFunction) => {
   const authHeader = req.headers["authorization"];
 
   if (!authHeader) {
-    return res
-      .status(401)
-      .json(
-        responses.generate("validationError", {
-          message: "Authorization header missing",
-        })
-      );
+    return res.status(401).json(
+      responses.generate("validationError", {
+        message: "Authorization header missing",
+      })
+    );
   }
 
-  const token = authHeader.split(" ")[1]; // Expecting "Bearer <token>"
+  const token = authHeader.split(" ")[1];
+
   if (!token) {
-    return res
-      .status(401)
-      .json(
-        responses.generate("validationError", {
-          message: "Token missing",
-        })
-      );
+    return res.status(401).json(
+      responses.generate("validationError", {
+        message: "Token missing",
+      })
+    );
   }
 
   try {
-    const decoded = jwt.verify(token, JWT_SECRET);
-    req.user = decoded; // Attach decoded user
-    next();
-  } catch (err) {
-    return res
-      .status(403)
-      .json(
-        responses.generate("loginFailed", {
-          message: "Invalid or expired token",
-          error: err,
-        })
-      );
-  }
-};
+    const decoded: any = jwt.verify(token, JWT_SECRET);
 
-/**
- * Middleware factory: Check user role
- * @param roles - One or more roles to allow
- */
-export const isRole = (...roles: string[]) => {
-  return (req: Request, res: Response, next: NextFunction) => {
-    if (!req.user || !roles.includes(req.user.role)) {
+    // ✅ Check token type (VERY IMPORTANT)
+    if (decoded.tokenUse !== "access") {
       return res.status(403).json(
         responses.generate("loginFailed", {
-             message: "You do not have permission to access this resource",
+          message: "Invalid token type",
         })
-     );
+      );
     }
-    next();
-  };
-};
 
-export default baseAuth;
+    // ✅ Map your custom payload → req.user
+    req.user = {
+      id: decoded.data.uid,
+      userName: decoded.data.userName,
+      email: decoded.data.email,
+      roleId: decoded.data.roleId,
+      role: decoded.data.role,
+      isActive: decoded.data.isActive,
+    };
+
+    next();
+  } catch (err) {
+    return res.status(403).json(
+      responses.generate("loginFailed", {
+        message: "Invalid or expired token",
+        error: err,
+      })
+    );
+  }
+};
