@@ -25,9 +25,9 @@ router.get(
 );
 
 
-router.get("/test", (req, res) => {
-  res.send("User route working ✅");
-});
+// router.get("/test", (req, res) => {
+//   res.send("User route working ✅");
+// });
 
 router.post(
   "/login",
@@ -39,7 +39,7 @@ router.post(
   validateRequest(createUserSchema, "body"),
   createUser
 );
-console.log("✅ user.routes.ts loaded");
+// console.log("✅ user.routes.ts loaded");
 
 // router.post("/createUser", createUser);
 router.put(
