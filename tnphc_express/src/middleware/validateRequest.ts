@@ -7,29 +7,34 @@ export const validateRequest = (
 	property: "body" | "query" | "params" = "body"
 ) => {
 	return (req: Request, res: Response, next: NextFunction) => {
-		// ? describe schema
+		// ✅ Schema preview (optional)
 		if (req.query["$schema"] === "true") {
-			res.status(200).send({
+			return res.status(200).send({
 				statusCode: 200,
 				message: "Schema Description",
 				data: { $schema: schema.describe() },
 			});
 		}
 
-		if (!req.query["$schema"]) {
-			// console.debug(schema.validate(req[property], { abortEarly: false }));
-			const { error } = schema.validate(req[property], { abortEarly: false });
+		// ✅ Validate with conversion enabled
+		const { error, value } = schema.validate(req[property], {
+			abortEarly: false,
+			allowUnknown: true,
+			convert: true // 🔥 THIS FIXES YOUR ISSUE
+		});
 
-			if (error) {
-				res.status(400).send({
-					statusCode: 400,
-					error: error.details.map((err) => err.message),
-					message: "validation Error",
-					// error: error.details.map((detail) => detail.message).join(","),
-				});
-			} else {
-				next();
-			}
+		// ❌ If validation fails
+		if (error) {
+			return res.status(400).send({
+				statusCode: 400,
+				error: error.details.map((err) => err.message),
+				message: "Validation Error",
+			});
 		}
+
+		// // ✅ VERY IMPORTANT: assign converted values back
+		// req[property] = value;
+
+		next();
 	};
 };

@@ -113,7 +113,7 @@ export const loginService = async (data: {
   userName: string;
   password: string;
 }) => {
-
+  // 🔍 Find user
   const user = await prisma.user.findFirst({
     where: {
       userName: data.userName,
@@ -126,29 +126,53 @@ export const loginService = async (data: {
     throw new Error("User not found");
   }
 
-  if (!user.passwordHashed) {
-    throw new Error("Password not set");
+  let isMatch = false;
+
+  // 🟢 CASE 1: Hashed password exists
+  if (user.passwordHashed && user.passwordHashed.trim() !== "") {
+    isMatch = await bcrypt.compare(data.password, user.passwordHashed);
   }
 
-  const isMatch = await bcrypt.compare(
-    data.password,
-    user.passwordHashed
-  );
+  // 🟡 CASE 2: First-time login (use temp password)
+  else if (user.passwordTemp && user.passwordTemp.trim() !== "") {
+    if (data.password !== user.passwordTemp) {
+      throw new Error("Invalid credentials");
+    }
+
+    // 🔐 Hash temp password and store permanently
+    const hashedPassword = await bcrypt.hash(data.password, 10);
+
+    await prisma.user.update({
+      where: { id: user.id },
+      data: {
+        passwordHashed: hashedPassword,
+        passwordTemp: "", // clear temp password
+      },
+    });
+
+    isMatch = true;
+  }
+
+  // 🔴 CASE 3: No password at all
+  else {
+    throw new Error("Password not set");
+  }
 
   if (!isMatch) {
     throw new Error("Invalid credentials");
   }
 
-  // ✅ NEW TOKEN SYSTEM
+  // ✅ Generate Tokens
   const { accessToken, refreshToken } = generateTokens({
     id: user.id,
     email: user.email,
     userName: user.userName,
     roleId: user.roleId,
     role: user.role?.name,
-    isActive: user.isActive
+    isActive: user.isActive,
   });
 
+  // ✅ Response
   return {
     user: {
       id: user.id,
@@ -157,6 +181,6 @@ export const loginService = async (data: {
       role: user.role,
     },
     accessToken,
-    refreshToken
+    refreshToken,
   };
 };

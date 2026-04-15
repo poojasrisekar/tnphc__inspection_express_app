@@ -1,0 +1,47 @@
+-- CreateTable
+CREATE TABLE "LandSiteInspection" (
+    "id" TEXT NOT NULL,
+    "projectId" TEXT NOT NULL,
+    "isEncroachment" "YesNo" NOT NULL,
+    "encroachmentPercent" DOUBLE PRECISION,
+    "encroachmentType" TEXT,
+    "isCourtCase" "YesNo" NOT NULL,
+    "caseDetails" TEXT,
+    "hasStructure" "YesNo" NOT NULL,
+    "structureDetails" TEXT,
+    "isLowLying" "YesNo" NOT NULL,
+    "waterDepth" DOUBLE PRECISION,
+    "waterDurationDays" INTEGER,
+    "treesCount" INTEGER,
+    "treesPhoto" TEXT,
+    "hasPowerLines" "YesNo" NOT NULL,
+    "powerLineDetails" TEXT,
+    "isNearMonument" "YesNo" NOT NULL,
+    "monumentName" TEXT,
+    "monumentDistance" DOUBLE PRECISION,
+    "isNearSea" "YesNo" NOT NULL,
+    "seaDistance" DOUBLE PRECISION,
+    "isNearForest" "YesNo" NOT NULL,
+    "forestName" TEXT,
+    "forestDistance" DOUBLE PRECISION,
+    "isNearWaterBody" BOOLEAN,
+    "waterBodyName" TEXT,
+    "waterBodyDistance" DOUBLE PRECISION,
+    "isNearBurial" "YesNo" NOT NULL,
+    "burialName" TEXT,
+    "burialDistance" DOUBLE PRECISION,
+    "roadType" TEXT,
+    "roadWidth" DOUBLE PRECISION,
+    "nearestService" TEXT,
+    "serviceDistance" DOUBLE PRECISION,
+    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" TIMESTAMP(3) NOT NULL,
+    "created_by" VARCHAR(255),
+    "updated_by" VARCHAR(255),
+    "is_active" BOOLEAN NOT NULL DEFAULT true,
+
+    CONSTRAINT "LandSiteInspection_pkey" PRIMARY KEY ("id")
+);
+
+-- AddForeignKey
+ALTER TABLE "LandSiteInspection" ADD CONSTRAINT "LandSiteInspection_projectId_fkey" FOREIGN KEY ("projectId") REFERENCES "project"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

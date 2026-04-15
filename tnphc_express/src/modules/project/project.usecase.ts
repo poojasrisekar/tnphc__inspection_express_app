@@ -3,7 +3,8 @@ import {
   getAllProjectsService,
   getProjectByIdService,
   updateProjectService,
-  deleteProjectService
+  deleteProjectService,
+  getProjectDashboardService
 } from "./project.service";
 
 export const createProjectUsecase = async (data: any) => {
@@ -14,15 +15,27 @@ export const getAllProjectsUsecase = async ({
   pageNumber,
   pageSize,
   search,
+  status,
+  districtId,
+  departmentId,
+  specialUnitId
 }: {
   pageNumber?: string;
   pageSize?: string;
   search?: string;
+  status?: string;
+  districtId?: string;
+  departmentId?: string;
+  specialUnitId?: string;
 }) => {
   return getAllProjectsService({
     pageNumber,
     pageSize,
     search,
+    status,
+    districtId,
+    departmentId,
+    specialUnitId
   });
 };
 
@@ -40,4 +53,8 @@ export const updateProjectUsecase = async (id: string, data: any) => {
 
 export const deleteProjectUsecase = async (id: string) => {
   return await deleteProjectService(id);
+};
+
+export const getProjectDashboardUsecase = async () => {
+  return getProjectDashboardService();
 };

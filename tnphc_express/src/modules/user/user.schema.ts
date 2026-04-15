@@ -35,5 +35,5 @@ export const updateParamsSchema = joi.object({
 
 export const loginUserSchema = joi.object({
     userName: joi.string().required(),
-    password: joi.string().min(6).required(),
+    password: joi.string().required(),
 });
