@@ -71,6 +71,73 @@ model specialUnits {
   @@map("special_units")
 }
 
+model LandSiteInspection {
+  id        String @id @default(uuid())
+  projectId String
+
+  // 🔹 Encroachment
+  isEncroachment        YesNo
+  encroachmentPercent   Float?
+  encroachmentType      String?
+  isCourtCase           YesNo
+  caseDetails           String?
+
+  // 🔹 Existing Structure
+  hasStructure          YesNo
+  structureDetails      String?
+
+  // 🔹 Drainage
+  isLowLying            YesNo
+  waterDepth            Float?
+  waterDurationDays     Int?
+
+  // 🔹 Trees
+  treesCount            Int?
+  treesPhoto            Json?
+
+  // 🔹 Power Lines
+  hasPowerLines         YesNo
+  powerLineDetails      String?
+
+  // 🔹 Restricted Zones
+  isNearMonument        YesNo
+  monumentName          String?
+  monumentDistance      Float?
+
+  isNearSea             YesNo
+  seaDistance           Float?
+
+  isNearForest          YesNo
+  forestName            String?
+  forestDistance        Float?
+
+  isNearWaterBody       Boolean?
+  waterBodyName         String?
+  waterBodyDistance     Float?
+
+  // 🔹 Burial Ground
+  isNearBurial          YesNo
+  burialName            String?
+  burialDistance        Float?
+
+  // 🔹 Roads
+  roadType              String?
+  roadWidth             Float?
+
+  // 🔹 Essential Services
+  nearestService        String?
+  serviceDistance       Float?
+
+  // 🔹 Common
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+  createdById String?  @map("created_by") @db.VarChar(255)
+  updatedById String?  @map("updated_by") @db.VarChar(255)
+  isActive    Boolean  @default(true) @map("is_active")
+
+  project project @relation(fields: [projectId], references: [id])
+}
+
 model project {
   id   String @id @default(uuid()) @db.VarChar(36)
   code Int    @default(autoincrement()) @map("code")
@@ -80,28 +147,58 @@ model project {
   district   District @relation(fields: [districtId], references: [id])
 
   // Either Department OR Special Unit
-  department    DepartmentEnum? // ENUM
+  department    department? @relation(fields: [departmentId], references: [id])
+  departmentId  String? // FK
   specialUnitId String? // FK
 
   specialUnit specialUnits? @relation(fields: [specialUnitId], references: [id])
 
   // Common
-  officers     OfficersEnum
+  officer     officer? @relation(fields: [officerId], references: [id])
+  officerId    String? // FK
   locationName String
   projectName  String
 
 
-  stageId String?
-  stage   stage? @relation(fields: [stageId], references: [id])
+  stages stage[]
+
   status status @default(AssignedProjects)  // ✅ default here
+
+
 
   createdAt   DateTime @default(now()) @map("created_at")
   updatedAt   DateTime @updatedAt @map("updated_at")
   createdById String?  @map("created_by") @db.VarChar(255)
   updatedById String?  @map("updated_by") @db.VarChar(255)
   isActive    Boolean  @default(true) @map("is_active")
+
+  landSiteInspection LandSiteInspection[]
 }
 
+model officer{
+  id   String @id @default(uuid()) @db.VarChar(36)
+  code Int    @default(autoincrement()) @map("code")
+  name String @map("name") @db.VarChar(255)
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+  createdById String?  @map("created_by") @db.VarChar(255)
+  updatedById String?  @map("updated_by") @db.VarChar(255)
+  isActive    Boolean  @default(true) @map("is_active")
+  projects project[]
+}
+
+
+model department {
+  id   String @id @default(uuid()) @db.VarChar(36)
+  code Int    @default(autoincrement()) @map("code")
+  name String @map("name") @db.VarChar(255)
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+  createdById String?  @map("created_by") @db.VarChar(255)
+  updatedById String?  @map("updated_by") @db.VarChar(255)
+  isActive    Boolean  @default(true) @map("is_active")
+  projects project[]
+}
 
 model AuditLog {
   id   String @id @default(uuid()) @db.VarChar(36)
@@ -131,7 +228,6 @@ model AuditLog {
 }
 
 
-
 model stage {
     id   String @id @default(uuid()) @db.VarChar(36)
     code Int    @default(autoincrement()) @map("code")
@@ -145,18 +241,61 @@ model stage {
 
 }
 
-enum DepartmentEnum {
-  POLICE
-  PRISON
-  FRS
+model material {
+  id          String   @id @default(uuid()) @db.VarChar(36)
+  code        Int      @unique @default(autoincrement())
+  name        String   @map("material_name") @db.VarChar(255)
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+  createdById String?  @map("created_by")
+  updatedById String?  @map("updated_by")
+  isActive    Boolean  @default(true) @map("is_active")
+
+  brands      brand[]
+
+  @@index([code])
 }
 
-enum OfficersEnum {
-  LEVEL1
-  LEVEL2
-  LEVEL3
+model brand {
+  id          String   @id @default(uuid()) @db.VarChar(36)
+  code        Int      @unique @default(autoincrement())
+  name        String   @map("brand_name") @db.VarChar(255)
+
+  materialId  String
+  material    material @relation(fields: [materialId], references: [id])
+
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+  createdById String?  @map("created_by")
+  updatedById String?  @map("updated_by")
+  isActive    Boolean  @default(true) @map("is_active")
+
+  grades      grade[]
+  masters     Master[]
+
+  @@index([code])
+  @@index([materialId])
+
 }
 
+model grade {
+  id          String   @id @default(uuid()) @db.VarChar(36)
+  code        Int      @default(autoincrement())
+  name        String   @map("grade_name") @db.VarChar(255)
+
+  brandId     String
+  brand       brand @relation(fields: [brandId], references: [id])
+
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+  createdById String?  @map("created_by")
+  updatedById String?  @map("updated_by")
+  isActive    Boolean  @default(true) @map("is_active")
+  masters     Master[]
+
+  @@index([code])
+  @@index([brandId])
+}
 
 enum status {
   TotalProjects
@@ -171,3 +310,25 @@ enum YesNo {
 }
 
 
+
+model Master {
+  id            String   @id @default(uuid()) @db.VarChar(36)
+  code          Int      @unique @default(autoincrement())
+
+  brandId       String
+  gradeId       String
+
+  materialName  String   @map("material_name") @db.VarChar(255)
+
+  brand         brand    @relation(fields: [brandId], references: [id])
+  grade         grade    @relation(fields: [gradeId], references: [id])
+
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+  createdById   String?  @map("created_by")
+  updatedById   String?  @map("updated_by")
+  isActive      Boolean  @default(true) @map("is_active")
+
+  @@index([brandId])
+  @@index([gradeId])
+}

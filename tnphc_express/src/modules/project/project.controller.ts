@@ -4,8 +4,11 @@ import {
   getAllProjectsUsecase,
   getProjectByIdUsecase,
   updateProjectUsecase,
-  deleteProjectUsecase
+  deleteProjectUsecase,
+  getProjectDashboardUsecase
 } from "./project.usecase";
+
+type StatusType = string | undefined;
 
 export const createProjectController = async (req: Request, res: Response) => {
   try {
@@ -23,14 +26,27 @@ export const createProjectController = async (req: Request, res: Response) => {
 
 export const getAllProjectsController = async (req: Request, res: Response) => {
   try {
+    const getSingleValue = (val: any) =>
+      Array.isArray(val) ? val[0] : val;
+
     const pageNumber = req.query.pageNumber as string | undefined;
     const pageSize = req.query.pageSize as string | undefined;
     const search = req.query.search as string | undefined;
+    const status = req.query.status as StatusType;
+
+    // ✅ ADD THESE (THIS IS THE FIX)
+    const districtId = getSingleValue(req.query.districtId);
+    const departmentId = getSingleValue(req.query.departmentId);
+    const specialUnitId = getSingleValue(req.query.specialUnitId);
 
     const result = await getAllProjectsUsecase({
       pageNumber,
       pageSize,
       search,
+      status,
+      districtId,
+      departmentId,
+      specialUnitId
     });
 
     res.status(200).json({
@@ -88,5 +104,25 @@ export const deleteProjectController = async (req: Request, res: Response) => {
     });
   } catch (error: any) {
     res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+export const getProjectDashboardController = async (
+  req: Request,
+  res: Response
+) => {
+  try {
+    const data = await getProjectDashboardUsecase();
+
+    res.status(200).json({
+      success: true,
+      message: "Dashboard data fetched successfully",
+      data,
+    });
+  } catch (error: any) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
   }
 };

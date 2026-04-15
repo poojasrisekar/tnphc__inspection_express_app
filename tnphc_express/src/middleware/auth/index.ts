@@ -1,1 +1,1 @@
-export { default as baseAuth } from "./baseAuth";
+export { baseAuth } from "./baseAuth";

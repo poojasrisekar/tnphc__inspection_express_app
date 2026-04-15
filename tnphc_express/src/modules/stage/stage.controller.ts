@@ -14,7 +14,7 @@ export const createStageController = async (req: any, res: Response) => {
 
     res.json({
       success: true,
-      message: "Stage created successfully",
+      message: "Stage Created Successfully",
       data: result
     });
   } catch (error: any) {
@@ -28,7 +28,7 @@ export const getAllStagesController = async (req: Request, res: Response) => {
 
   res.json({
     success: true,
-    total: result.length,
+    totalRecords: result.length,
     data: result
   });
 };
@@ -56,7 +56,7 @@ export const updateStageController = async (req: any, res: Response) => {
 
     res.json({
       success: true,
-      message: "Stage updated",
+      message: "Stage Updated Successfully",
       data: result
     });
   } catch (error: any) {
@@ -71,7 +71,7 @@ export const deleteStageController = async (req: any, res: Response) => {
 
     res.json({
       success: true,
-      message: "Stage deleted"
+      message: "Stage Deleted Successfully"
     });
   } catch (error: any) {
     res.status(400).json({ success: false, message: error.message });
