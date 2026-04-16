@@ -1,13 +1,27 @@
 {
   "compilerOptions": {
-    "ignoreDeprecations": "6.0",
     "target": "ES2020",
-    "module": "CommonJS",        // ✅ important
-    "moduleResolution": "Node",  // ✅ important
-
-    "esModuleInterop": true,     // ✅ allows import express
+    "module": "CommonJS",
+    "rootDir": "src",
+    "outDir": "dist",
+    "esModuleInterop": true,
     "strict": true,
-    "skipLibCheck": true
+    "skipLibCheck": true,
+
+    "forceConsistentCasingInFileNames": true,
+
+    "typeRoots": [
+      "./src/types",
+      "./node_modules/@types"
+    ],
+
+    "types": [
+      "node",
+      "multer"
+    ]
   },
-  "include": ["src"]
+
+  "include": [
+    "src/**/*"
+  ]
 }
