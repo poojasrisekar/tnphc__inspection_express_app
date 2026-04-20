@@ -162,7 +162,7 @@ model project {
 
   stages stage[]
 
-  status status @default(AssignedProjects)  // ✅ default here
+  status status @default(AssignedProjects)  //  default here
 
 
 
@@ -173,6 +173,12 @@ model project {
   isActive    Boolean  @default(true) @map("is_active")
 
   landSiteInspection LandSiteInspection[]
+  preConstructionInspections PreConstructionInspection[]
+  foundationProgresses FoundationProgress[]
+  foundationQualityChecks FoundationQualityCheck[]
+  plinthStages PlinthStage[]
+  interiorsStages InteriorsStage[]
+  exteriorsStages ExteriorsStage[]
 }
 
 model officer{
@@ -331,4 +337,488 @@ model Master {
 
   @@index([brandId])
   @@index([gradeId])
+}
+
+
+model PreConstructionInspection {
+  id        String @id @default(uuid())
+  projectId String
+
+  //  Permissions
+  isPermissionObtained YesNo
+  permissionDate       DateTime?
+
+  //  Site Clearance
+  isSiteCleared YesNo
+  siteDetails   String?
+
+  //  Labour Shed
+  hasLabourShed  YesNo
+  labourShedType String?
+  labourShedArea Float?
+
+  hasWaterSupply    YesNo
+  waterSupplyPhotos Json?
+
+  hasToiletFacility YesNo
+  toiletPhotos      Json?
+
+  hasElectricity    YesNo
+  electricityPhotos Json?
+
+  //  Labour Registration
+  labourCount  Int?
+  labourPhotos Json?
+
+  //  Material Storage
+  hasMaterialStorage YesNo
+  materialType       String?
+  materialPhotos     Json?
+
+  //  Electricity & Water
+  hasTempElectricity YesNo
+  waterType          String?
+
+  // Access Road
+  isAccessRoadGood YesNo
+  accessRoadPhotos Json?
+
+  //  Remarks
+  remarks String?
+
+  //  Common
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  createdById String?
+  isActive    Boolean  @default(true)
+
+  project project @relation(fields: [projectId], references: [id])
+}
+
+
+model FoundationProgress {
+  id        String @id @default(uuid())
+  projectId String
+
+  type FoundationType   // Footing | Pile | Raft
+
+  // COMMON
+  total     Int?
+  completed Int?
+  photos    Json?
+
+  workStartedDate DateTime?
+
+  isDelay   Boolean @default(false)
+  delayDays Int?
+  delayPhotos Json?
+
+  delayReason      String?
+  delayOtherReason String?
+
+  generalRemarks String?
+
+  // ONLY FOR RAFT
+  raftType String?
+
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+  createdById String?  @map("created_by")
+  updatedById String?  @map("updated_by")
+  isActive    Boolean  @default(true) @map("is_active")
+
+  project project @relation(fields: [projectId], references: [id])
+}
+
+enum FoundationType {
+  Footing
+  Pile
+  Raft
+}
+
+
+model FoundationQualityCheck {
+  id        String @id @default(uuid())
+  projectId String
+
+  
+  cementGradeId   String?
+  cementBrandId   String?
+  cementRemarks   String?
+
+  cementLabTest   String?   // dropdown value
+  cementPhoto     Json?
+
+  
+  sandType String?   // "RIVER" | "M_SAND" (from UI)
+
+  sandLabTest   String?
+  sandPhoto     Json?
+
+  sandSieveTestDone Boolean?
+
+  sandSieveLabTest  String?
+  sandSievePhoto    Json?
+
+  
+  steelGradeId   String?
+  steelBrandId   String?
+
+  steelLabTest   String?
+  steelPhoto     Json?
+
+  
+  aggregateSize Float?
+
+  aggregateLabTest String?
+  aggregatePhoto   Json?
+
+  
+  waterLabTest String?
+  waterPhoto   Json?
+
+  
+  concreteLabTest String?
+  concretePhoto   Json?
+
+  concreteQualityTestDone Boolean?
+
+  concreteQualityLabTest String?
+  concreteQualityPhoto   Json?
+
+  
+  bricksLabTest String?
+  bricksPhoto   Json?
+
+  bricksQualityTestDone Boolean?
+
+  bricksQualityLabTest String?
+  bricksQualityPhoto   Json?
+
+  
+  remarks String?
+
+  
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+  createdById String?  @map("created_by")
+  updatedById String?  @map("updated_by")
+  isActive    Boolean  @default(true) @map("is_active")
+
+  project project @relation(fields: [projectId], references: [id])
+}
+
+
+
+model PlinthStage {
+  id        String @id @default(uuid())
+  projectId String
+
+  
+
+  stageOfWork String?   // Plinth Beam / Brick Work / Earth Filling / Floor Concreting
+
+  isCompleted Boolean?  // YES = true / NO = false
+  progressRemarks String?
+  progressPhoto Json?
+
+  workStartedDate DateTime?
+
+  isDelay Boolean?
+  delayDays Int?
+
+  delayReason      String?
+  delayOtherReason String?
+
+  // CEMENT
+  cementGradeId   String?
+  cementBrandId   String?
+  cementRemarks   String?
+
+  cementLabTest   String?
+  cementPhoto     Json?
+
+  // SAND
+  sandType String?
+
+  sandLabTest   String?
+  sandPhoto     Json?
+
+  sandSieveTestDone Boolean?
+
+  sandSieveLabTest  String?
+  sandSievePhoto    Json?
+
+  // STEEL
+  steelGradeId   String?
+  steelBrandId   String?
+
+  steelLabTest   String?
+  steelPhoto     Json?
+
+  // AGGREGATES
+  aggregateSize Float?
+
+  aggregateLabTest String?
+  aggregatePhoto   Json?
+
+  // WATER
+  waterLabTest String?
+  waterPhoto   Json?
+
+  // CONCRETE
+  concreteLabTest String?
+  concretePhoto   Json?
+
+  concreteQualityTestDone Boolean?
+
+  concreteQualityLabTest String?
+  concreteQualityPhoto   Json?
+
+  // BRICKS
+  bricksLabTest String?
+  bricksPhoto   Json?
+
+  bricksQualityTestDone Boolean?
+
+  bricksQualityLabTest String?
+  bricksQualityPhoto   Json?
+
+  
+  qualityRemarks String?
+
+  
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+  createdById String?  @map("created_by")
+  updatedById String?  @map("updated_by")
+  isActive    Boolean  @default(true) @map("is_active")
+
+  project project @relation(fields: [projectId], references: [id])
+}
+
+
+
+model InteriorsStage {
+  id        String @id @default(uuid())
+  projectId String
+
+  
+
+  block   String?   // Block A / B / etc.
+  floor   String?   // Ground / First / Terrace
+  stageOfWork String?   // Plumbing / Electrical / etc.
+
+  progressPhoto Json?
+
+  progressRemarks String?
+
+  
+
+  // CEMENT
+  cementGradeId   String?
+  cementBrandId   String?
+  cementRemarks   String?
+
+  cementLabTest   String?
+  cementPhoto     Json?
+
+  // SAND
+  sandType String?
+
+  sandLabTest   String?
+  sandPhoto     Json?
+
+  sandSieveTestDone Boolean?
+
+  sandSieveLabTest  String?
+  sandSievePhoto    Json?
+
+  
+
+  // AGGREGATE
+  aggregateSize Float?
+
+  aggregateLabTest String?
+  aggregatePhoto   Json?
+
+  // WATER
+  waterLabTest String?
+  waterPhoto   Json?
+
+  // CONCRETE
+  concreteLabTest String?
+  concretePhoto   Json?
+
+  concreteQualityTestDone Boolean?
+
+  concreteQualityLabTest String?
+  concreteQualityPhoto   Json?
+
+  // BRICKS
+  bricksLabTest String?
+  bricksPhoto   Json?
+
+  bricksQualityTestDone Boolean?
+
+  bricksQualityLabTest String?
+  bricksQualityPhoto   Json?
+
+ 
+
+  //  PLASTERING
+  plasteringTestDone Boolean?
+
+  plasteringLabTest String?
+  plasteringPhoto   Json?
+
+  //  DOORS & WINDOWS
+  doorWoodType String?
+  upvcBrand    String?
+  glassBrand   String?
+  glassThickness String?
+
+  //  TILES
+  floorType String?
+  tileBrand String?
+  tileRemarks String?
+
+  //  PAINTING
+  paintBrand String?
+  paintingQuality String?
+
+  
+  qualityRemarks String?
+
+  
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+  createdById String?  @map("created_by")
+  updatedById String?  @map("updated_by")
+  isActive    Boolean  @default(true) @map("is_active")
+
+  project project @relation(fields: [projectId], references: [id])
+}
+
+model ExteriorsStage {
+  id        String @id @default(uuid())
+  projectId String
+
+  
+
+  block        String?
+  floor        String?
+  stageOfWork  String?
+
+  progressPhoto Json?
+
+  
+
+  workStartedDate DateTime?
+
+  isDelayed Boolean?
+
+  delayDays Int?
+  delayReason String?
+  delayOther String?
+
+  progressRemarks String?
+
+ 
+
+  // CEMENT
+  cementGradeId   String?
+  cementBrandId   String?
+  cementRemarks   String?
+
+  cementLabTest   String?
+  cementPhoto     Json?
+
+  // SAND
+  sandType String?
+
+  sandLabTest   String?
+  sandPhoto     Json?
+
+  sandSieveTestDone Boolean?
+
+  sandSieveLabTest  String?
+  sandSievePhoto    Json?
+
+  
+
+  // AGGREGATE
+  aggregateSize Float?
+
+  aggregateLabTest String?
+  aggregatePhoto   Json?
+
+  // WATER
+  waterLabTest String?
+  waterPhoto   Json?
+
+  // CONCRETE
+  concreteLabTest String?
+  concretePhoto   Json?
+
+  concreteQualityTestDone Boolean?
+
+  concreteQualityLabTest String?
+  concreteQualityPhoto   Json?
+
+  // BRICKS
+  bricksLabTest String?
+  bricksPhoto   Json?
+
+  bricksQualityTestDone Boolean?
+
+  bricksQualityLabTest String?
+  bricksQualityPhoto   Json?
+
+
+
+  //  PLASTERING
+  plasteringTestDone Boolean?
+  plasteringLabTest  String?
+  plasteringPhoto    Json?
+  plasteringRemarks  String?
+
+  //  DOORS & WINDOWS
+  doorWindowType     String?
+  upvcBrand          String?
+  glassBrand         String?
+  glassThickness     String?
+  doorWindowRemarks  String?
+
+  //  INTERIOR TILES
+  interiorFloorType String?
+  interiorTileBrand String?
+  interiorTileRemarks String?
+
+  //  EXTERIOR ROOF TILES
+  roofFloorType String?
+  roofTileBrand String?
+  roofTileRemarks String?
+
+  //  INTERIOR PAINTING
+  interiorPaintBrand String?
+  interiorPaintingQuality String?
+
+  //  EXTERIOR PAINTING
+  exteriorPaintBrand String?
+  exteriorPaintingQuality String?
+
+  
+
+  qualityRemarks String?
+
+  
+
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+  createdById String?  @map("created_by")
+  updatedById String?  @map("updated_by")
+  isActive    Boolean  @default(true) @map("is_active")
+
+  project project @relation(fields: [projectId], references: [id])
 }
