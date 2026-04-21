@@ -179,6 +179,7 @@ model project {
   plinthStages PlinthStage[]
   interiorsStages InteriorsStage[]
   exteriorsStages ExteriorsStage[]
+  BuildingInspection BuildingInspection[]
 }
 
 model officer{
@@ -191,6 +192,7 @@ model officer{
   updatedById String?  @map("updated_by") @db.VarChar(255)
   isActive    Boolean  @default(true) @map("is_active")
   projects project[]
+  
 }
 
 
@@ -814,6 +816,33 @@ model ExteriorsStage {
 
   
 
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+  createdById String?  @map("created_by")
+  updatedById String?  @map("updated_by")
+  isActive    Boolean  @default(true) @map("is_active")
+
+  project project @relation(fields: [projectId], references: [id])
+}
+
+
+
+model BuildingInspection {
+
+  id        String @id @default(uuid())
+  projectId String
+  structure Json?
+  painting Json?
+  tilingFlooring Json?
+  falseCeiling Json?
+  plumbingSystem Json?
+  electricalSystem Json?
+  doorsWindows Json?
+   lifts Json?
+  fireFightingSystem Json?
+  terraceInspection Json?
+
+  
   createdAt   DateTime @default(now()) @map("created_at")
   updatedAt   DateTime @updatedAt @map("updated_at")
   createdById String?  @map("created_by")
