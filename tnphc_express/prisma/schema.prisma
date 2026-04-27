@@ -180,6 +180,7 @@ model project {
   interiorsStages InteriorsStage[]
   exteriorsStages ExteriorsStage[]
   BuildingInspection BuildingInspection[]
+  DevelopmentWork  DevelopmentWork[]
 }
 
 model officer{
@@ -850,4 +851,32 @@ model BuildingInspection {
   isActive    Boolean  @default(true) @map("is_active")
 
   project project @relation(fields: [projectId], references: [id])
+}
+
+
+model DevelopmentWork{
+
+  id  String @id @default(uuid())
+  projectId String
+  sumpPump Json?
+  borewell Json?
+  inspectionChamber Json?
+  stormWaterDrains Json?
+  sullageDrain Json?
+  road Json?
+  paverBlock Json?
+  compoundWall Json?
+  rainWaterHarvesting Json?
+  landScaping Json?
+  otherDefects Json?
+  generalRemarks Json?
+
+
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+  createdById String?  @map("created_by")
+  updatedById String?  @map("updated_by")
+  isActive    Boolean  @default(true) @map("is_active")
+
+project project @relation(fields: [projectId], references: [id])
 }
