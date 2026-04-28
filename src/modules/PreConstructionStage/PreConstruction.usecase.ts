@@ -21,7 +21,9 @@ export const createPreConstructionUsecase = async (
       url: `${baseUrl}/uploads/${file.filename}`
     }));
   };
-
+  if(body.projectId === undefined){
+    throw Error("Project Id Not Found");
+  }
   const data = {
     projectId: body.projectId,
 

@@ -179,7 +179,7 @@ model project {
   plinthStages PlinthStage[]
   interiorsStages InteriorsStage[]
   exteriorsStages ExteriorsStage[]
-  BuildingInspection BuildingInspection[]
+  DevelopmentBuildingInspection DevelopmentBuildingInspection[]
   DevelopmentWork  DevelopmentWork[]
 }
 
@@ -828,7 +828,7 @@ model ExteriorsStage {
 
 
 
-model BuildingInspection {
+model DevelopmentBuildingInspection {
 
   id        String @id @default(uuid())
   projectId String

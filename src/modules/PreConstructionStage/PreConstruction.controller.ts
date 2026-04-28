@@ -13,7 +13,7 @@ const getFiles = (files: any, field: string, baseUrl: string) => {
 export const createPreConstruction = async (req: Request, res: Response) => {
   try {
     const userId = (req as any).user?.id;
-
+    console.log('--------------------->>> REQ',req.body)
     const result = await createPreConstructionUsecase(
       req.body,
       req.files,

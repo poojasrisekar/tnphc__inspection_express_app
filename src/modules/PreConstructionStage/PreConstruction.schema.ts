@@ -1,7 +1,7 @@
 import Joi from "joi";
 
 export const createPreConstructionSchema = Joi.object({
-  id:Joi.string().required(),
+  
   projectId: Joi.string().required(),
 
   isPermissionObtained: Joi.string().valid("Yes", "No").required(),

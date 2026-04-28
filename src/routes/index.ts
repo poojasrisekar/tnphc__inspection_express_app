@@ -22,9 +22,7 @@ import exteriorsStageRoutes from "../modules/ExteriorsStage/Exteriorsstage.route
 import developmentWorkRoutes from "../modules/DevelopmentWork/DevelopmentWork.route";
 import  buildingInspectionRoutes  from "../modules/BuildingInspection/BuildingInspection.routers";
 
-import { validateRequest } from "../middleware/validateRequest";
-import { createPreConstruction } from "../modules/PreConstructionStage/PreConstruction.controller";
-import { createPreConstructionSchema } from "../modules/PreConstructionStage/PreConstruction.schema";
+
 
 const router = Router();
 
