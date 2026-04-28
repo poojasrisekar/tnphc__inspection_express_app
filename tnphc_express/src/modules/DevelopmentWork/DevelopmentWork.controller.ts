@@ -1,0 +1,59 @@
+import { Request, Response } from "express";
+import {
+  createDevelopmentWorkUsecase,
+  getAllDevelopmentWorkUsecase,
+  getDevelopmentWorkByIdUsecase,
+  updateDevelopmentWorkUsecase,
+  deleteDevelopmentWorkUsecase
+} from "./DevelopmentWork.usecase";
+
+export const createDevelopmentWork = async (req: Request, res: Response) => {
+  try {
+    const userId = (req as any).user?.id;
+    const result = await createDevelopmentWorkUsecase(req.body, req.files, req, userId);
+    res.status(201).json({ success: true, message: "Created", data: result });
+  } catch (err: any) {
+    res.status(400).json({ success: false, message: err.message });
+  }
+};
+
+export const getAllDevelopmentWork = async (req: Request, res: Response) => {
+  try {
+    const projectId = req.params.projectId as string;
+    const result = await getAllDevelopmentWorkUsecase(projectId);
+    res.status(200).json({ success: true, data: result });
+  } catch (err: any) {
+    res.status(400).json({ success: false, message: err.message });
+  }
+};
+
+export const getDevelopmentWorkById = async (req: Request, res: Response) => {
+  try {
+    const id = req.params.id as string;
+    const result = await getDevelopmentWorkByIdUsecase(id);
+    res.status(200).json({ success: true, data: result });
+  } catch (err: any) {
+    res.status(404).json({ success: false, message: err.message });
+  }
+};
+
+export const updateDevelopmentWork = async (req: Request, res: Response) => {
+  try {
+    const id = req.params.id as string;
+    const userId = (req as any).user?.id;
+    const result = await updateDevelopmentWorkUsecase(id, req.body, req.files, req, userId);
+    res.status(200).json({ success: true, message: "Updated", data: result });
+  } catch (err: any) {
+    res.status(400).json({ success: false, message: err.message });
+  }
+};
+
+export const deleteDevelopmentWork = async (req: Request, res: Response) => {
+  try {
+    const id = req.params.id as string;
+    await deleteDevelopmentWorkUsecase(id);
+    res.status(200).json({ success: true, message: "Deleted" });
+  } catch (err: any) {
+    res.status(400).json({ success: false, message: err.message });
+  }
+};

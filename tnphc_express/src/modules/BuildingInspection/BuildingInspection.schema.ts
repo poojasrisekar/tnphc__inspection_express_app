@@ -1,0 +1,187 @@
+import Joi from "joi";
+
+export const createBuildingInspectionSchema = Joi.object({
+  projectId: Joi.string().required(),
+
+  // STRUCTURE
+  structureAlignment: Joi.boolean().truthy("true").falsy("false").optional(),
+  structureLocation: Joi.string().optional().allow(null, ""),
+  structureDefectReport: Joi.string().optional().allow(null, ""),
+
+  // PAINTING
+  paintingIsQualityOk: Joi.boolean().truthy("true").falsy("false").optional(),
+  paintingLocation: Joi.string().optional().allow(null, ""),
+  paintingDefectReport: Joi.string().optional().allow(null, ""),
+
+  // TILING & FLOORING
+  tilingIsQualityOk: Joi.boolean().truthy("true").falsy("false").optional(),
+  tilingLocation: Joi.string().optional().allow(null, ""),
+  tilingDefectReport: Joi.string().optional().allow(null, ""),
+
+  // FALSE CEILING
+  falseCeilingIsQualityOk: Joi.boolean().truthy("true").falsy("false").optional(),
+  falseCeilingLocation: Joi.string().optional().allow(null, ""),
+  falseCeilingDefectReport: Joi.string().optional().allow(null, ""),
+
+  // PLUMBING SYSTEM
+  plumbingWaterSupply: Joi.boolean().truthy("true").falsy("false").optional(),
+  plumbingWaterSupplyLocation: Joi.string().optional().allow(null, ""),
+  plumbingWaterSupplyDefect: Joi.string().optional().allow(null, ""),
+
+  plumbingLeakage: Joi.boolean().truthy("true").falsy("false").optional(),
+  plumbingLeakageLocation: Joi.string().optional().allow(null, ""),
+  plumbingLeakageDefect: Joi.string().optional().allow(null, ""),
+
+  // ELECTRICAL SYSTEM
+  electricalSwitchQuality: Joi.boolean().truthy("true").falsy("false").optional(),
+  electricalSwitchRemarks: Joi.string().optional().allow(null, ""),
+
+  electricalPowerSupply: Joi.boolean().truthy("true").falsy("false").optional(),
+  electricalPowerRemarks: Joi.string().optional().allow(null, ""),
+
+  electricalVoltage: Joi.boolean().truthy("true").falsy("false").optional(),
+  electricalVoltageRemarks: Joi.string().optional().allow(null, ""),
+
+  electricalEarthingTest: Joi.boolean().truthy("true").falsy("false").optional(),
+  electricalEarthingProper: Joi.string().optional().allow(null, ""),
+
+  electricalELCB: Joi.string().optional().allow(null, ""),
+
+  // DOORS & WINDOWS
+  dwQuality: Joi.boolean().truthy("true").falsy("false").optional(),
+  dwQualityRemarks: Joi.string().optional().allow(null, ""),
+
+  dwOperation: Joi.boolean().truthy("true").falsy("false").optional(),
+  dwOperationRemarks: Joi.string().optional().allow(null, ""),
+
+  // LIFTS
+  liftWorking: Joi.boolean().truthy("true").falsy("false").optional(),
+  liftWorkingRemarks: Joi.string().optional().allow(null, ""),
+
+  liftSafety: Joi.boolean().truthy("true").falsy("false").optional(),
+  liftSafetyRemarks: Joi.string().optional().allow(null, ""),
+
+  // FIRE FIGHTING SYSTEM
+  fireSystems: Joi.alternatives()
+    .try(
+      Joi.array().items(
+        Joi.string().valid(
+          "Extinguishers",
+          "Hydrants",
+          "Sprinklers",
+          "Fire Alarm System"
+        )
+      ),
+      Joi.string().valid(
+        "Extinguishers",
+        "Hydrants",
+        "Sprinklers",
+        "Fire Alarm System"
+      )
+    )
+    .optional(),
+
+  // TERRACE INSPECTION
+  terraceRoofTiles: Joi.boolean().truthy("true").falsy("false").optional(),
+  terraceRoofTilesRemarks: Joi.string().optional().allow(null, ""),
+
+  terraceDrainage: Joi.boolean().truthy("true").falsy("false").optional(),
+  terraceDrainageRemarks: Joi.string().optional().allow(null, ""),
+
+  terraceLeakageTest: Joi.boolean().truthy("true").falsy("false").optional(),
+  terraceLeakageRemarks: Joi.string().optional().allow(null, ""),
+  terraceTestDate: Joi.string().isoDate().optional().allow(null, ""),
+  terraceConductedBy: Joi.string().optional().allow(null, "")
+});
+
+export const updateBuildingInspectionSchema = Joi.object({
+  // STRUCTURE
+  structureAlignment: Joi.boolean().truthy("true").falsy("false").optional(),
+  structureLocation: Joi.string().optional().allow(null, ""),
+  structureDefectReport: Joi.string().optional().allow(null, ""),
+
+  // PAINTING
+  paintingIsQualityOk: Joi.boolean().truthy("true").falsy("false").optional(),
+  paintingLocation: Joi.string().optional().allow(null, ""),
+  paintingDefectReport: Joi.string().optional().allow(null, ""),
+
+  // TILING & FLOORING
+  tilingIsQualityOk: Joi.boolean().truthy("true").falsy("false").optional(),
+  tilingLocation: Joi.string().optional().allow(null, ""),
+  tilingDefectReport: Joi.string().optional().allow(null, ""),
+
+  // FALSE CEILING
+  falseCeilingIsQualityOk: Joi.boolean().truthy("true").falsy("false").optional(),
+  falseCeilingLocation: Joi.string().optional().allow(null, ""),
+  falseCeilingDefectReport: Joi.string().optional().allow(null, ""),
+
+  // PLUMBING SYSTEM
+  plumbingWaterSupply: Joi.boolean().truthy("true").falsy("false").optional(),
+  plumbingWaterSupplyLocation: Joi.string().optional().allow(null, ""),
+  plumbingWaterSupplyDefect: Joi.string().optional().allow(null, ""),
+
+  plumbingLeakage: Joi.boolean().truthy("true").falsy("false").optional(),
+  plumbingLeakageLocation: Joi.string().optional().allow(null, ""),
+  plumbingLeakageDefect: Joi.string().optional().allow(null, ""),
+
+  // ELECTRICAL SYSTEM
+  electricalSwitchQuality: Joi.boolean().truthy("true").falsy("false").optional(),
+  electricalSwitchRemarks: Joi.string().optional().allow(null, ""),
+
+  electricalPowerSupply: Joi.boolean().truthy("true").falsy("false").optional(),
+  electricalPowerRemarks: Joi.string().optional().allow(null, ""),
+
+  electricalVoltage: Joi.boolean().truthy("true").falsy("false").optional(),
+  electricalVoltageRemarks: Joi.string().optional().allow(null, ""),
+
+  electricalEarthingTest: Joi.boolean().truthy("true").falsy("false").optional(),
+  electricalEarthingProper: Joi.string().optional().allow(null, ""),
+
+  electricalELCB: Joi.string().optional().allow(null, ""),
+
+  // DOORS & WINDOWS
+  dwQuality: Joi.boolean().truthy("true").falsy("false").optional(),
+  dwQualityRemarks: Joi.string().optional().allow(null, ""),
+
+  dwOperation: Joi.boolean().truthy("true").falsy("false").optional(),
+  dwOperationRemarks: Joi.string().optional().allow(null, ""),
+
+  // LIFTS
+  liftWorking: Joi.boolean().truthy("true").falsy("false").optional(),
+  liftWorkingRemarks: Joi.string().optional().allow(null, ""),
+
+  liftSafety: Joi.boolean().truthy("true").falsy("false").optional(),
+  liftSafetyRemarks: Joi.string().optional().allow(null, ""),
+
+  // FIRE FIGHTING SYSTEM
+  fireSystems: Joi.alternatives()
+    .try(
+      Joi.array().items(
+        Joi.string().valid(
+          "Extinguishers",
+          "Hydrants",
+          "Sprinklers",
+          "Fire Alarm System"
+        )
+      ),
+      Joi.string().valid(
+        "Extinguishers",
+        "Hydrants",
+        "Sprinklers",
+        "Fire Alarm System"
+      )
+    )
+    .optional(),
+
+  // TERRACE INSPECTION
+  terraceRoofTiles: Joi.boolean().truthy("true").falsy("false").optional(),
+  terraceRoofTilesRemarks: Joi.string().optional().allow(null, ""),
+
+  terraceDrainage: Joi.boolean().truthy("true").falsy("false").optional(),
+  terraceDrainageRemarks: Joi.string().optional().allow(null, ""),
+
+  terraceLeakageTest: Joi.boolean().truthy("true").falsy("false").optional(),
+  terraceLeakageRemarks: Joi.string().optional().allow(null, ""),
+  terraceTestDate: Joi.string().isoDate().optional().allow(null, ""),
+  terraceConductedBy: Joi.string().optional().allow(null, "")
+});

@@ -19,6 +19,10 @@ import foundationQualityCheckRoutes from "../modules/FoundationQualityCheck/Foun
 import plinthStageRoutes from "../modules/PlinthStage/PlinthStage.router";
 import interiorsStageRoutes from "../modules/InteriorsStage/InteriorsStage.routes";
 import exteriorsStageRoutes from "../modules/ExteriorsStage/Exteriorsstage.router";
+import developmentWorkRoutes from "../modules/DevelopmentWork/DevelopmentWork.route";
+import  buildingInspectionRoutes  from "../modules/BuildingInspection/BuildingInspection.routers";
+
+
 
 const router = Router();
 
@@ -41,6 +45,10 @@ router.use("/foundation-quality-check", baseAuth, foundationQualityCheckRoutes);
 router.use("/plinth-stage", baseAuth, plinthStageRoutes);
 router.use("/interiors-stage", baseAuth, interiorsStageRoutes);
 router.use("/exteriors-stage", baseAuth, exteriorsStageRoutes);
+router.use("/building-inspection", baseAuth, buildingInspectionRoutes)
+router.use("/development-work", baseAuth, developmentWorkRoutes);
+
+
 
 
 
