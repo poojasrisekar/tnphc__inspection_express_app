@@ -39,7 +39,7 @@ router.use("/materials",baseAuth,materialRoutes);
 router.use("/grades",baseAuth,gradeRoutes); 
 router.use("/brands",baseAuth,brandRoutes); 
 router.use("/master",baseAuth,masterRoutes);
-router.use("/pre-construction", baseAuth, preConstructionRoutes);  
+router.use("/pre-construction", preConstructionRoutes);  
 router.use("/foundation-progress", baseAuth, foundationProgressRoutes);
 router.use("/foundation-quality-check", baseAuth, foundationQualityCheckRoutes); 
 router.use("/plinth-stage", baseAuth, plinthStageRoutes);
