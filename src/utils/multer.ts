@@ -2,8 +2,9 @@ import multer from "multer";
 import path from "path";
 import fs from "fs";
 
-// ✅ create uploads folder if not exists
-const uploadDir = path.join(process.cwd(), "uploads");
+//  create uploads folder if not exists
+// const uploadDir = path.join(process.cwd(), "uploads");
+const uploadDir = path.join(process.cwd(), process.env.UPLOAD_DIR || "uploads");
 
 if (!fs.existsSync(uploadDir)) {
   fs.mkdirSync(uploadDir, { recursive: true });
