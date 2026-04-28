@@ -22,7 +22,9 @@ import exteriorsStageRoutes from "../modules/ExteriorsStage/Exteriorsstage.route
 import developmentWorkRoutes from "../modules/DevelopmentWork/DevelopmentWork.route";
 import  buildingInspectionRoutes  from "../modules/BuildingInspection/BuildingInspection.routers";
 
-
+import { validateRequest } from "../middleware/validateRequest";
+import { createPreConstruction } from "../modules/PreConstructionStage/PreConstruction.controller";
+import { createPreConstructionSchema } from "../modules/PreConstructionStage/PreConstruction.schema";
 
 const router = Router();
 
@@ -39,7 +41,9 @@ router.use("/materials",baseAuth,materialRoutes);
 router.use("/grades",baseAuth,gradeRoutes); 
 router.use("/brands",baseAuth,brandRoutes); 
 router.use("/master",baseAuth,masterRoutes);
-router.use("/pre-construction", baseAuth, preConstructionRoutes);  
+router.use("", baseAuth, preConstructionRoutes); 
+router.post("/pre-construction/createPreConstruction", baseAuth ,validateRequest(createPreConstructionSchema),
+  createPreConstruction ) 
 router.use("/foundation-progress", baseAuth, foundationProgressRoutes);
 router.use("/foundation-quality-check", baseAuth, foundationQualityCheckRoutes); 
 router.use("/plinth-stage", baseAuth, plinthStageRoutes);
