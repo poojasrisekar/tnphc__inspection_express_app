@@ -20,4 +20,8 @@ router.post(
   createPreConstruction
 );
 
+router.get("/test", (req, res) => {
+  res.send("Server working ✅");
+});
+
 export default router;

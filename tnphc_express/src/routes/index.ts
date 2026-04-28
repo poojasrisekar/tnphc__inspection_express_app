@@ -41,9 +41,7 @@ router.use("/materials",baseAuth,materialRoutes);
 router.use("/grades",baseAuth,gradeRoutes); 
 router.use("/brands",baseAuth,brandRoutes); 
 router.use("/master",baseAuth,masterRoutes);
-router.use("", baseAuth, preConstructionRoutes); 
-router.post("/pre-construction/createPreConstruction", baseAuth ,validateRequest(createPreConstructionSchema),
-  createPreConstruction ) 
+router.use("/pre-construction", baseAuth, preConstructionRoutes);
 router.use("/foundation-progress", baseAuth, foundationProgressRoutes);
 router.use("/foundation-quality-check", baseAuth, foundationQualityCheckRoutes); 
 router.use("/plinth-stage", baseAuth, plinthStageRoutes);
