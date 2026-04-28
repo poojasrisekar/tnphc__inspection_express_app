@@ -13,7 +13,7 @@ app.use(cors());
 app.use(express.json());
 
 // ✅ THEN ROUTES
-app.use("/api/v1", routes);
+app.use("/v1", routes);
 
 app.get("/", (req, res) => {
   res.send("Server working ✅");

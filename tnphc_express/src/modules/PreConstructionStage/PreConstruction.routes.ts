@@ -11,7 +11,7 @@ router.post(
   // upload.fields([
   //   { name: "waterSupplyPhotos", maxCount: 3 },
   //   { name: "toiletPhotos", maxCount: 3 },
-  //   { name: "electricityPhotos", maxCount: 3 },
+  //   { name: "electricityPhotos", maxCount: 3 },x 
   //   { name: "labourPhotos", maxCount: 3 },
   //   { name: "materialPhotos", maxCount: 3 },
   //   { name: "accessRoadPhotos", maxCount: 3 }
@@ -21,7 +21,14 @@ router.post(
 );
 
 router.get("/test", (req, res) => {
-  res.send("Server working ✅");
+  console.log("req.user",req.user)
+  console.log("working")
+  // res.send("Server working ✅");
+   res.status(201).json({
+      success: true,
+      message: "Created",
+      data: "result"
+    });
 });
 
 export default router;
