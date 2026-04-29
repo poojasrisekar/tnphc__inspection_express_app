@@ -2,6 +2,7 @@ import { status } from "@prisma/client";
 import Joi from "joi";
 import { stat } from "node:fs";
 
+
 export const createProjectSchema = Joi.object({
   districtId: Joi.string().required(),
   departmentId: Joi.string().optional(),
@@ -9,10 +10,19 @@ export const createProjectSchema = Joi.object({
   officerId: Joi.string().required(),
   locationName: Joi.string().required(),
   projectName: Joi.string().required(),
-  stageId: Joi.array()
-  .items(Joi.string().required())
-  .min(1)
-  .required()});
+
+  stageId: Joi.array().items(Joi.string().required()).min(1).required(),
+
+  
+  superStructure: Joi.array()
+    .items(
+      Joi.object({
+        blockName: Joi.string().required(),
+        totalFloors: Joi.number().integer().min(1).required()
+      })
+    )
+    .optional()
+});
 
 export const updateProjectSchema = Joi.object({
   districtId: Joi.string().optional(),
@@ -21,31 +31,59 @@ export const updateProjectSchema = Joi.object({
   officerId: Joi.string().optional(),
   locationName: Joi.string().optional(),
   projectName: Joi.string().optional(),
-  stage: Joi.array()
-  .items(Joi.string().required())
-  .min(1)
-  .optional(),
-  status: Joi.string().valid("AssignedProjects", "TotalProjects", "OngoingProjects","CompletedProjects").optional()
+
+  // ❌ stage → FIX
+  stageId: Joi.array().items(Joi.string().required()).optional(),
+
+  status: Joi.string()
+    .valid("AssignedProjects", "TotalProjects", "OngoingProjects", "CompletedProjects")
+    .optional(),
+
+  // 🔥 ADD THIS
+  superStructure: Joi.array()
+    .items(
+      Joi.object({
+        blockName: Joi.string().required(),
+        totalFloors: Joi.number().integer().min(1).required()
+      })
+    )
+    .optional()
 });
 
 export const getProjectByIdSchema = Joi.object({
-  id: Joi.string().required()
+  id: Joi.string().uuid().required()
 });
 
 export const deleteProjectSchema = Joi.object({
-  id: Joi.string().required()
+  id: Joi.string().uuid().required()
+});
+
+
+
+export const updateParamsSchema = Joi.object({
+  id: Joi.string().uuid().required()
 });
 
 export const getAllProjectsSchema = Joi.object({
-  pageNumber: Joi.number().integer(),
-  pageSize: Joi.number().integer(),
-  search: Joi.string().optional(),
-  status: Joi.string().valid("AssignedProjects", "TotalProjects", "OngoingProjects","CompletedProjects").optional(),
-  districtId: Joi.string().optional(),
-  departmentId: Joi.string().optional(),
-  specialUnitId: Joi.string().optional()
-});
+  pageNumber: Joi.number().integer().min(1).default(1),
+  pageSize: Joi.number().integer().min(1).max(100).default(10),
 
-export const updateParamsSchema = Joi.object({
-  id: Joi.string().required()
-});
+  search: Joi.string().trim().optional(),
+
+  status: Joi.string()
+    .valid(
+      "AssignedProjects",
+      "TotalProjects",
+      "OngoingProjects",
+      "CompletedProjects"
+    )
+    .optional(),
+
+  districtId: Joi.string().uuid().optional(),
+  departmentId: Joi.string().uuid().optional(),
+  specialUnitId: Joi.string().uuid().optional(),
+
+})
+//  BEST CHOICE (explained below)
+.nand("departmentId", "specialUnitId")
+.required();

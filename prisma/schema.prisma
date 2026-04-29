@@ -179,8 +179,13 @@ model project {
   plinthStages PlinthStage[]
   interiorsStages InteriorsStage[]
   exteriorsStages ExteriorsStage[]
-  DevelopmentBuildingInspection DevelopmentBuildingInspection[]
+  BuildingInspection BuildingInspection[]
   DevelopmentWork  DevelopmentWork[]
+  TakeoverBuildingInsepction TakeoverBuildingInspection[]
+  TakeoverDevelopmentWork TakeoverDevelopmentWork []
+
+  SuperStructure SuperStructure[]
+  SuperStructureProgress SuperStructureProgress[]
 }
 
 model officer{
@@ -828,7 +833,7 @@ model ExteriorsStage {
 
 
 
-model DevelopmentBuildingInspection {
+model BuildingInspection {
 
   id        String @id @default(uuid())
   projectId String
@@ -879,4 +884,107 @@ model DevelopmentWork{
   isActive    Boolean  @default(true) @map("is_active")
 
 project project @relation(fields: [projectId], references: [id])
+}
+
+
+
+model TakeoverBuildingInspection {
+
+  id        String @id @default(uuid())
+  projectId String
+  structure Json?
+  painting Json?
+  tilingFlooring Json?
+  falseCeiling Json?
+  plumbingSystem Json?
+  electricalSystem Json?
+  doorsWindows Json?
+   lifts Json?
+  fireFightingSystem Json?
+  terraceInspection Json?
+
+  
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+  createdById String?  @map("created_by")
+  updatedById String?  @map("updated_by")
+  isActive    Boolean  @default(true) @map("is_active")
+
+  project project @relation(fields: [projectId], references: [id])
+}
+
+
+model TakeoverDevelopmentWork{
+
+  id  String @id @default(uuid())
+  projectId String
+  sumpPump Json?
+  borewell Json?
+  inspectionChamber Json?
+  stormWaterDrains Json?
+  sullageDrain Json?
+  road Json?
+  paverBlock Json?
+  compoundWall Json?
+  rainWaterHarvesting Json?
+  landScaping Json?
+  otherDefects Json?
+  generalRemarks Json?
+
+
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+  createdById String?  @map("created_by")
+  updatedById String?  @map("updated_by")
+  isActive    Boolean  @default(true) @map("is_active")
+
+project project @relation(fields: [projectId], references: [id])
+}
+
+
+
+model SuperStructure {
+  id            String   @id @default(uuid())
+  projectId     String
+
+  blockName     String   // A, B, C
+  totalFloors   Int      // 5, 4, etc.
+
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+  createdById String?  @map("created_by")
+  updatedById String?  @map("updated_by")
+  isActive    Boolean  @default(true) @map("is_active")
+
+  
+  project       project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@unique([projectId, blockName]) // prevent duplicate blocks
+}
+
+
+
+model SuperStructureProgress {
+  id            String   @id @default(uuid())
+  projectId     String
+
+  blockName     String
+  currentFloor  Int?
+  status        SuperStructureStatus
+
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+  createdById String?  @map("created_by")
+  updatedById String?  @map("updated_by")
+  isActive    Boolean  @default(true) @map("is_active")
+
+  project       project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@unique([projectId, blockName])
+}
+
+enum SuperStructureStatus {
+  NOT_STARTED
+  IN_PROGRESS
+  COMPLETED
 }
