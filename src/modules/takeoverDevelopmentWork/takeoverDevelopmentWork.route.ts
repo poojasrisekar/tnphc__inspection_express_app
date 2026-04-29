@@ -1,0 +1,28 @@
+import express from "express";
+import { upload } from "../../utils/multer";
+import * as ctrl from "./takeoverDevelopmentWork.controller";
+
+const router = express.Router();
+
+const uploadFields = upload.fields([
+  { name: "sumpCapacityPhotos", maxCount: 5 },
+  { name: "sumpQualityPhotos", maxCount: 5 },
+  { name: "pumpsSpecPhotos", maxCount: 5 },
+  { name: "standbyPumpsPhotos", maxCount: 5 },
+  { name: "pumpsWorkingPhotos", maxCount: 5 },
+  { name: "borewellPhotos", maxCount: 5 },
+  { name: "borewellLabReport", maxCount: 5 },
+  { name: "roadPhotos", maxCount: 5 },
+  { name: "compoundWallQualityPhotos", maxCount: 5 },
+  { name: "compoundWallExpansionPhotos", maxCount: 5 },
+  { name: "compoundWallAirVentsPhotos", maxCount: 5 },
+  { name: "otherDefectsPhotos", maxCount: 5 }
+]);
+
+router.post("/createTakeoverDevelopmentWork", uploadFields, ctrl.createTakeoverDevelopmentWork);
+router.get("/getAllTakeoverDevelopmentWork/:projectId", ctrl.getAllTakeoverDevelopmentWork);
+router.get("/getTakeoverDevelopmentWork/:id", ctrl.getTakeoverDevelopmentWorkById);
+router.put("/updateTakeoverDevelopmentWork/:id", uploadFields, ctrl.updateTakeoverDevelopmentWork);
+router.delete("/deleteTakeoverDevelopmentWork/:id", ctrl.deleteTakeoverDevelopmentWork);
+
+export default router;

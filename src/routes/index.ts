@@ -21,6 +21,8 @@ import interiorsStageRoutes from "../modules/InteriorsStage/InteriorsStage.route
 import exteriorsStageRoutes from "../modules/ExteriorsStage/Exteriorsstage.router";
 import developmentWorkRoutes from "../modules/DevelopmentWork/DevelopmentWork.route";
 import  buildingInspectionRoutes  from "../modules/BuildingInspection/BuildingInspection.routers";
+import  TakeoverBuildingInspectionRoutes from "../modules/takeoverBuildingInspection/takeoverBuildingInspection.router"; 
+import takeoverDevelopmentRoutes from "../modules/takeoverDevelopmentWork/takeoverDevelopmentWork.route"
 
 
 
@@ -45,9 +47,10 @@ router.use("/foundation-quality-check", baseAuth, foundationQualityCheckRoutes);
 router.use("/plinth-stage", baseAuth, plinthStageRoutes);
 router.use("/interiors-stage", baseAuth, interiorsStageRoutes);
 router.use("/exteriors-stage", baseAuth, exteriorsStageRoutes);
-router.use("/building-inspection", baseAuth, buildingInspectionRoutes)
+router.use("/building-inspection", baseAuth, buildingInspectionRoutes);
 router.use("/development-work", baseAuth, developmentWorkRoutes);
-
+router.use("/takeover-buildinginspection", baseAuth,TakeoverBuildingInspectionRoutes);
+router.use("/takeover-developmentwork", baseAuth, takeoverDevelopmentRoutes);
 
 
 
