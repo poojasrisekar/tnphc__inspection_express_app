@@ -617,9 +617,18 @@ model InteriorsStage {
   floor   String?   // Ground / First / Terrace
   stageOfWork String?   // Plumbing / Electrical / etc.
 
+  isCompleted Boolean
+
   progressPhoto Json?
 
   progressRemarks String?
+
+  workStartedDate DateTime?
+
+  isDelay Boolean?
+  delayDays Int?
+delayReason String?
+delayOtherReason String?
 
   
 
