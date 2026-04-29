@@ -6,12 +6,14 @@ import prisma from "../../shared/prisma";
 
 
 export const createProjectService = async (data: any) => {
+  console.log("req ------------->>> ",data)
   if (data.officerId) {
     const officerExists = await prisma.officer.findUnique({
       where: { id: data.officerId }
     });
     if (!officerExists) throw new Error("Invalid officerId");
   }
+  console.log("req ------------->>> id",data.officerId)
 
   if (!data.departmentId && !data.specialUnitId) {
     throw new Error("At least one of departmentId or specialUnitId is required");
@@ -21,8 +23,10 @@ export const createProjectService = async (data: any) => {
     Array.isArray(data.stageId) && data.stageId.length > 0
       ? { stages: { connect: data.stageId.map((id: string) => ({ id })) } }
       : {};
+  console.log("req ------------->>>  stageData",stageData)
 
   return await prisma.$transaction(async (tx) => {
+    console.log("")
     // 1. Create Project
     const project = await tx.project.create({
       data: {
@@ -37,7 +41,8 @@ export const createProjectService = async (data: any) => {
         createdById: data.createdById
       }
     });
-
+  console.log("req ------------->>> project ",project)
+  console.log("req ------------->>>  superStructure",data?.superStructure)
     // 2. Insert SuperStructure blocks only
     if (Array.isArray(data.superStructure) && data.superStructure.length > 0) {
       await tx.superStructure.createMany({
@@ -49,6 +54,8 @@ export const createProjectService = async (data: any) => {
         }))
       });
     }
+    
+
 
     return project;
   });
@@ -97,7 +104,7 @@ export const getAllProjectsService = async (query: any) => {
         stages: true,
         department: true,
         specialUnit: true,
-        SuperStructure: true // 🔥 ADD
+        SuperStructure: true 
       },
       orderBy: { createdAt: "desc" },
       skip,
@@ -116,7 +123,7 @@ export const getAllProjectsService = async (query: any) => {
     stage: p.stages?.[0]?.name ?? null,
     status: p.status,
 
-    // 🔥 ADD SUMMARY
+    
     totalBlocks: p.SuperStructure.length,
     totalFloors: p.SuperStructure.reduce((sum, b) => sum + b.totalFloors, 0),
 
