@@ -1,4 +1,4 @@
-import { status, SuperStructureStatus} from "@prisma/client";
+import { status, superStructureStatus} from "@prisma/client";
 import { pageConfig } from "../../utils/query.helper";
 import prisma from "../../shared/prisma";
 
@@ -67,7 +67,7 @@ export const createProjectService = async (data: any) => {
           projectId: project.id,
           blockName: b.blockName,
           currentFloor: null,
-          status: SuperStructureStatus.NOT_STARTED,
+          status: superStructureStatus.NOT_STARTED,
           createdById: data.createdById
         }))
       });
@@ -262,7 +262,7 @@ export const updateProjectService = async (id: string, data: any) => {
           projectId: id,
           blockName: b.blockName,
           currentFloor: null,
-          status: SuperStructureStatus.NOT_STARTED
+          status: superStructureStatus.NOT_STARTED
         }))
       });
     }
@@ -329,14 +329,14 @@ export const getProjectDashboardService = async () => {
     prisma.superStructureProgress.count({
       where: {
         isActive: true,
-        status: SuperStructureStatus.IN_PROGRESS
+        status: superStructureStatus.IN_PROGRESS
       }
     }),
 
     prisma.superStructureProgress.count({
       where: {
         isActive: true,
-        status: SuperStructureStatus.COMPLETED
+        status: superStructureStatus.COMPLETED
       }
     }),
   ]);

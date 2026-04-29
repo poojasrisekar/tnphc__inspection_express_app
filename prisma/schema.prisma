@@ -184,8 +184,8 @@ model project {
   TakeoverBuildingInsepction TakeoverBuildingInspection[]
   TakeoverDevelopmentWork TakeoverDevelopmentWork []
 
-  SuperStructure SuperStructure[]
-  SuperStructureProgress SuperStructureProgress[]
+  SuperStructure superStructure[]
+  SuperStructureProgress superStructureProgress[]
 }
 
 model officer{
@@ -943,7 +943,7 @@ project project @relation(fields: [projectId], references: [id])
 
 
 
-model SuperStructure {
+model superStructure {
   id            String   @id @default(uuid())
   projectId     String
 
@@ -959,18 +959,18 @@ model SuperStructure {
   
   project       project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
 
-  @@unique([projectId, blockName]) // prevent duplicate blocks
+  @@unique([projectId, blockName]) 
 }
 
 
 
-model SuperStructureProgress {
+model superStructureProgress {
   id            String   @id @default(uuid())
   projectId     String
 
   blockName     String
   currentFloor  Int?
-  status        SuperStructureStatus
+  status        superStructureStatus
 
   createdAt   DateTime @default(now()) @map("created_at")
   updatedAt   DateTime @updatedAt @map("updated_at")
@@ -983,7 +983,7 @@ model SuperStructureProgress {
   @@unique([projectId, blockName])
 }
 
-enum SuperStructureStatus {
+enum superStructureStatus {
   NOT_STARTED
   IN_PROGRESS
   COMPLETED
