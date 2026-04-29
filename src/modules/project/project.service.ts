@@ -6,36 +6,24 @@ import prisma from "../../shared/prisma";
 
 
 export const createProjectService = async (data: any) => {
-  // ✅ Validate officer
   if (data.officerId) {
     const officerExists = await prisma.officer.findUnique({
       where: { id: data.officerId }
     });
-
-    if (!officerExists) {
-      throw new Error("Invalid officerId");
-    }
+    if (!officerExists) throw new Error("Invalid officerId");
   }
 
-  // ✅ NEW LOGIC (both allowed)
   if (!data.departmentId && !data.specialUnitId) {
     throw new Error("At least one of departmentId or specialUnitId is required");
   }
 
-  // ✅ Stage handling
   const stageData =
     Array.isArray(data.stageId) && data.stageId.length > 0
-      ? {
-          stages: {
-            connect: data.stageId.map((id: string) => ({ id }))
-          }
-        }
+      ? { stages: { connect: data.stageId.map((id: string) => ({ id })) } }
       : {};
 
-  // 🔥 TRANSACTION
   return await prisma.$transaction(async (tx) => {
-    console.log("tx keys:", Object.keys(tx).filter(k => k.includes('uper')));
-    // ✅ 1. Create Project
+    // 1. Create Project
     const project = await tx.project.create({
       data: {
         districtId: data.districtId,
@@ -50,24 +38,13 @@ export const createProjectService = async (data: any) => {
       }
     });
 
-    // ✅ 2. Insert SuperStructure
+    // 2. Insert SuperStructure blocks only
     if (Array.isArray(data.superStructure) && data.superStructure.length > 0) {
       await tx.superStructure.createMany({
         data: data.superStructure.map((b: any) => ({
           projectId: project.id,
           blockName: b.blockName,
           totalFloors: b.totalFloors,
-          createdById: data.createdById
-        }))
-      });
-
-      // ✅ 3. Insert default progress
-      await tx.superStructureProgress.createMany({
-        data: data.superStructure.map((b: any) => ({
-          projectId: project.id,
-          blockName: b.blockName,
-          currentFloor: null,
-          status: superStructureStatus.NOT_STARTED,
           createdById: data.createdById
         }))
       });
@@ -207,7 +184,6 @@ export const getProjectByIdService = async (id: string) => {
 
 export const updateProjectService = async (id: string, data: any) => {
   return prisma.$transaction(async (tx) => {
-    // ✅ Validate officer
     if (data.officerId) {
       const officerExists = await tx.officer.findUnique({
         where: { id: data.officerId }
@@ -215,17 +191,11 @@ export const updateProjectService = async (id: string, data: any) => {
       if (!officerExists) throw new Error("Invalid officerId");
     }
 
-    // ✅ Stage update
     let stageData = {};
     if (Array.isArray(data.stageId)) {
-      stageData = {
-        stages: {
-          set: data.stageId.map((id: string) => ({ id }))
-        }
-      };
+      stageData = { stages: { set: data.stageId.map((id: string) => ({ id })) } };
     }
 
-    // ✅ Update Project
     const project = await tx.project.update({
       where: { id },
       data: {
@@ -241,28 +211,16 @@ export const updateProjectService = async (id: string, data: any) => {
       }
     });
 
-    // 🔥 SUPERSTRUCTURE UPDATE
+    // Update SuperStructure blocks only (no progress)
     if (Array.isArray(data.superStructure)) {
-      // 1. Delete old
       await tx.superStructure.deleteMany({ where: { projectId: id } });
-      await tx.superStructureProgress.deleteMany({ where: { projectId: id } });
 
-      // 2. Insert new
       await tx.superStructure.createMany({
         data: data.superStructure.map((b: any) => ({
           projectId: id,
           blockName: b.blockName,
-          totalFloors: b.totalFloors
-        }))
-      });
-
-      // 3. Reset progress
-      await tx.superStructureProgress.createMany({
-        data: data.superStructure.map((b: any) => ({
-          projectId: id,
-          blockName: b.blockName,
-          currentFloor: null,
-          status: superStructureStatus.NOT_STARTED
+          totalFloors: b.totalFloors,
+          updatedById: data.updatedById
         }))
       });
     }
@@ -273,20 +231,12 @@ export const updateProjectService = async (id: string, data: any) => {
 
 export const deleteProjectService = async (id: string) => {
   return prisma.$transaction(async (tx) => {
-    // 1. Soft delete project
     await tx.project.update({
       where: { id },
       data: { isActive: false }
     });
 
-    // 2. Soft delete SuperStructure
     await tx.superStructure.updateMany({
-      where: { projectId: id },
-      data: { isActive: false }
-    });
-
-    // 3. Soft delete SuperStructureProgress
-    await tx.superStructureProgress.updateMany({
       where: { projectId: id },
       data: { isActive: false }
     });
@@ -321,7 +271,7 @@ export const getProjectDashboardService = async () => {
       where: { isActive: true, status: "CompletedProjects" },
     }),
 
-    // 🔥 NEW METRICS
+    
     prisma.superStructure.count({
       where: { isActive: true }
     }),
