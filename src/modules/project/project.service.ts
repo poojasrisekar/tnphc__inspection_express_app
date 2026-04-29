@@ -4,6 +4,7 @@ import prisma from "../../shared/prisma";
 
 
 
+
 export const createProjectService = async (data: any) => {
   // ✅ Validate officer
   if (data.officerId) {
@@ -33,6 +34,7 @@ export const createProjectService = async (data: any) => {
 
   // 🔥 TRANSACTION
   return await prisma.$transaction(async (tx) => {
+    console.log("tx keys:", Object.keys(tx).filter(k => k.includes('uper')));
     // ✅ 1. Create Project
     const project = await tx.project.create({
       data: {
