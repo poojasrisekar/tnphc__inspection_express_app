@@ -726,6 +726,7 @@ model ExteriorsStage {
   block        String?
   floor        String?
   stageOfWork  String?
+  isCompleted Boolean
 
   progressPhoto Json?
 
