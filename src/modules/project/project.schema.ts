@@ -5,15 +5,19 @@ import { stat } from "node:fs";
 
 export const createProjectSchema = Joi.object({
   districtId: Joi.string().required(),
+
   departmentId: Joi.string().optional(),
   specialUnitId: Joi.string().optional(),
+
   officerId: Joi.string().required(),
   locationName: Joi.string().required(),
   projectName: Joi.string().required(),
 
-  stageId: Joi.array().items(Joi.string().required()).min(1).required(),
+  stageId: Joi.array()
+    .items(Joi.string().required())
+    .min(1)
+    .required(),
 
-  
   superStructure: Joi.array()
     .items(
       Joi.object({
@@ -22,7 +26,8 @@ export const createProjectSchema = Joi.object({
       })
     )
     .optional()
-});
+})
+.or("departmentId", "specialUnitId");
 
 export const updateProjectSchema = Joi.object({
   districtId: Joi.string().optional(),

@@ -3,6 +3,7 @@ import { pageConfig } from "../../utils/query.helper";
 import prisma from "../../shared/prisma";
 
 
+
 export const createProjectService = async (data: any) => {
   // ✅ Validate officer
   if (data.officerId) {
@@ -15,13 +16,9 @@ export const createProjectService = async (data: any) => {
     }
   }
 
-  // ✅ Validate either department OR specialUnit
-  if (data.departmentId && data.specialUnitId) {
-    throw new Error("Provide either departmentId OR specialUnitId, not both");
-  }
-
+  // ✅ NEW LOGIC (both allowed)
   if (!data.departmentId && !data.specialUnitId) {
-    throw new Error("Either departmentId OR specialUnitId is required");
+    throw new Error("At least one of departmentId or specialUnitId is required");
   }
 
   // ✅ Stage handling
@@ -34,7 +31,7 @@ export const createProjectService = async (data: any) => {
         }
       : {};
 
-  // 🔥 TRANSACTION START
+  // 🔥 TRANSACTION
   return await prisma.$transaction(async (tx) => {
     // ✅ 1. Create Project
     const project = await tx.project.create({
@@ -42,7 +39,7 @@ export const createProjectService = async (data: any) => {
         districtId: data.districtId,
         departmentId: data.departmentId || null,
         specialUnitId: data.specialUnitId || null,
-        officerId: data.officerId || null,
+        officerId: data.officerId,
         locationName: data.locationName,
         projectName: data.projectName,
         ...stageData,
@@ -51,9 +48,8 @@ export const createProjectService = async (data: any) => {
       }
     });
 
-    // ✅ 2. Insert SuperStructure (if exists)
+    // ✅ 2. Insert SuperStructure
     if (Array.isArray(data.superStructure) && data.superStructure.length > 0) {
-      // Insert blocks
       await tx.superStructure.createMany({
         data: data.superStructure.map((b: any) => ({
           projectId: project.id,
@@ -63,7 +59,7 @@ export const createProjectService = async (data: any) => {
         }))
       });
 
-      // 🔥 3. Insert default progress
+      // ✅ 3. Insert default progress
       await tx.superStructureProgress.createMany({
         data: data.superStructure.map((b: any) => ({
           projectId: project.id,
