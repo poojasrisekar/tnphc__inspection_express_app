@@ -45,7 +45,7 @@ export const createProjectService = async (data: any) => {
   console.log("req ------------->>>  superStructure",data?.superStructure)
     // 2. Insert SuperStructure blocks only
     if (Array.isArray(data.superStructure) && data.superStructure.length > 0) {
-      await tx.superStructure.createMany({
+     const a = await tx.superStructure.createMany({
         data: data.superStructure.map((b: any) => ({
           projectId: project.id,
           blockName: b.blockName,
@@ -53,6 +53,7 @@ export const createProjectService = async (data: any) => {
           createdById: data.createdById
         }))
       });
+      console.log(a)
     }
     
 
