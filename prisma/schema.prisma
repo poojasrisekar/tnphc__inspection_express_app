@@ -17,12 +17,20 @@ model user {
   passwordHashed String   @map("password_hashed") @db.VarChar(255)
   passwordTemp   String   @map("password_temp") @db.VarChar(255)
   roleId         String?  @map("role_id") @db.VarChar(36)
+  departmentId   String?  @map("department_id") @db.VarChar(36) // ← ADD
+  districtId     String?  @map("district_id") @db.VarChar(36)
+  officerId      String?  @map("officer_id") @db.VarChar(36)
   updatedAt      DateTime @updatedAt @map("updated_at")
   updatedById    String?  @map("updated_by") @db.VarChar(255)
   userName       String   @unique @map("user_name") @db.VarChar(15)
-  role           Roles?   @relation(fields: [roleId], references: [id])
+
+  role       Roles?      @relation(fields: [roleId], references: [id])
+  department department? @relation(fields: [departmentId], references: [id]) // ← ADD
+  district   District?   @relation(fields: [districtId], references: [id])
+  officer    officer?    @relation(fields: [officerId], references: [id])
 
   @@index([code])
+  @@index([departmentId, districtId, userName])
 }
 
 model Roles {
@@ -50,6 +58,7 @@ model District {
   updatedById String?   @map("updated_by") @db.VarChar(255)
   isActive    Boolean   @default(true) @map("is_active")
   projects    project[]
+  users       user[]
 
   @@index([code])
   @@map("districts")
@@ -76,57 +85,57 @@ model LandSiteInspection {
   projectId String
 
   // 🔹 Encroachment
-  isEncroachment        YesNo
-  encroachmentPercent   Float?
-  encroachmentType      String?
-  isCourtCase           YesNo
-  caseDetails           String?
+  isEncroachment      YesNo
+  encroachmentPercent Float?
+  encroachmentType    String?
+  isCourtCase         YesNo
+  caseDetails         String?
 
   // 🔹 Existing Structure
-  hasStructure          YesNo
-  structureDetails      String?
+  hasStructure     YesNo
+  structureDetails String?
 
   // 🔹 Drainage
-  isLowLying            YesNo
-  waterDepth            Float?
-  waterDurationDays     Int?
+  isLowLying        YesNo
+  waterDepth        Float?
+  waterDurationDays Int?
 
   // 🔹 Trees
-  treesCount            Int?
-  treesPhoto            Json?
+  treesCount Int?
+  treesPhoto Json?
 
   // 🔹 Power Lines
-  hasPowerLines         YesNo
-  powerLineDetails      String?
+  hasPowerLines    YesNo
+  powerLineDetails String?
 
   // 🔹 Restricted Zones
-  isNearMonument        YesNo
-  monumentName          String?
-  monumentDistance      Float?
+  isNearMonument   YesNo
+  monumentName     String?
+  monumentDistance Float?
 
-  isNearSea             YesNo
-  seaDistance           Float?
+  isNearSea   YesNo
+  seaDistance Float?
 
-  isNearForest          YesNo
-  forestName            String?
-  forestDistance        Float?
+  isNearForest   YesNo
+  forestName     String?
+  forestDistance Float?
 
-  isNearWaterBody       Boolean?
-  waterBodyName         String?
-  waterBodyDistance     Float?
+  isNearWaterBody   Boolean?
+  waterBodyName     String?
+  waterBodyDistance Float?
 
   // 🔹 Burial Ground
-  isNearBurial          YesNo
-  burialName            String?
-  burialDistance        Float?
+  isNearBurial   YesNo
+  burialName     String?
+  burialDistance Float?
 
   // 🔹 Roads
-  roadType              String?
-  roadWidth             Float?
+  roadType  String?
+  roadWidth Float?
 
   // 🔹 Essential Services
-  nearestService        String?
-  serviceDistance       Float?
+  nearestService  String?
+  serviceDistance Float?
 
   // 🔹 Common
   createdAt   DateTime @default(now()) @map("created_at")
@@ -154,17 +163,14 @@ model project {
   specialUnit specialUnits? @relation(fields: [specialUnitId], references: [id])
 
   // Common
-  officer     officer? @relation(fields: [officerId], references: [id])
+  officer      officer? @relation(fields: [officerId], references: [id])
   officerId    String? // FK
   locationName String
   projectName  String
 
-
   stages stage[]
 
-  status status @default(AssignedProjects)  //  default here
-
-
+  status status @default(AssignedProjects) //  default here
 
   createdAt   DateTime @default(now()) @map("created_at")
   updatedAt   DateTime @updatedAt @map("updated_at")
@@ -172,46 +178,49 @@ model project {
   updatedById String?  @map("updated_by") @db.VarChar(255)
   isActive    Boolean  @default(true) @map("is_active")
 
-  landSiteInspection LandSiteInspection[]
+  landSiteInspection         LandSiteInspection[]
   preConstructionInspections PreConstructionInspection[]
-  foundationProgresses FoundationProgress[]
-  foundationQualityChecks FoundationQualityCheck[]
-  plinthStages PlinthStage[]
-  interiorsStages InteriorsStage[]
-  exteriorsStages ExteriorsStage[]
-  BuildingInspection BuildingInspection[]
-  DevelopmentWork  DevelopmentWork[]
+  foundationProgresses       FoundationProgress[]
+  foundationQualityChecks    FoundationQualityCheck[]
+  plinthStages               PlinthStage[]
+  interiorsStages            InteriorsStage[]
+  exteriorsStages            ExteriorsStage[]
+  BuildingInspection         BuildingInspection[]
+  DevelopmentWork            DevelopmentWork[]
   TakeoverBuildingInsepction TakeoverBuildingInspection[]
-  TakeoverDevelopmentWork TakeoverDevelopmentWork []
+  TakeoverDevelopmentWork    TakeoverDevelopmentWork[]
 
-  SuperStructure superStructure[]
+  SuperStructure         superStructure[]
   SuperStructureProgress superStructureProgress[]
 }
 
-model officer{
-  id   String @id @default(uuid()) @db.VarChar(36)
-  code Int    @default(autoincrement()) @map("code")
-  name String @map("name") @db.VarChar(255)
+model officer {
+  id          String   @id @default(uuid()) @db.VarChar(36)
+  code        Int      @default(autoincrement()) @map("code")
+  name        String   @map("name") @db.VarChar(255)
   createdAt   DateTime @default(now()) @map("created_at")
   updatedAt   DateTime @updatedAt @map("updated_at")
   createdById String?  @map("created_by") @db.VarChar(255)
   updatedById String?  @map("updated_by") @db.VarChar(255)
   isActive    Boolean  @default(true) @map("is_active")
+
+  users    user[]
   projects project[]
-  
 }
 
-
 model department {
-  id   String @id @default(uuid()) @db.VarChar(36)
-  code Int    @default(autoincrement()) @map("code")
-  name String @map("name") @db.VarChar(255)
-  createdAt   DateTime @default(now()) @map("created_at")
-  updatedAt   DateTime @updatedAt @map("updated_at")
-  createdById String?  @map("created_by") @db.VarChar(255)
-  updatedById String?  @map("updated_by") @db.VarChar(255)
-  isActive    Boolean  @default(true) @map("is_active")
-  projects project[]
+  id          String    @id @default(uuid()) @db.VarChar(36)
+  code        Int       @default(autoincrement()) @map("code")
+  name        String    @map("name") @db.VarChar(255)
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+  createdById String?   @map("created_by") @db.VarChar(255)
+  updatedById String?   @map("updated_by") @db.VarChar(255)
+  isActive    Boolean   @default(true) @map("is_active")
+  projects    project[]
+  users       user[]
+
+  @@map("department")
 }
 
 model AuditLog {
@@ -241,18 +250,16 @@ model AuditLog {
   @@map("audit_logs")
 }
 
-
 model stage {
-    id   String @id @default(uuid()) @db.VarChar(36)
-    code Int    @default(autoincrement()) @map("code")
-    name String @map("name") @db.VarChar(255)
-    createdAt   DateTime @default(now()) @map("created_at")
-    updatedAt   DateTime @updatedAt @map("updated_at")
-    createdById String?  @map("created_by") @db.VarChar(255)
-    updatedById String?  @map("updated_by") @db.VarChar(255)
-    isActive    Boolean  @default(true) @map("is_active")
-    projects project[]
-
+  id          String    @id @default(uuid()) @db.VarChar(36)
+  code        Int       @default(autoincrement()) @map("code")
+  name        String    @map("name") @db.VarChar(255)
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+  createdById String?   @map("created_by") @db.VarChar(255)
+  updatedById String?   @map("updated_by") @db.VarChar(255)
+  isActive    Boolean   @default(true) @map("is_active")
+  projects    project[]
 }
 
 model material {
@@ -265,18 +272,18 @@ model material {
   updatedById String?  @map("updated_by")
   isActive    Boolean  @default(true) @map("is_active")
 
-  brands      brand[]
+  brands brand[]
 
   @@index([code])
 }
 
 model brand {
-  id          String   @id @default(uuid()) @db.VarChar(36)
-  code        Int      @unique @default(autoincrement())
-  name        String   @map("brand_name") @db.VarChar(255)
+  id   String @id @default(uuid()) @db.VarChar(36)
+  code Int    @unique @default(autoincrement())
+  name String @map("brand_name") @db.VarChar(255)
 
-  materialId  String
-  material    material @relation(fields: [materialId], references: [id])
+  materialId String
+  material   material @relation(fields: [materialId], references: [id])
 
   createdAt   DateTime @default(now()) @map("created_at")
   updatedAt   DateTime @updatedAt @map("updated_at")
@@ -284,21 +291,20 @@ model brand {
   updatedById String?  @map("updated_by")
   isActive    Boolean  @default(true) @map("is_active")
 
-  grades      grade[]
-  masters     Master[]
+  grades  grade[]
+  masters Master[]
 
   @@index([code])
   @@index([materialId])
-
 }
 
 model grade {
-  id          String   @id @default(uuid()) @db.VarChar(36)
-  code        Int      @default(autoincrement())
-  name        String   @map("grade_name") @db.VarChar(255)
+  id   String @id @default(uuid()) @db.VarChar(36)
+  code Int    @default(autoincrement())
+  name String @map("grade_name") @db.VarChar(255)
 
-  brandId     String
-  brand       brand @relation(fields: [brandId], references: [id])
+  brandId String
+  brand   brand  @relation(fields: [brandId], references: [id])
 
   createdAt   DateTime @default(now()) @map("created_at")
   updatedAt   DateTime @updatedAt @map("updated_at")
@@ -323,30 +329,27 @@ enum YesNo {
   No
 }
 
-
-
 model Master {
-  id            String   @id @default(uuid()) @db.VarChar(36)
-  code          Int      @unique @default(autoincrement())
+  id   String @id @default(uuid()) @db.VarChar(36)
+  code Int    @unique @default(autoincrement())
 
-  brandId       String
-  gradeId       String
+  brandId String
+  gradeId String
 
-  materialName  String   @map("material_name") @db.VarChar(255)
+  materialName String @map("material_name") @db.VarChar(255)
 
-  brand         brand    @relation(fields: [brandId], references: [id])
-  grade         grade    @relation(fields: [gradeId], references: [id])
+  brand brand @relation(fields: [brandId], references: [id])
+  grade grade @relation(fields: [gradeId], references: [id])
 
-  createdAt     DateTime @default(now()) @map("created_at")
-  updatedAt     DateTime @updatedAt @map("updated_at")
-  createdById   String?  @map("created_by")
-  updatedById   String?  @map("updated_by")
-  isActive      Boolean  @default(true) @map("is_active")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+  createdById String?  @map("created_by")
+  updatedById String?  @map("updated_by")
+  isActive    Boolean  @default(true) @map("is_active")
 
   @@index([brandId])
   @@index([gradeId])
 }
-
 
 model PreConstructionInspection {
   id        String @id @default(uuid())
@@ -403,12 +406,11 @@ model PreConstructionInspection {
   project project @relation(fields: [projectId], references: [id])
 }
 
-
 model FoundationProgress {
   id        String @id @default(uuid())
   projectId String
 
-  type FoundationType   // Footing | Pile | Raft
+  type FoundationType // Footing | Pile | Raft
 
   // COMMON
   total     Int?
@@ -417,8 +419,8 @@ model FoundationProgress {
 
   workStartedDate DateTime?
 
-  isDelay   Boolean @default(false)
-  delayDays Int?
+  isDelay     Boolean @default(false)
+  delayDays   Int?
   delayPhotos Json?
 
   delayReason      String?
@@ -444,48 +446,41 @@ enum FoundationType {
   Raft
 }
 
-
 model FoundationQualityCheck {
   id        String @id @default(uuid())
   projectId String
 
-  
-  cementGradeId   String?
-  cementBrandId   String?
-  cementRemarks   String?
+  cementGradeId String?
+  cementBrandId String?
+  cementRemarks String?
 
-  cementLabTest   String?   // dropdown value
-  cementPhoto     Json?
+  cementLabTest String? // dropdown value
+  cementPhoto   Json?
 
-  
-  sandType String?   // "RIVER" | "M_SAND" (from UI)
+  sandType String? // "RIVER" | "M_SAND" (from UI)
 
-  sandLabTest   String?
-  sandPhoto     Json?
+  sandLabTest String?
+  sandPhoto   Json?
 
   sandSieveTestDone Boolean?
 
-  sandSieveLabTest  String?
-  sandSievePhoto    Json?
+  sandSieveLabTest String?
+  sandSievePhoto   Json?
 
-  
-  steelGradeId   String?
-  steelBrandId   String?
+  steelGradeId String?
+  steelBrandId String?
 
-  steelLabTest   String?
-  steelPhoto     Json?
+  steelLabTest String?
+  steelPhoto   Json?
 
-  
   aggregateSize Float?
 
   aggregateLabTest String?
   aggregatePhoto   Json?
 
-  
   waterLabTest String?
   waterPhoto   Json?
 
-  
   concreteLabTest String?
   concretePhoto   Json?
 
@@ -494,7 +489,6 @@ model FoundationQualityCheck {
   concreteQualityLabTest String?
   concreteQualityPhoto   Json?
 
-  
   bricksLabTest String?
   bricksPhoto   Json?
 
@@ -503,10 +497,8 @@ model FoundationQualityCheck {
   bricksQualityLabTest String?
   bricksQualityPhoto   Json?
 
-  
   remarks String?
 
-  
   createdAt   DateTime @default(now()) @map("created_at")
   updatedAt   DateTime @updatedAt @map("updated_at")
   createdById String?  @map("created_by")
@@ -516,53 +508,49 @@ model FoundationQualityCheck {
   project project @relation(fields: [projectId], references: [id])
 }
 
-
-
 model PlinthStage {
   id        String @id @default(uuid())
   projectId String
 
-  
+  stageOfWork String? // Plinth Beam / Brick Work / Earth Filling / Floor Concreting
 
-  stageOfWork String?   // Plinth Beam / Brick Work / Earth Filling / Floor Concreting
-
-  isCompleted Boolean?  // YES = true / NO = false
+  isCompleted     Boolean? // YES = true / NO = false
   progressRemarks String?
-  progressPhoto Json?
+  progressPhoto   Json?
 
   workStartedDate DateTime?
 
-  isDelay Boolean?
+  isDelay   Boolean?
   delayDays Int?
 
   delayReason      String?
   delayOtherReason String?
 
   // CEMENT
-  cementGradeId   String?
-  cementBrandId   String?
-  cementRemarks   String?
+  cementGradeId String?
+  cementBrandId String?
+  cementRemarks String?
 
-  cementLabTest   String?
-  cementPhoto     Json?
+  cementLabTest String?
+  cementPhoto   Json?
 
   // SAND
   sandType String?
 
-  sandLabTest   String?
-  sandPhoto     Json?
+  sandLabTest String?
+  sandPhoto   Json?
 
   sandSieveTestDone Boolean?
 
-  sandSieveLabTest  String?
-  sandSievePhoto    Json?
+  sandSieveLabTest String?
+  sandSievePhoto   Json?
 
   // STEEL
-  steelGradeId   String?
-  steelBrandId   String?
+  steelGradeId String?
+  steelBrandId String?
 
-  steelLabTest   String?
-  steelPhoto     Json?
+  steelLabTest String?
+  steelPhoto   Json?
 
   // AGGREGATES
   aggregateSize Float?
@@ -592,10 +580,8 @@ model PlinthStage {
   bricksQualityLabTest String?
   bricksQualityPhoto   Json?
 
-  
   qualityRemarks String?
 
-  
   createdAt   DateTime @default(now()) @map("created_at")
   updatedAt   DateTime @updatedAt @map("updated_at")
   createdById String?  @map("created_by")
@@ -605,17 +591,13 @@ model PlinthStage {
   project project @relation(fields: [projectId], references: [id])
 }
 
-
-
 model InteriorsStage {
   id        String @id @default(uuid())
   projectId String
 
-  
-
-  block   String?   // Block A / B / etc.
-  floor   String?   // Ground / First / Terrace
-  stageOfWork String?   // Plumbing / Electrical / etc.
+  block       String? // Block A / B / etc.
+  floor       String? // Ground / First / Terrace
+  stageOfWork String? // Plumbing / Electrical / etc.
 
   isCompleted Boolean
 
@@ -625,33 +607,29 @@ model InteriorsStage {
 
   workStartedDate DateTime?
 
-  isDelay Boolean?
-  delayDays Int?
-delayReason String?
-delayOtherReason String?
-
-  
+  isDelay          Boolean?
+  delayDays        Int?
+  delayReason      String?
+  delayOtherReason String?
 
   // CEMENT
-  cementGradeId   String?
-  cementBrandId   String?
-  cementRemarks   String?
+  cementGradeId String?
+  cementBrandId String?
+  cementRemarks String?
 
-  cementLabTest   String?
-  cementPhoto     Json?
+  cementLabTest String?
+  cementPhoto   Json?
 
   // SAND
   sandType String?
 
-  sandLabTest   String?
-  sandPhoto     Json?
+  sandLabTest String?
+  sandPhoto   Json?
 
   sandSieveTestDone Boolean?
 
-  sandSieveLabTest  String?
-  sandSievePhoto    Json?
-
-  
+  sandSieveLabTest String?
+  sandSievePhoto   Json?
 
   // AGGREGATE
   aggregateSize Float?
@@ -681,8 +659,6 @@ delayOtherReason String?
   bricksQualityLabTest String?
   bricksQualityPhoto   Json?
 
- 
-
   //  PLASTERING
   plasteringTestDone Boolean?
 
@@ -690,24 +666,22 @@ delayOtherReason String?
   plasteringPhoto   Json?
 
   //  DOORS & WINDOWS
-  doorWoodType String?
-  upvcBrand    String?
-  glassBrand   String?
+  doorWoodType   String?
+  upvcBrand      String?
+  glassBrand     String?
   glassThickness String?
 
   //  TILES
-  floorType String?
-  tileBrand String?
+  floorType   String?
+  tileBrand   String?
   tileRemarks String?
 
   //  PAINTING
-  paintBrand String?
+  paintBrand      String?
   paintingQuality String?
 
-  
   qualityRemarks String?
 
-  
   createdAt   DateTime @default(now()) @map("created_at")
   updatedAt   DateTime @updatedAt @map("updated_at")
   createdById String?  @map("created_by")
@@ -721,49 +695,41 @@ model ExteriorsStage {
   id        String @id @default(uuid())
   projectId String
 
-  
-
-  block        String?
-  floor        String?
-  stageOfWork  String?
+  block       String?
+  floor       String?
+  stageOfWork String?
   isCompleted Boolean
 
   progressPhoto Json?
-
-  
 
   workStartedDate DateTime?
 
   isDelayed Boolean?
 
-  delayDays Int?
+  delayDays   Int?
   delayReason String?
-  delayOther String?
+  delayOther  String?
 
   progressRemarks String?
 
- 
-
   // CEMENT
-  cementGradeId   String?
-  cementBrandId   String?
-  cementRemarks   String?
+  cementGradeId String?
+  cementBrandId String?
+  cementRemarks String?
 
-  cementLabTest   String?
-  cementPhoto     Json?
+  cementLabTest String?
+  cementPhoto   Json?
 
   // SAND
   sandType String?
 
-  sandLabTest   String?
-  sandPhoto     Json?
+  sandLabTest String?
+  sandPhoto   Json?
 
   sandSieveTestDone Boolean?
 
-  sandSieveLabTest  String?
-  sandSievePhoto    Json?
-
-  
+  sandSieveLabTest String?
+  sandSievePhoto   Json?
 
   // AGGREGATE
   aggregateSize Float?
@@ -793,8 +759,6 @@ model ExteriorsStage {
   bricksQualityLabTest String?
   bricksQualityPhoto   Json?
 
-
-
   //  PLASTERING
   plasteringTestDone Boolean?
   plasteringLabTest  String?
@@ -802,36 +766,32 @@ model ExteriorsStage {
   plasteringRemarks  String?
 
   //  DOORS & WINDOWS
-  doorWindowType     String?
-  upvcBrand          String?
-  glassBrand         String?
-  glassThickness     String?
-  doorWindowRemarks  String?
+  doorWindowType    String?
+  upvcBrand         String?
+  glassBrand        String?
+  glassThickness    String?
+  doorWindowRemarks String?
 
   //  INTERIOR TILES
-  interiorFloorType String?
-  interiorTileBrand String?
+  interiorFloorType   String?
+  interiorTileBrand   String?
   interiorTileRemarks String?
 
   //  EXTERIOR ROOF TILES
-  roofFloorType String?
-  roofTileBrand String?
+  roofFloorType   String?
+  roofTileBrand   String?
   roofTileRemarks String?
 
   //  INTERIOR PAINTING
-  interiorPaintBrand String?
+  interiorPaintBrand      String?
   interiorPaintingQuality String?
 
   //  EXTERIOR PAINTING
-  exteriorPaintBrand String?
+  exteriorPaintBrand      String?
   exteriorPaintingQuality String?
-
-  
 
   qualityRemarks String?
 
-  
-
   createdAt   DateTime @default(now()) @map("created_at")
   updatedAt   DateTime @updatedAt @map("updated_at")
   createdById String?  @map("created_by")
@@ -840,25 +800,21 @@ model ExteriorsStage {
 
   project project @relation(fields: [projectId], references: [id])
 }
-
-
 
 model BuildingInspection {
-
-  id        String @id @default(uuid())
-  projectId String
-  structure Json?
-  painting Json?
-  tilingFlooring Json?
-  falseCeiling Json?
-  plumbingSystem Json?
-  electricalSystem Json?
-  doorsWindows Json?
-   lifts Json?
+  id                 String @id @default(uuid())
+  projectId          String
+  structure          Json?
+  painting           Json?
+  tilingFlooring     Json?
+  falseCeiling       Json?
+  plumbingSystem     Json?
+  electricalSystem   Json?
+  doorsWindows       Json?
+  lifts              Json?
   fireFightingSystem Json?
-  terraceInspection Json?
+  terraceInspection  Json?
 
-  
   createdAt   DateTime @default(now()) @map("created_at")
   updatedAt   DateTime @updatedAt @map("updated_at")
   createdById String?  @map("created_by")
@@ -868,24 +824,21 @@ model BuildingInspection {
   project project @relation(fields: [projectId], references: [id])
 }
 
-
-model DevelopmentWork{
-
-  id  String @id @default(uuid())
-  projectId String
-  sumpPump Json?
-  borewell Json?
-  inspectionChamber Json?
-  stormWaterDrains Json?
-  sullageDrain Json?
-  road Json?
-  paverBlock Json?
-  compoundWall Json?
+model DevelopmentWork {
+  id                  String @id @default(uuid())
+  projectId           String
+  sumpPump            Json?
+  borewell            Json?
+  inspectionChamber   Json?
+  stormWaterDrains    Json?
+  sullageDrain        Json?
+  road                Json?
+  paverBlock          Json?
+  compoundWall        Json?
   rainWaterHarvesting Json?
-  landScaping Json?
-  otherDefects Json?
-  generalRemarks Json?
-
+  landScaping         Json?
+  otherDefects        Json?
+  generalRemarks      Json?
 
   createdAt   DateTime @default(now()) @map("created_at")
   updatedAt   DateTime @updatedAt @map("updated_at")
@@ -893,27 +846,23 @@ model DevelopmentWork{
   updatedById String?  @map("updated_by")
   isActive    Boolean  @default(true) @map("is_active")
 
-project project @relation(fields: [projectId], references: [id])
+  project project @relation(fields: [projectId], references: [id])
 }
-
-
 
 model TakeoverBuildingInspection {
-
-  id        String @id @default(uuid())
-  projectId String
-  structure Json?
-  painting Json?
-  tilingFlooring Json?
-  falseCeiling Json?
-  plumbingSystem Json?
-  electricalSystem Json?
-  doorsWindows Json?
-   lifts Json?
+  id                 String @id @default(uuid())
+  projectId          String
+  structure          Json?
+  painting           Json?
+  tilingFlooring     Json?
+  falseCeiling       Json?
+  plumbingSystem     Json?
+  electricalSystem   Json?
+  doorsWindows       Json?
+  lifts              Json?
   fireFightingSystem Json?
-  terraceInspection Json?
+  terraceInspection  Json?
 
-  
   createdAt   DateTime @default(now()) @map("created_at")
   updatedAt   DateTime @updatedAt @map("updated_at")
   createdById String?  @map("created_by")
@@ -923,24 +872,21 @@ model TakeoverBuildingInspection {
   project project @relation(fields: [projectId], references: [id])
 }
 
-
-model TakeoverDevelopmentWork{
-
-  id  String @id @default(uuid())
-  projectId String
-  sumpPump Json?
-  borewell Json?
-  inspectionChamber Json?
-  stormWaterDrains Json?
-  sullageDrain Json?
-  road Json?
-  paverBlock Json?
-  compoundWall Json?
+model TakeoverDevelopmentWork {
+  id                  String @id @default(uuid())
+  projectId           String
+  sumpPump            Json?
+  borewell            Json?
+  inspectionChamber   Json?
+  stormWaterDrains    Json?
+  sullageDrain        Json?
+  road                Json?
+  paverBlock          Json?
+  compoundWall        Json?
   rainWaterHarvesting Json?
-  landScaping Json?
-  otherDefects Json?
-  generalRemarks Json?
-
+  landScaping         Json?
+  otherDefects        Json?
+  generalRemarks      Json?
 
   createdAt   DateTime @default(now()) @map("created_at")
   updatedAt   DateTime @updatedAt @map("updated_at")
@@ -948,17 +894,15 @@ model TakeoverDevelopmentWork{
   updatedById String?  @map("updated_by")
   isActive    Boolean  @default(true) @map("is_active")
 
-project project @relation(fields: [projectId], references: [id])
+  project project @relation(fields: [projectId], references: [id])
 }
-
-
 
 model superStructure {
-  id            String   @id @default(uuid())
-  projectId     String
+  id        String @id @default(uuid())
+  projectId String
 
-  blockName     String   // A, B, C
-  totalFloors   Int      // 5, 4, etc.
+  blockName   String // A, B, C
+  totalFloors Int // 5, 4, etc.
 
   createdAt   DateTime @default(now()) @map("created_at")
   updatedAt   DateTime @updatedAt @map("updated_at")
@@ -966,21 +910,18 @@ model superStructure {
   updatedById String?  @map("updated_by")
   isActive    Boolean  @default(true) @map("is_active")
 
-  
-  project       project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  project project @relation(fields: [projectId], references: [id], onDelete: Cascade)
 
-  @@unique([projectId, blockName]) 
+  @@unique([projectId, blockName])
 }
 
-
-
 model superStructureProgress {
-  id            String   @id @default(uuid())
-  projectId     String
+  id        String @id @default(uuid())
+  projectId String
 
-  blockName     String
-  currentFloor  Int?
-  status        superStructureStatus
+  blockName    String
+  currentFloor Int?
+  status       superStructureStatus
 
   createdAt   DateTime @default(now()) @map("created_at")
   updatedAt   DateTime @updatedAt @map("updated_at")
@@ -988,7 +929,7 @@ model superStructureProgress {
   updatedById String?  @map("updated_by")
   isActive    Boolean  @default(true) @map("is_active")
 
-  project       project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  project project @relation(fields: [projectId], references: [id], onDelete: Cascade)
 
   @@unique([projectId, blockName])
 }
