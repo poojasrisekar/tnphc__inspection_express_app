@@ -17,7 +17,8 @@ model user {
   passwordHashed String   @map("password_hashed") @db.VarChar(255)
   passwordTemp   String   @map("password_temp") @db.VarChar(255)
   roleId         String?  @map("role_id") @db.VarChar(36)
-  departmentId   String?  @map("department_id") @db.VarChar(36) // ← ADD
+  departmentId   String?  @map("department_id") @db.VarChar(36) 
+  specialUnitId  String?  @map("special_unit_id") @db.VarChar(36) 
   districtId     String?  @map("district_id") @db.VarChar(36)
   officerId      String?  @map("officer_id") @db.VarChar(36)
   updatedAt      DateTime @updatedAt @map("updated_at")
@@ -28,6 +29,10 @@ model user {
   department department? @relation(fields: [departmentId], references: [id]) // ← ADD
   district   District?   @relation(fields: [districtId], references: [id])
   officer    officer?    @relation(fields: [officerId], references: [id])
+    specialUnit    specialUnits? @relation(fields: [specialUnitId], references: [id])  // ← ADD
+ 
+   
+  @@index([specialUnitId, districtId, userName])
 
   @@index([code])
   @@index([departmentId, districtId, userName])
@@ -74,7 +79,9 @@ model specialUnits {
   updatedById String?  @map("updated_by") @db.VarChar(255)
   isActive    Boolean  @default(true) @map("is_active")
 
+  users    user[]
   projects project[]
+
 
   @@index([code])
   @@map("special_units")

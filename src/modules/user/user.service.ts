@@ -1,3 +1,5 @@
+// user.service.ts — full updated file
+
 import prisma from "../../shared/prisma";
 import bcrypt from "bcrypt";
 import { generateTokens } from "../../utils/jwt";
@@ -5,21 +7,49 @@ import { generateTokens } from "../../utils/jwt";
 type CreateUserInput = {
   userName: string;
   email: string;
-  passwordTemp: string;
-  passwordHashed?: string;
+  password: string;
   roleId?: string;
   departmentId?: string;
+  specialUnitId?: string;
   districtId?: string;
   officerId?: string;
   createdById?: string;
 };
 
-// ─── GET ALL ────────────────────────────────────────────────────────────────
+type UpdateUserInput = {
+  userName?: string;
+  email?: string;
+  passwordTemp?: string;
+  roleId?: string;
+  departmentId?: string;
+  specialUnitId?: string;
+  districtId?: string;
+  officerId?: string;
+  updatedById?: string;
+};
+
+// ─── HELPERS ─────────────────────────────────────────────────────────────────
+
+function resolveDeptAndUnit(
+  departmentId?: string | null,
+  specialUnitId?: string | null
+) {
+  if (departmentId && specialUnitId) {
+    throw new Error("Select either a department or a special unit, not both");
+  }
+  return {
+    departmentId: departmentId ?? null,
+    specialUnitId: specialUnitId ?? null,
+  };
+}
+
+// ─── GET ALL ─────────────────────────────────────────────────────────────────
 
 export const getAllUsersService = async (filters?: {
   search?: string;
   roleId?: string;
   departmentId?: string;
+  specialUnitId?: string;
   districtId?: string;
   officerId?: string;
   pageNumber?: number;
@@ -39,6 +69,7 @@ export const getAllUsersService = async (filters?: {
   }
   if (filters?.roleId) where.roleId = filters.roleId;
   if (filters?.departmentId) where.departmentId = filters.departmentId;
+  if (filters?.specialUnitId) where.specialUnitId = filters.specialUnitId;
   if (filters?.districtId) where.districtId = filters.districtId;
 
   const [data, total] = await Promise.all([
@@ -47,7 +78,13 @@ export const getAllUsersService = async (filters?: {
       skip,
       take: size,
       orderBy: { createdAt: "desc" },
-      include: { role: true, department: true, district: true },
+      include: {
+        role: true,
+        department: true,
+        district: true,
+        specialUnit: true,
+        officer: true,
+      },
     }),
     prisma.user.count({ where }),
   ]);
@@ -60,31 +97,44 @@ export const getAllUsersService = async (filters?: {
 export const getUserByIdService = async (id: string) => {
   return prisma.user.findUnique({
     where: { id },
-    include: { role: true, department: true, district: true },
+    include: {
+      role: true,
+      department: true,
+      district: true,
+      specialUnit: true,
+      officer: true,
+    },
   });
 };
 
 // ─── CREATE ──────────────────────────────────────────────────────────────────
 
-export const createUserService = async (data: any) => {
+export const createUserService = async (data: CreateUserInput) => {
   if (!data.password) throw new Error("Password is required");
   if (!data.userName || !data.email)
     throw new Error("Username and Email are required");
 
-  // 🔴 Duplicate check
-  if (data.departmentId && data.districtId) {
-    const duplicate = await prisma.user.findFirst({
-      where: {
-        userName: data.userName,
-        departmentId: data.departmentId,
-        districtId: data.districtId,
-        isActive: true,
-      },
-    });
+  // Enforce mutual exclusivity
+  const { departmentId, specialUnitId } = resolveDeptAndUnit(
+    data.departmentId,
+    data.specialUnitId
+  );
 
+  // Duplicate check: same userName + district + (department OR specialUnit)
+  if (data.districtId) {
+    const dupWhere: any = {
+      userName: data.userName,
+      districtId: data.districtId,
+      isActive: true,
+    };
+
+    if (departmentId) dupWhere.departmentId = departmentId;
+    else if (specialUnitId) dupWhere.specialUnitId = specialUnitId;
+
+    const duplicate = await prisma.user.findFirst({ where: dupWhere });
     if (duplicate) {
       throw new Error(
-        "A user with the same name already exists in this department and district"
+        "A user with the same name already exists in this district and department/unit"
       );
     }
   }
@@ -101,7 +151,6 @@ export const createUserService = async (data: any) => {
   });
   if (existingUserName) throw new Error("Username already taken");
 
-  // ✅ FIX HERE
   const hashedPassword = await bcrypt.hash(data.password, 10);
 
   return prisma.user.create({
@@ -110,16 +159,20 @@ export const createUserService = async (data: any) => {
       email: data.email,
       passwordHashed: hashedPassword,
       passwordTemp: data.password,
-
-      
-
       roleId: data.roleId ?? null,
-      departmentId: data.departmentId ?? null,
+      departmentId,
+      specialUnitId,
       districtId: data.districtId ?? null,
       officerId: data.officerId ?? null,
       createdById: data.createdById ?? null,
     },
-    include: { role: true, department: true, district: true },
+    include: {
+      role: true,
+      department: true,
+      district: true,
+      specialUnit: true,
+      officer: true,
+    },
   });
 };
 
@@ -127,34 +180,51 @@ export const createUserService = async (data: any) => {
 
 export const updateUserService = async (
   id: string,
-  data: Partial<CreateUserInput> & { updatedById?: string }
+  data: UpdateUserInput
 ) => {
   const existing = await prisma.user.findUnique({ where: { id } });
   if (!existing || !existing.isActive) throw new Error("User not found");
 
+  // Resolve department/specialUnit — fall back to existing values if not provided
+  // but if either is explicitly passed, enforce mutual exclusivity
+  const incomingDept =
+    "departmentId" in data ? data.departmentId : existing.departmentId;
+  const incomingUnit =
+    "specialUnitId" in data ? data.specialUnitId : existing.specialUnitId;
+
+  const { departmentId, specialUnitId } = resolveDeptAndUnit(
+    incomingDept,
+    incomingUnit
+  );
+
+  // If one side is being set, explicitly null out the other
+  const finalDeptId = data.specialUnitId ? null : departmentId;
+  const finalUnitId = data.departmentId ? null : specialUnitId;
+
   // Duplicate check on update (exclude self)
-  const deptId = data.departmentId ?? existing.departmentId;
   const distId = data.districtId ?? existing.districtId;
   const uName = data.userName ?? existing.userName;
 
-  if (deptId && distId) {
-    const duplicate = await prisma.user.findFirst({
-      where: {
-        userName: uName,
-        departmentId: deptId,
-        districtId: distId,
-        isActive: true,
-        NOT: { id },
-      },
-    });
+  if (distId) {
+    const dupWhere: any = {
+      userName: uName,
+      districtId: distId,
+      isActive: true,
+      NOT: { id },
+    };
+
+    if (finalDeptId) dupWhere.departmentId = finalDeptId;
+    else if (finalUnitId) dupWhere.specialUnitId = finalUnitId;
+
+    const duplicate = await prisma.user.findFirst({ where: dupWhere });
     if (duplicate) {
       throw new Error(
-        "A user with the same name already exists in this department and district"
+        "A user with the same name already exists in this district and department/unit"
       );
     }
   }
 
-  // Check email uniqueness (exclude self)
+  // Email uniqueness (exclude self)
   if (data.email && data.email !== existing.email) {
     const emailExists = await prisma.user.findFirst({
       where: { email: data.email, NOT: { id } },
@@ -162,7 +232,7 @@ export const updateUserService = async (
     if (emailExists) throw new Error("Email already in use");
   }
 
-  // Check username uniqueness (exclude self)
+  // Username uniqueness (exclude self)
   if (data.userName && data.userName !== existing.userName) {
     const unameExists = await prisma.user.findFirst({
       where: { userName: data.userName, NOT: { id } },
@@ -174,13 +244,14 @@ export const updateUserService = async (
     userName: data.userName,
     email: data.email,
     roleId: data.roleId,
-    departmentId: data.departmentId,
+    departmentId: finalDeptId,
+    specialUnitId: finalUnitId,
     districtId: data.districtId,
     officerId: data.officerId,
     updatedById: data.updatedById,
   };
 
-  // ✅ Direct password update (admin edits, not forgot-password flow)
+  // Admin password update
   if (data.passwordTemp) {
     updatedData.passwordHashed = await bcrypt.hash(String(data.passwordTemp), 10);
     updatedData.passwordTemp = data.passwordTemp;
@@ -189,7 +260,13 @@ export const updateUserService = async (
   return prisma.user.update({
     where: { id },
     data: updatedData,
-    include: { role: true, department: true, district: true,officer: true },
+    include: {
+      role: true,
+      department: true,
+      district: true,
+      specialUnit: true,
+      officer: true,
+    },
   });
 };
 
@@ -204,10 +281,18 @@ export const deleteUserService = async (id: string, updatedById?: string) => {
 
 // ─── LOGIN ───────────────────────────────────────────────────────────────────
 
-export const loginService = async (data: { userName: string; password: string }) => {
+export const loginService = async (data: {
+  userName: string;
+  password: string;
+}) => {
   const user = await prisma.user.findFirst({
     where: { userName: data.userName, isActive: true },
-    include: { role: true, department: true, district: true },
+    include: {
+      role: true,
+      department: true,
+      district: true,
+      specialUnit: true,
+    },
   });
 
   if (!user) throw new Error("User not found");
@@ -217,7 +302,8 @@ export const loginService = async (data: { userName: string; password: string })
   if (user.passwordHashed && user.passwordHashed.trim() !== "") {
     isMatch = await bcrypt.compare(data.password, user.passwordHashed);
   } else if (user.passwordTemp && user.passwordTemp.trim() !== "") {
-    if (data.password !== user.passwordTemp) throw new Error("Invalid credentials");
+    if (data.password !== user.passwordTemp)
+      throw new Error("Invalid credentials");
 
     const hashedPassword = await bcrypt.hash(data.password, 10);
     await prisma.user.update({
@@ -247,6 +333,7 @@ export const loginService = async (data: { userName: string; password: string })
       email: user.email,
       role: user.role,
       department: user.department,
+      specialUnit: user.specialUnit,
       district: user.district,
     },
     accessToken,
@@ -274,6 +361,15 @@ export const getDistrictsService = async () => {
 
 export const getRolesService = async () => {
   return prisma.roles.findMany({
+    orderBy: { name: "asc" },
+    select: { id: true, name: true },
+  });
+};
+
+// ─── NEW: Special Units dropdown ─────────────────────────────────────────────
+export const getSpecialUnitsService = async () => {
+  return prisma.specialUnits.findMany({
+    where: { isActive: true },
     orderBy: { name: "asc" },
     select: { id: true, name: true },
   });
