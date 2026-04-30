@@ -4,7 +4,8 @@ import {
   getProjectByIdService,
   updateProjectService,
   deleteProjectService,
-  getProjectDashboardService
+  getProjectDashboardService,
+  getProjectsByUserService
 } from "./project.service";
 
 export const createProjectUsecase = async (data: any) => {
@@ -57,4 +58,8 @@ export const deleteProjectUsecase = async (id: string) => {
 
 export const getProjectDashboardUsecase = async () => {
   return getProjectDashboardService();
+};
+
+export const getProjectsByUserUsecase = async (userId: string) => {
+  return await getProjectsByUserService(userId);
 };

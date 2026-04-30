@@ -5,7 +5,8 @@ import {
   getProjectByIdUsecase,
   updateProjectUsecase,
   deleteProjectUsecase,
-  getProjectDashboardUsecase
+  getProjectDashboardUsecase,
+  getProjectsByUserUsecase
 } from "./project.usecase";
 
 type StatusType = string | undefined;
@@ -124,6 +125,25 @@ export const getProjectDashboardController = async (
     res.status(500).json({
       success: false,
       message: error.message,
+    });
+  }
+};
+
+
+export const getProjectsByUserController = async (req: Request, res: Response) => {
+  try {
+    const userId = String(req.params.userId);
+
+    const result = await getProjectsByUserUsecase(userId);
+
+    res.status(200).json({
+      success: true,
+      data: result
+    });
+  } catch (error: any) {
+    res.status(500).json({
+      success: false,
+      message: error.message
     });
   }
 };

@@ -5,7 +5,8 @@ import {
   getProjectByIdController,
   updateProjectController,
   deleteProjectController,
-  getProjectDashboardController
+  getProjectDashboardController,
+  getProjectsByUserController
 } from "./project.controller";
 
 import { validateRequest } from "../../middleware/validateRequest";
@@ -51,5 +52,10 @@ router.patch(
 );
 
 router.get("/getProjectDashboard", getProjectDashboardController);
+
+router.get(
+  "/getProjectsByUser/:userId",
+  getProjectsByUserController
+);
 
 export default router;
