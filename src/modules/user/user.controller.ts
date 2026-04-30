@@ -56,9 +56,15 @@ export const updateUser = async (req: Request<{ id: string }>, res: Response) =>
 
 export const deleteUser = async (req: Request<{ id: string }>, res: Response) => {
   try {
-    await deleteUserUsecase(req.params.id, req.body.updatedById);
+    // ✅ SAFE ACCESS (this is the fix)
+    const updatedById = req.body?.updatedById;
+
+    await deleteUserUsecase(req.params.id, updatedById);
+
     ok(res, { message: "User deleted successfully" });
-  } catch (e) { fail(res, e); }
+  } catch (e) { 
+    fail(res, e); 
+  }
 };
 
 export const login = async (req: Request, res: Response) => {
