@@ -5,10 +5,13 @@ import {
   updateUserService,
   deleteUserService,
   loginService,
+  getDepartmentsService,
+  getDistrictsService,
+  getRolesService,
 } from "./user.service";
 
-export const getAllUsersUsecase = async () => {
-  return await getAllUsersService();
+export const getAllUsersUsecase = async (filters?: any) => {
+  return await getAllUsersService(filters);
 };
 
 export const getUserByIdUsecase = async (id: string) => {
@@ -25,13 +28,14 @@ export const updateUserUsecase = async (id: string, data: any) => {
   return await updateUserService(id, data);
 };
 
-export const deleteUserUsecase = async (
-  id: string,
-  updatedById?: string
-) => {
+export const deleteUserUsecase = async (id: string, updatedById?: string) => {
   return await deleteUserService(id, updatedById);
 };
 
 export const loginUsecase = async (data: any) => {
   return loginService(data);
 };
+
+export const getDepartmentsUsecase = async () => getDepartmentsService();
+export const getDistrictsUsecase = async () => getDistrictsService();
+export const getRolesUsecase = async () => getRolesService();
