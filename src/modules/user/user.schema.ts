@@ -6,6 +6,7 @@ export const createUserSchema = joi.object({
   password: joi.string().min(4).required(),
   roleId: joi.string().optional(),
   departmentId: joi.string().optional(),
+  specialUnitId: joi.string().optional(),   // ← ADD
   districtId: joi.string().optional(),
   officerId: joi.string().optional(),
   createdById: joi.string().optional(),
@@ -14,9 +15,10 @@ export const createUserSchema = joi.object({
 export const updateUserSchema = joi.object({
   userName: joi.string().max(15).optional(),
   email: joi.string().email().optional(),
-  passwordTemp: joi.string().min(6).optional(), // editable by admin
+  passwordTemp: joi.string().min(6).optional(),
   roleId: joi.string().optional(),
   departmentId: joi.string().optional(),
+  specialUnitId: joi.string().optional(),   // ← ADD
   districtId: joi.string().optional(),
   officerId: joi.string().optional(),
   updatedById: joi.string().optional(),
@@ -28,6 +30,7 @@ export const getAllUsersSchema = joi.object({
   search: joi.string().optional().allow(""),
   roleId: joi.string().optional(),
   departmentId: joi.string().optional(),
+  specialUnitId: joi.string().optional(),   // ← ADD
   districtId: joi.string().optional(),
 });
 

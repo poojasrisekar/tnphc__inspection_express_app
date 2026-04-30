@@ -8,6 +8,7 @@ import {
   getDepartmentsService,
   getDistrictsService,
   getRolesService,
+  getSpecialUnitsService,  // ← ADD
 } from "./user.service";
 
 export const getAllUsersUsecase = async (filters?: any) => {
@@ -39,3 +40,4 @@ export const loginUsecase = async (data: any) => {
 export const getDepartmentsUsecase = async () => getDepartmentsService();
 export const getDistrictsUsecase = async () => getDistrictsService();
 export const getRolesUsecase = async () => getRolesService();
+export const getSpecialUnitsUsecase = async () => getSpecialUnitsService();  // ← ADD
