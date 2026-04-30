@@ -1,6 +1,6 @@
-import { status } from "@prisma/client";
+
 import Joi from "joi";
-import { stat } from "node:fs";
+
 
 
 export const createProjectSchema = Joi.object({
@@ -12,6 +12,7 @@ export const createProjectSchema = Joi.object({
   officerId: Joi.string().required(),
   locationName: Joi.string().required(),
   projectName: Joi.string().required(),
+  assignedUserId: Joi.string().required(),
 
   stageId: Joi.array()
     .items(Joi.string().required())
@@ -36,15 +37,16 @@ export const updateProjectSchema = Joi.object({
   officerId: Joi.string().optional(),
   locationName: Joi.string().optional(),
   projectName: Joi.string().optional(),
+  assignedUserId: Joi.string().optional(),
 
-  // ❌ stage → FIX
+ 
   stageId: Joi.array().items(Joi.string().required()).optional(),
 
   status: Joi.string()
     .valid("AssignedProjects", "TotalProjects", "OngoingProjects", "CompletedProjects")
     .optional(),
 
-  // 🔥 ADD THIS
+  
   superStructure: Joi.array()
     .items(
       Joi.object({

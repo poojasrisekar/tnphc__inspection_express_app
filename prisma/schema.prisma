@@ -30,6 +30,7 @@ model user {
   district   District?   @relation(fields: [districtId], references: [id])
   officer    officer?    @relation(fields: [officerId], references: [id])
     specialUnit    specialUnits? @relation(fields: [specialUnitId], references: [id])  // ← ADD
+    assignedProjects project[]
  
    
   @@index([specialUnitId, districtId, userName])
@@ -174,6 +175,12 @@ model project {
   officerId    String? // FK
   locationName String
   projectName  String
+    // ✅ NEW: store selected stage ids
+  selectedStageIds Json? @map("selected_stage_ids")
+
+  // ✅ NEW: assign user
+  assignedUserId String? @db.VarChar(36)
+  assignedUser   user?   @relation(fields: [assignedUserId], references: [id])
 
   stages stage[]
 
