@@ -4,10 +4,11 @@ import {
   getAllInspection,
   getInspectionById,
   updateInspection,
-  deleteInspection
+  deleteInspection,
 } from "./landSiteInspection.controller";
 
 import { validateRequest } from "../../middleware/validateRequest";
+import { upload } from "../../utils/multer";
 
 import {
   createLandSiteInspectionSchema,
@@ -15,11 +16,11 @@ import {
   getLandSiteInspectionSchema,
   deleteLandSiteInspectionSchema,
   listLandSiteInspectionSchema,
-  updateLandSiteInspectionParamsSchema
+  updateLandSiteInspectionParamsSchema,
 } from "./landSiteInspection.schema";
-import { upload } from "../../utils/multer";
 
 const router = express.Router();
+
 
 router.post(
   "/createLandSiteInspection",
@@ -28,31 +29,31 @@ router.post(
   createInspection
 );
 
-// ✅ Get All (by projectId)
+
 router.get(
-  "/listLandSiteInspections",
+  "/land-site-inspections",
   validateRequest(listLandSiteInspectionSchema, "query"),
   getAllInspection
 );
 
-// ✅ Get By ID
 router.get(
-  "/getLandSiteInspection/:id",
+  "/land-site-inspections/:id",
   validateRequest(getLandSiteInspectionSchema, "params"),
   getInspectionById
 );
 
-// ✅ Update
+
 router.put(
-  "/updateLandSiteInspection/:id",
+  "/land-site-inspections/:id",
+  upload.array("treesPhoto", 3),
   validateRequest(updateLandSiteInspectionParamsSchema, "params"),
   validateRequest(updateLandSiteInspectionSchema),
   updateInspection
 );
 
-// ✅ Delete (soft)
+
 router.delete(
-  "/deleteLandSiteInspection/:id",
+  "/land-site-inspections/:id",
   validateRequest(deleteLandSiteInspectionSchema, "params"),
   deleteInspection
 );
