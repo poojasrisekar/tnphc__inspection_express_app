@@ -915,8 +915,9 @@ model superStructure {
   id        String @id @default(uuid())
   projectId String
 
-  blockName   String // A, B, C
-  totalFloors Int // 5, 4, etc.
+  blockName   String 
+  totalFloors Int 
+  floors Json?  
 
   createdAt   DateTime @default(now()) @map("created_at")
   updatedAt   DateTime @updatedAt @map("updated_at")

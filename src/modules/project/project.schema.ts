@@ -23,7 +23,15 @@ export const createProjectSchema = Joi.object({
     .items(
       Joi.object({
         blockName: Joi.string().required(),
-        totalFloors: Joi.number().integer().min(1).required()
+
+        // still keep for reference (optional or required as per your need)
+        totalFloors: Joi.number().integer().min(1).required(),
+
+        
+        floors: Joi.array()
+          .items(Joi.string().required())
+          .min(1)
+          .required()
       })
     )
     .optional()
