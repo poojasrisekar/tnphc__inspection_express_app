@@ -3,7 +3,6 @@ import { pageConfig } from "../../utils/query.helper";
 import prisma from "../../shared/prisma";
 
 export const createProjectService = async (data: any) => {
-  // console.log("req ------------->>> ", data);
 
   // ✅ officer validation
   if (data.officerId) {
@@ -21,6 +20,7 @@ export const createProjectService = async (data: any) => {
     if (!userExists) throw new Error("Invalid assignedUserId");
   }
 
+  // ✅ department / special unit validation
   if (!data.departmentId && !data.specialUnitId) {
     throw new Error("At least one of departmentId or specialUnitId is required");
   }
@@ -31,6 +31,7 @@ export const createProjectService = async (data: any) => {
       : {};
 
   return await prisma.$transaction(async (tx) => {
+
     // ✅ Create Project
     const project = await tx.project.create({
       data: {
@@ -40,28 +41,41 @@ export const createProjectService = async (data: any) => {
         officerId: data.officerId,
         locationName: data.locationName,
         projectName: data.projectName,
-
-        // ✅ NEW
         assignedUserId: data.assignedUserId,
-
-        // ✅ NEW JSON
         selectedStageIds: data.stageId,
-
         ...stageData,
         status: status.AssignedProjects,
         createdById: data.createdById
       }
     });
 
-    // ✅ SuperStructure
+    // ✅ SuperStructure with CUSTOM floors
     if (Array.isArray(data.superStructure) && data.superStructure.length > 0) {
-      await tx.superStructure.createMany({
-        data: data.superStructure.map((b: any) => ({
+
+      const superStructureData = data.superStructure.map((b: any) => {
+
+        // 🔥 Validation (important)
+        if (!Array.isArray(b.floors) || b.floors.length === 0) {
+          throw new Error(`Floors required for block ${b.blockName}`);
+        }
+
+        if (b.totalFloors !== b.floors.length) {
+          throw new Error(
+            `totalFloors mismatch in block ${b.blockName}`
+          );
+        }
+
+        return {
           projectId: project.id,
           blockName: b.blockName,
           totalFloors: b.totalFloors,
+          floors: b.floors, // ✅ store custom JSON
           createdById: data.createdById
-        }))
+        };
+      });
+
+      await tx.superStructure.createMany({
+        data: superStructureData
       });
     }
 
