@@ -1,144 +1,104 @@
-import e from "express";
 import Joi from "joi";
 
-// ✅ Reusable enum
+const yesNo = Joi.string().valid("Yes", "No");
 
+// 🔹 helpers
+const requiredIfYes = (field: string, schema: Joi.Schema) =>
+  Joi.when(field, {
+    is: "Yes",
+    then: schema.required(),
+    otherwise: Joi.forbidden(),
+  });
+
+const optionalIfYes = (field: string, schema: Joi.Schema) =>
+  Joi.when(field, {
+    is: "Yes",
+    then: schema.optional(),
+    otherwise: Joi.forbidden(),
+  });
+
+/**
+ * ✅ CREATE / UPDATE SCHEMA
+ */
 export const createLandSiteInspectionSchema = Joi.object({
-
   projectId: Joi.string().required(),
 
-  // 🔹 Encroachment
-  isEncroachment: Joi.string().valid("Yes", "No").required(),
-  encroachmentPercent: Joi.number().required(),
-  encroachmentType: Joi.string().required(),
+  isEncroachment: yesNo.required(),
+  encroachmentPercent: requiredIfYes("isEncroachment", Joi.number()),
+  encroachmentType: requiredIfYes("isEncroachment", Joi.string()),
 
-  // 🔹 Court Cases
-  isCourtCase:  Joi.string().valid("Yes", "No").required(),
-  caseDetails: Joi.string().required(),
+  isCourtCase: yesNo.required(),
+  caseDetails: requiredIfYes("isCourtCase", Joi.string()),
 
-  // 🔹 Existing Structure
-  hasStructure: Joi.string().valid("Yes", "No").required(),
-  structureDetails:Joi.string().required(),
+  hasStructure: yesNo.required(),
+  structureDetails: requiredIfYes("hasStructure", Joi.string()),
 
-  // 🔹 Drainage
-  isLowLying: Joi.string().valid("Yes", "No").required(),
-  waterDepth: Joi.number().required(),
-  waterDurationDays: Joi.number().integer().required(),
+  isLowLying: yesNo.required(),
+  waterDepth: requiredIfYes("isLowLying", Joi.number()),
+  waterDurationDays: requiredIfYes("isLowLying", Joi.number()),
 
-  // 🔹 Trees
-  treesCount: Joi.number().integer().min(0).optional(),
- treesPhoto: Joi.any().optional(),
+  treesCount: Joi.number().required(),
 
-  // 🔹 Power Lines
-  hasPowerLines:  Joi.string().valid("Yes", "No").required(),
-  powerLineDetails:Joi.string().required(),
+  hasPowerLines: yesNo.required(),
+  powerLineDetails: requiredIfYes("hasPowerLines", Joi.string()),
 
-  // 🔹 Restricted Zones
-  isNearMonument: Joi.string().valid("Yes", "No").required(),
-  monumentName:Joi.string().required(),
-  monumentDistance: Joi.number().required(),
+  isNearMonument: yesNo.required(),
+  monumentName: requiredIfYes("isNearMonument", Joi.string()),
+  monumentDistance: requiredIfYes("isNearMonument", Joi.number()),
 
-  isNearSea: Joi.string().valid("Yes", "No").required(),
-  seaDistance: Joi.number().required(),
+  isNearSea: yesNo.required(),
+  seaDistance: optionalIfYes("isNearSea", Joi.number()),
 
-  isNearForest: Joi.string().valid("Yes", "No").required(),
-  forestName: Joi.string().required(),
-  forestDistance: Joi.number().required(),
+  isNearForest: yesNo.required(),
+  forestName: requiredIfYes("isNearForest", Joi.string()),
+  forestDistance: requiredIfYes("isNearForest", Joi.number()),
 
-  isNearWaterBody:Joi.string().valid("Yes", "No").required(),
-  waterBodyName: Joi.string().required(),
-  waterBodyDistance: Joi.number().required(),
+  isNearWaterBody: yesNo.required(),
+  waterBodyName: requiredIfYes("isNearWaterBody", Joi.string()),
+  waterBodyDistance: optionalIfYes("isNearWaterBody", Joi.number()),
 
-  // 🔹 Burial Ground
-  isNearBurial: Joi.string().valid("Yes", "No").required(),
-  burialName: Joi.string().required(),
-  burialDistance: Joi.number().required(),
+  isNearBurial: yesNo.required(),
+  burialName: requiredIfYes("isNearBurial", Joi.string()),
+  burialDistance: requiredIfYes("isNearBurial", Joi.number()),
 
-  // 🔹 Roads
-  roadType: Joi.string().optional(),
+  roadType: Joi.string().required(),
   roadWidth: Joi.number().optional(),
 
-  // 🔹 Essential Services
-  nearestService: Joi.string().optional(),
-  serviceDistance: Joi.number().optional(),
+  nearestService: Joi.string().required(),
+  serviceDistance: Joi.number().required(),
 
+  treesPhoto: Joi.any().optional(),
 });
 
-export const updateLandSiteInspectionSchema = Joi.object({
+/**
+ * ✅ UPDATE = SAME AS CREATE
+ */
+export const updateLandSiteInspectionSchema = createLandSiteInspectionSchema;
 
-  projectId: Joi.string().required(),
-
-  // 🔹 Encroachment
-  isEncroachment: Joi.string().valid("Yes", "No").required(),
-  encroachmentPercent: Joi.number().required(),
-  encroachmentType: Joi.string().required(),
-
-  // 🔹 Court Cases
-  isCourtCase:  Joi.string().valid("Yes", "No").required(),
-  caseDetails: Joi.string().required(),
-
-  // 🔹 Existing Structure
-  hasStructure: Joi.string().valid("Yes", "No").required(),
-  structureDetails:Joi.string().required(),
-
-  // 🔹 Drainage
-  isLowLying: Joi.string().valid("Yes", "No").required(),
-  waterDepth: Joi.number().required(),
-  waterDurationDays: Joi.number().integer().required(),
-
-  // 🔹 Trees
-  treesCount: Joi.number().integer().min(0).optional(),
-  treesPhoto: Joi.array()
-    .items(Joi.string())
-    .max(3) // ✅ max 3 images
-    .optional(),
-
-  // 🔹 Power Lines
-  hasPowerLines:  Joi.string().valid("Yes", "No").required(),
-  powerLineDetails:Joi.string().required(),
-
-  // 🔹 Restricted Zones
-  isNearMonument: Joi.string().valid("Yes", "No").required(),
-  monumentName:Joi.string().required(),
-  monumentDistance: Joi.number().required(),
-
-  isNearSea: Joi.string().valid("Yes", "No").required(),
-  seaDistance: Joi.number().required(),
-
-  isNearForest: Joi.string().valid("Yes", "No").required(),
-  forestName: Joi.string().required(),
-  forestDistance: Joi.number().required(),
-
-  isNearWaterBody:Joi.string().valid("Yes", "No").required(),
-  waterBodyName: Joi.string().required(),
-  waterBodyDistance: Joi.number().required(),
-
-  // 🔹 Burial Ground
-  isNearBurial: Joi.string().valid("Yes", "No").required(),
-  burialName: Joi.string().required(),
-  burialDistance: Joi.number().required(),
-
-  // 🔹 Roads
-  roadType: Joi.string().optional(),
-  roadWidth: Joi.number().optional(),
-
-  // 🔹 Essential Services
-  nearestService: Joi.string().optional(),
-  serviceDistance: Joi.number().optional(),
-
-});
-
+/**
+ * ✅ GET BY ID PARAM
+ */
 export const getLandSiteInspectionSchema = Joi.object({
-  id: Joi.string().required()
-});
-
-export const deleteLandSiteInspectionSchema = Joi.object({
-  id: Joi.string().required()
-});
-
-export const listLandSiteInspectionSchema = Joi.object({
-  projectId: Joi.string().required()
-});
- export const updateLandSiteInspectionParamsSchema = Joi.object({
   id: Joi.string().required(),
+});
+
+/**
+ * ✅ DELETE PARAM
+ */
+export const deleteLandSiteInspectionSchema = Joi.object({
+  id: Joi.string().required(),
+});
+
+/**
+ * ✅ UPDATE PARAM
+ */
+export const updateLandSiteInspectionParamsSchema = Joi.object({
+  id: Joi.string().required(),
+});
+
+/**
+ * ✅ LIST QUERY
+ */
+export const listLandSiteInspectionSchema = Joi.object({
+  projectId: Joi.string().required(),
 });
