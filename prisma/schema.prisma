@@ -205,7 +205,10 @@ model project {
   TakeoverDevelopmentWork    TakeoverDevelopmentWork[]
 
   SuperStructure         superStructure[]
-  SuperStructureProgress superStructureProgress[]
+    SuperStructureProgress superStructureProgress[]
+
+  
+  superStructureQuality  superStructureQuality?
 }
 
 model officer {
@@ -933,13 +936,28 @@ model superStructure {
 model superStructureProgress {
   id        String @id @default(uuid())
   projectId String
+  project project @relation(fields: [projectId], references: [id])
 
-  blockName    String
-  currentFloor Int?
-  status       superStructureStatus
-  floorsProgress Json?
+  blockName String
+  floorName String
 
-    workStartedDate DateTime?
+  stage String?
+  photo Json?
+
+  status superStructureStatus @default(NOT_STARTED)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  
+}
+
+model superStructureQuality {
+  id        String @id @default(uuid())
+  projectId String @unique
+  project project @relation(fields: [projectId], references: [id])
+
+  workStartedDate DateTime?
 
   isDelay   Boolean?
   delayDays Int?
@@ -947,71 +965,47 @@ model superStructureProgress {
   delayReason      String?
   delayOtherReason String?
 
-
   cementGradeId String?
   cementBrandId String?
   cementRemarks String?
-
   cementLabTest String?
   cementPhoto   Json?
 
-  // SAND
   sandType String?
-
   sandLabTest String?
   sandPhoto   Json?
-
   sandSieveTestDone Boolean?
-
   sandSieveLabTest String?
   sandSievePhoto   Json?
 
-  // STEEL
   steelGradeId String?
   steelBrandId String?
-
   steelLabTest String?
   steelPhoto   Json?
 
-  // AGGREGATES
   aggregateSize Float?
-
   aggregateLabTest String?
   aggregatePhoto   Json?
 
-  // WATER
   waterLabTest String?
   waterPhoto   Json?
 
-  // CONCRETE
   concreteLabTest String?
   concretePhoto   Json?
-
   concreteQualityTestDone Boolean?
-
   concreteQualityLabTest String?
   concreteQualityPhoto   Json?
 
-  // BRICKS
   bricksLabTest String?
   bricksPhoto   Json?
-
   bricksQualityTestDone Boolean?
-
   bricksQualityLabTest String?
   bricksQualityPhoto   Json?
 
   qualityRemarks String?
 
-  createdAt   DateTime @default(now()) @map("created_at")
-  updatedAt   DateTime @updatedAt @map("updated_at")
-  createdById String?  @map("created_by")
-  updatedById String?  @map("updated_by")
-  isActive    Boolean  @default(true) @map("is_active")
-
-  project project @relation(fields: [projectId], references: [id], onDelete: Cascade)
-
-  @@unique([projectId, blockName])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 enum superStructureStatus {

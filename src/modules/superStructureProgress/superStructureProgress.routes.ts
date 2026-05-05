@@ -1,49 +1,43 @@
 import express from "express";
-import {
-  getSuperStructureProgressViewController,
-  createSuperStructureProgressController,
-  updateSuperStructureProgressController
-} from "./superStructureProgress.controller";
-
-import { validateRequest } from "../../middleware/validateRequest";
-import {
-  createSuperStructureProgressSchema
-} from "./superStructureProgress.schema";
-
 import { upload } from "../../utils/multer";
+
+import {
+  getSuperStructureFullViewController,
+  createProgressController,
+  createQualityController,
+  deleteProgressController
+} from "./superStructureProgress.controller";
 
 const router = express.Router();
 
-router.get(
-  "/get/:projectId",
-  getSuperStructureProgressViewController
+// 🔹 GET
+router.get("/full/:projectId", getSuperStructureFullViewController);
+
+// 🔹 PROGRESS
+router.post(
+  "/progress",
+  upload.fields([{ name: "photo" }]),
+  createProgressController
 );
 
+// 🔹 QUALITY
 router.post(
-  "/create",
+  "/quality",
   upload.fields([
-    { name: "superStructurePhoto" },
     { name: "cementPhoto" },
     { name: "sandPhoto" },
     { name: "steelPhoto" },
     { name: "aggregatePhoto" },
     { name: "waterPhoto" },
     { name: "concretePhoto" },
-    { name: "bricksPhoto" }
+    { name: "concreteQualityPhoto" },
+    { name: "bricksPhoto" },
+    { name: "bricksQualityPhoto" }
   ]),
-  validateRequest(createSuperStructureProgressSchema, "body"),
-  createSuperStructureProgressController
+  createQualityController
 );
 
-router.put(
-  "/update/:id",
-  upload.fields([
-    { name: "superStructurePhoto" },
-    { name: "cementPhoto" },
-    { name: "sandPhoto" },
-    { name: "steelPhoto" }
-  ]),
-  updateSuperStructureProgressController
-);
+// 🔹 DELETE
+router.delete("/progress/:id", deleteProgressController);
 
 export default router;

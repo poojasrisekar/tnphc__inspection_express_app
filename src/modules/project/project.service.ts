@@ -207,7 +207,7 @@ export const getProjectByIdService = async (id: string) => {
       return {
         blockName: b.blockName,
         totalFloors: b.totalFloors,
-        currentFloor: progress?.currentFloor ?? null,
+        currentFloor: progress?.floorName ?? null,
         status: progress?.status ?? "NOT_STARTED"
       };
     }),
