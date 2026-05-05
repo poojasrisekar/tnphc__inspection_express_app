@@ -1,34 +1,38 @@
 import prisma from "../../shared/prisma";
 
-export const getSuperStructureProgressViewService = async (
-  projectId: string
-) => {
+// 🔥 GET FULL VIEW
+export const getSuperStructureFullViewService = async (projectId: string) => {
   const project = await prisma.project.findUnique({
     where: { id: projectId },
     include: {
-      SuperStructure: true, // ❌ REMOVE where filter
-      SuperStructureProgress: true
+      SuperStructure: true,
+      SuperStructureProgress: true,
+      superStructureQuality: true
     }
   });
 
   if (!project) throw new Error("Project not found");
 
   const blocks = project.SuperStructure.map((block) => {
-    const progress = project.SuperStructureProgress.find(
+    const progressList = project.SuperStructureProgress.filter(
       (p) => p.blockName === block.blockName
     );
 
     return {
       blockName: block.blockName,
       totalFloors: block.totalFloors,
-
-      // 🔥 IMPORTANT FIX
       floors: block.floors ?? [],
 
-      currentFloor: progress?.currentFloor ?? 0,
-      status: progress?.status ?? "NOT_STARTED",
+      currentFloor: progressList.length,
 
-      isStarted: !!progress
+      status:
+        progressList.length === 0
+          ? "NOT_STARTED"
+          : progressList.length === block.totalFloors
+          ? "COMPLETED"
+          : "IN_PROGRESS",
+
+      isStarted: progressList.length > 0
     };
   });
 
@@ -36,22 +40,51 @@ export const getSuperStructureProgressViewService = async (
     projectId: project.id,
     projectName: project.projectName,
     locationName: project.locationName,
-
     totalBlocks: blocks.length,
-
-    blocks
+    blocks,
+    quality: project.superStructureQuality || null
   };
 };
 
-// ✅ CREATE
-export const createSuperStructureProgressDB = (data: any) => {
+// 🔥 UPSERT PROGRESS
+export const upsertProgressDB = async (data: any) => {
+  const existing = await prisma.superStructureProgress.findFirst({
+    where: {
+      projectId: data.projectId,
+      blockName: data.blockName,
+      floorName: data.floorName
+    }
+  });
+
+  if (existing) {
+    return prisma.superStructureProgress.update({
+      where: { id: existing.id },
+      data
+    });
+  }
+
   return prisma.superStructureProgress.create({ data });
 };
 
-// ✅ UPDATE
-export const updateSuperStructureProgressDB = (id: string, data: any) => {
-  return prisma.superStructureProgress.update({
-    where: { id },
-    data
+// 🔥 DELETE
+export const deleteProgressDB = (id: string) => {
+  return prisma.superStructureProgress.delete({
+    where: { id }
   });
+};
+
+// 🔥 UPSERT QUALITY
+export const upsertQualityDB = async (data: any) => {
+  const existing = await prisma.superStructureQuality.findUnique({
+    where: { projectId: data.projectId }
+  });
+
+  if (existing) {
+    return prisma.superStructureQuality.update({
+      where: { projectId: data.projectId },
+      data
+    });
+  }
+
+  return prisma.superStructureQuality.create({ data });
 };

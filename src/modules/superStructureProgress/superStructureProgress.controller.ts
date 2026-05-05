@@ -1,86 +1,83 @@
 import { Request, Response } from "express";
 import {
-  getSuperStructureProgressViewUsecase,
-  createSuperStructureProgressUsecase,
-  updateSuperStructureProgressUsecase
+  getSuperStructureFullViewUsecase,
+  createProgressUsecase,
+  createQualityUsecase,
+  deleteProgressUsecase
 } from "./superStructureProgress.usecase";
 
-// ✅ GET
-export const getSuperStructureProgressViewController = async (
+// 🔹 helper (VERY IMPORTANT)
+const getSingleValue = (val: any): string => {
+  return Array.isArray(val) ? val[0] : val;
+};
+
+// 🔹 GET
+export const getSuperStructureFullViewController = async (
   req: Request,
   res: Response
 ) => {
   try {
-    const projectId = String(req.params.projectId);
+    const projectId = getSingleValue(req.params.projectId);
 
-    const data =
-      await getSuperStructureProgressViewUsecase(projectId);
+    const data = await getSuperStructureFullViewUsecase(projectId);
 
-    res.status(200).json({
-      success: true,
-      data
-    });
-  } catch (error: any) {
-    res.status(404).json({
-      success: false,
-      message: error.message
-    });
+    res.status(200).json({ success: true, data });
+  } catch (e: any) {
+    res.status(500).json({ success: false, message: e.message });
   }
 };
 
-// ✅ CREATE
-export const createSuperStructureProgressController = async (
+// 🔹 PROGRESS
+export const createProgressController = async (
   req: Request,
   res: Response
 ) => {
   try {
-    const result =
-      await createSuperStructureProgressUsecase(
-        req.body,
-        req.files,
-        req,
-        req.user?.id
-      );
+    const data = await createProgressUsecase(
+      req.body,
+      req.files,
+      req
+    );
 
-    res.status(201).json({
-      success: true,
-      message: "Created successfully",
-      data: result
-    });
-  } catch (error: any) {
-    res.status(400).json({
-      success: false,
-      message: error.message
-    });
+    res.status(200).json({ success: true, data });
+  } catch (e: any) {
+    res.status(400).json({ success: false, message: e.message });
   }
 };
 
-// ✅ UPDATE
-export const updateSuperStructureProgressController = async (
+// 🔹 QUALITY
+export const createQualityController = async (
   req: Request,
   res: Response
 ) => {
   try {
-    const id = String(req.params.id);
+    const data = await createQualityUsecase(
+      req.body,
+      req.files,
+      req
+    );
 
-    const result =
-      await updateSuperStructureProgressUsecase(
-        id,
-        req.body,
-        req.files,
-        req,
-        req.user?.id
-      );
+    res.status(200).json({ success: true, data });
+  } catch (e: any) {
+    res.status(400).json({ success: false, message: e.message });
+  }
+};
+
+// 🔹 DELETE
+export const deleteProgressController = async (
+  req: Request,
+  res: Response
+) => {
+  try {
+    const id = getSingleValue(req.params.id);
+
+    await deleteProgressUsecase(id);
 
     res.status(200).json({
       success: true,
-      message: "Updated successfully",
-      data: result
+      message: "Deleted successfully"
     });
-  } catch (error: any) {
-    res.status(400).json({
-      success: false,
-      message: error.message
-    });
+  } catch (e: any) {
+    res.status(500).json({ success: false, message: e.message });
   }
 };
