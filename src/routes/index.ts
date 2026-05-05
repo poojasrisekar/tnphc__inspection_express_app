@@ -22,7 +22,8 @@ import exteriorsStageRoutes from "../modules/ExteriorsStage/Exteriorsstage.route
 import developmentWorkRoutes from "../modules/DevelopmentWork/DevelopmentWork.route";
 import  buildingInspectionRoutes  from "../modules/BuildingInspection/BuildingInspection.routers";
 import  TakeoverBuildingInspectionRoutes from "../modules/takeoverBuildingInspection/takeoverBuildingInspection.router"; 
-import takeoverDevelopmentRoutes from "../modules/takeoverDevelopmentWork/takeoverDevelopmentWork.route"
+import takeoverDevelopmentRoutes from "../modules/takeoverDevelopmentWork/takeoverDevelopmentWork.route";
+import superStructureProgressRoutes from "../modules/superStructureProgress/superStructureProgress.routes";
 
 
 
@@ -51,6 +52,7 @@ router.use("/building-inspection", baseAuth, buildingInspectionRoutes);
 router.use("/development-work", baseAuth, developmentWorkRoutes);
 router.use("/takeover-buildinginspection", baseAuth,TakeoverBuildingInspectionRoutes);
 router.use("/takeover-developmentwork", baseAuth, takeoverDevelopmentRoutes);
+router.use("/superstructure",baseAuth,superStructureProgressRoutes);
 
 
 
