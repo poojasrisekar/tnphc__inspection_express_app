@@ -17,15 +17,15 @@ const optionalIfYes = (field: string, schema: Joi.Schema) =>
     otherwise: Joi.forbidden(),
   });
 
-/**
- * ✅ CREATE / UPDATE SCHEMA
- */
+
 export const createLandSiteInspectionSchema = Joi.object({
   projectId: Joi.string().required(),
 
   isEncroachment: yesNo.required(),
   encroachmentPercent: requiredIfYes("isEncroachment", Joi.number()),
   encroachmentType: requiredIfYes("isEncroachment", Joi.string()),
+  personEncroachingName: requiredIfYes("isEncroachment", Joi.string()),
+  
 
   isCourtCase: yesNo.required(),
   caseDetails: requiredIfYes("isCourtCase", Joi.string()),
@@ -70,35 +70,25 @@ export const createLandSiteInspectionSchema = Joi.object({
   treesPhoto: Joi.any().optional(),
 });
 
-/**
- * ✅ UPDATE = SAME AS CREATE
- */
+
 export const updateLandSiteInspectionSchema = createLandSiteInspectionSchema;
 
-/**
- * ✅ GET BY ID PARAM
- */
+
 export const getLandSiteInspectionSchema = Joi.object({
   id: Joi.string().required(),
 });
 
-/**
- * ✅ DELETE PARAM
- */
+
 export const deleteLandSiteInspectionSchema = Joi.object({
   id: Joi.string().required(),
 });
 
-/**
- * ✅ UPDATE PARAM
- */
+
 export const updateLandSiteInspectionParamsSchema = Joi.object({
   id: Joi.string().required(),
 });
 
-/**
- * ✅ LIST QUERY
- */
+
 export const listLandSiteInspectionSchema = Joi.object({
   projectId: Joi.string().required(),
 });
