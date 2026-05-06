@@ -163,15 +163,27 @@ export const updateInspectionService = async (
 };
 
 // ✅ GET ALL
-export const getAllInspectionService = (projectId: string) => {
+export const getAllInspectionService = (
+  projectId?: string
+) => {
   return prisma.landSiteInspection.findMany({
-    where: { projectId, isActive: true },
+    where: {
+      isActive: true,
+      ...(projectId ? { projectId } : {}),
+    },
   });
 };
 
 // ✅ GET ONE
-export const getInspectionByIdService = (id: string) => {
-  return prisma.landSiteInspection.findUnique({ where: { id } });
+export const getInspectionByIdService = (
+  projectId: string
+) => {
+  return prisma.landSiteInspection.findFirst({
+    where: {
+      projectId,
+      isActive: true,
+    },
+  });
 };
 
 // ✅ DELETE
