@@ -10,8 +10,15 @@ export const getAllFoundationQualityCheckDB = (projectId: string) => {
   });
 };
 
-export const getFoundationQualityCheckByIdDB = (id: string) => {
-  return prisma.foundationQualityCheck.findUnique({ where: { id } });
+export const getFoundationQualityCheckByIdDB = (
+  projectId: string
+) => {
+  return prisma.foundationQualityCheck.findFirst({
+    where: {
+      projectId,
+      isActive: true
+    }
+  });
 };
 
 export const updateFoundationQualityCheckDB = (id: string, data: any) => {

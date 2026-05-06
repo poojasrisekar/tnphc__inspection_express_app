@@ -43,7 +43,10 @@ router.get(
   getAllFoundationQualityCheck
 );
 
-router.get("/getFoundationQualityCheck/:id", getFoundationQualityCheckById);
+router.get(
+  "/getFoundationQualityCheck/:projectId",
+  getFoundationQualityCheckById
+);
 
 router.put(
   "/updateFoundationQualityCheck/:id",
