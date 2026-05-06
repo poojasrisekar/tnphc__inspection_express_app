@@ -10,8 +10,15 @@ export const getAllFoundationProgressDB = (projectId: string) => {
   });
 };
 
-export const getFoundationProgressByIdDB = (id: string) => {
-  return prisma.foundationProgress.findUnique({ where: { id } });
+export const getFoundationProgressByIdDB = (
+  projectId: string
+) => {
+  return prisma.foundationProgress.findFirst({
+    where: {
+      projectId,
+      isActive: true
+    }
+  });
 };
 
 export const updateFoundationProgressDB = (id: string, data: any) => {

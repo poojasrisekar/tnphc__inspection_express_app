@@ -32,16 +32,27 @@ export const getAllFoundationProgress = async (req: Request, res: Response) => {
   }
 };
 
-export const getFoundationProgressById = async (req: Request, res: Response) => {
+export const getFoundationProgressById = async (
+  req: Request,
+  res: Response
+) => {
   try {
-    const id = req.params.id as string;  
-    const result = await getFoundationProgressByIdUsecase(id);
-    res.status(200).json({ success: true, data: result });
+    const projectId = req.params.projectId as string;
+
+    const result =
+      await getFoundationProgressByIdUsecase(projectId);
+
+    res.status(200).json({
+      success: true,
+      data: result
+    });
   } catch (err: any) {
-    res.status(404).json({ success: false, message: err.message });
+    res.status(404).json({
+      success: false,
+      message: err.message
+    });
   }
 };
-
 export const updateFoundationProgress = async (req: Request, res: Response) => {
   try {
     const id = req.params.id as string;  

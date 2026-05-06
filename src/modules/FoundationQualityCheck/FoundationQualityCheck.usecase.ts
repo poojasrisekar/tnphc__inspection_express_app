@@ -95,9 +95,17 @@ export const getAllFoundationQualityCheckUsecase = async (
   return getAllFoundationQualityCheckDB(projectId);
 };
 
-export const getFoundationQualityCheckByIdUsecase = async (id: string) => {
-  const data = await getFoundationQualityCheckByIdDB(id);
-  if (!data) throw new Error("Foundation quality check record not found");
+export const getFoundationQualityCheckByIdUsecase = async (
+  projectId: string
+) => {
+  const data =
+    await getFoundationQualityCheckByIdDB(projectId);
+
+  if (!data)
+    throw new Error(
+      "Foundation quality check record not found"
+    );
+
   return data;
 };
 

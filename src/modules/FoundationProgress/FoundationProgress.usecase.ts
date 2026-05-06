@@ -61,9 +61,15 @@ export const getAllFoundationProgressUsecase = async (projectId: string) => {
   return getAllFoundationProgressDB(projectId);
 };
 
-export const getFoundationProgressByIdUsecase = async (id: string) => {
-  const data = await getFoundationProgressByIdDB(id);
-  if (!data) throw new Error("Foundation progress record not found");
+export const getFoundationProgressByIdUsecase = async (
+  projectId: string
+) => {
+  const data =
+    await getFoundationProgressByIdDB(projectId);
+
+  if (!data)
+    throw new Error("Foundation progress record not found");
+
   return data;
 };
 

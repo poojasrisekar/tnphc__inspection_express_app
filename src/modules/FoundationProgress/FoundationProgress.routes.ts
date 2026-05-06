@@ -29,7 +29,10 @@ router.post(
 
 router.get("/getAllFoundationProgress/:projectId", getAllFoundationProgress);
 
-router.get("/getFoundationProgress/:id", getFoundationProgressById);
+router.get(
+  "/getFoundationProgress/:projectId",
+  getFoundationProgressById
+);
 
 router.put(
   "/updateFoundationProgress/:id",
