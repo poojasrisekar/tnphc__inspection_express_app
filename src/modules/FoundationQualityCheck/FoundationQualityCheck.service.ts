@@ -24,3 +24,50 @@ export const deleteFoundationQualityCheckDB = (id: string) => {
     data: { isActive: false }
   });
 };
+
+
+
+
+// 🔹 SINGLE PROJECT
+export const getFoundationCombinedByProjectDB = async (projectId: string) => {
+  const [progress, quality] = await Promise.all([
+    prisma.foundationProgress.findMany({
+      where: { projectId, isActive: true },
+      orderBy: { createdAt: "desc" }
+    }),
+    prisma.foundationQualityCheck.findMany({
+      where: { projectId, isActive: true },
+      orderBy: { createdAt: "desc" }
+    })
+  ]);
+
+  return {
+    foundationProgress: progress,
+    foundationQualityCheck: quality
+  };
+};
+
+// 🔹 ALL PROJECTS
+export const getAllFoundationCombinedDB = async () => {
+  const projects = await prisma.project.findMany({
+    where: { isActive: true },
+    include: {
+      foundationProgresses: {
+        where: { isActive: true },
+        orderBy: { createdAt: "desc" }
+      },
+      foundationQualityChecks: {
+        where: { isActive: true },
+        orderBy: { createdAt: "desc" }
+      }
+    }
+  });
+
+  return projects.map((p) => ({
+    projectId: p.id,
+    projectName: p.projectName,
+    locationName: p.locationName,
+    foundationProgress: p.foundationProgresses,
+    foundationQualityCheck: p.foundationQualityChecks
+  }));
+};

@@ -96,17 +96,22 @@ model LandSiteInspection {
   isEncroachment      YesNo
   encroachmentPercent Float?
   encroachmentType    String?
+  personEncroachingName String?
+  encroachmentPhotos  Json? 
+
   isCourtCase         YesNo
   caseDetails         String?
 
   // 🔹 Existing Structure
   hasStructure     YesNo
   structureDetails String?
+  structurePhotos  Json?
 
   // 🔹 Drainage
   isLowLying        YesNo
   waterDepth        Float?
   waterDurationDays Int?
+  drainagePhotos    Json?
 
   // 🔹 Trees
   treesCount Int?
@@ -115,27 +120,33 @@ model LandSiteInspection {
   // 🔹 Power Lines
   hasPowerLines    YesNo
   powerLineDetails String?
+  powerLinePhotos  Json?
 
   // 🔹 Restricted Zones
   isNearMonument   YesNo
   monumentName     String?
   monumentDistance Float?
+  monumentPhotos   Json?
 
   isNearSea   YesNo
   seaDistance Float?
+  seaPhotos   Json?
 
   isNearForest   YesNo
   forestName     String?
   forestDistance Float?
+  forestPhotos   Json?
 
   isNearWaterBody   Boolean?
   waterBodyName     String?
   waterBodyDistance Float?
+  waterBodyPhotos   Json?
 
   // 🔹 Burial Ground
   isNearBurial   YesNo
   burialName     String?
   burialDistance Float?
+  burialPhotos   Json?
 
   // 🔹 Roads
   roadType  String?

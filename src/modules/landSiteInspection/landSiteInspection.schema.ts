@@ -68,6 +68,17 @@ export const createLandSiteInspectionSchema = Joi.object({
   serviceDistance: Joi.number().required(),
 
   treesPhoto: Joi.any().optional(),
+  // 🔥 ADD THESE ONLY (don’t change anything else)
+
+encroachmentPhotos: Joi.any().optional(),
+structurePhotos: Joi.any().optional(),
+drainagePhotos: Joi.any().optional(),
+powerLinePhotos: Joi.any().optional(),
+monumentPhotos: Joi.any().optional(),
+seaPhotos: Joi.any().optional(),
+forestPhotos: Joi.any().optional(),
+waterBodyPhotos: Joi.any().optional(),
+burialPhotos: Joi.any().optional(),
 });
 
 

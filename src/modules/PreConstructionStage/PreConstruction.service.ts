@@ -6,12 +6,21 @@ export const createPreConstructionDB = (data: any) => {
 
 export const getAllPreConstructionDB = (projectId: string) => {
   return prisma.preConstructionInspection.findMany({
-    where: { projectId, isActive: true }
+    where: {
+      projectId,
+      isActive: true
+    },
+    orderBy: { createdAt: "desc" }
   });
 };
 
 export const getPreConstructionByIdDB = (id: string) => {
-  return prisma.preConstructionInspection.findUnique({ where: { id } });
+  return prisma.preConstructionInspection.findFirst({
+    where: {
+      id,
+      isActive: true
+    }
+  });
 };
 
 export const updatePreConstructionDB = (id: string, data: any) => {

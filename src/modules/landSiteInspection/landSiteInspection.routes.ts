@@ -24,7 +24,18 @@ const router = express.Router();
 
 router.post(
   "/createLandSiteInspection",
-  upload.array("treesPhoto", 3),
+  upload.fields([
+    { name: "encroachmentPhotos", maxCount: 3 },
+    { name: "structurePhotos", maxCount: 3 },
+    { name: "drainagePhotos", maxCount: 3 },
+    { name: "treesPhoto", maxCount: 3 },
+    { name: "powerLinePhotos", maxCount: 3 },
+    { name: "monumentPhotos", maxCount: 3 },
+    { name: "seaPhotos", maxCount: 3 },
+    { name: "forestPhotos", maxCount: 3 },
+    { name: "waterBodyPhotos", maxCount: 3 },
+    { name: "burialPhotos", maxCount: 3 },
+  ]),
   validateRequest(createLandSiteInspectionSchema),
   createInspection
 );
@@ -45,7 +56,18 @@ router.get(
 
 router.put(
   "/land-site-inspections/:id",
-  upload.array("treesPhoto", 3),
+  upload.fields([
+    { name: "encroachmentPhotos", maxCount: 3 },
+    { name: "structurePhotos", maxCount: 3 },
+    { name: "drainagePhotos", maxCount: 3 },
+    { name: "treesPhoto", maxCount: 3 },
+    { name: "powerLinePhotos", maxCount: 3 },
+    { name: "monumentPhotos", maxCount: 3 },
+    { name: "seaPhotos", maxCount: 3 },
+    { name: "forestPhotos", maxCount: 3 },
+    { name: "waterBodyPhotos", maxCount: 3 },
+    { name: "burialPhotos", maxCount: 3 },
+  ]),
   validateRequest(updateLandSiteInspectionParamsSchema, "params"),
   validateRequest(updateLandSiteInspectionSchema),
   updateInspection

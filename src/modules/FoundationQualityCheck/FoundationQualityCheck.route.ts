@@ -6,7 +6,10 @@ import {
   getAllFoundationQualityCheck,
   getFoundationQualityCheckById,
   updateFoundationQualityCheck,
-  deleteFoundationQualityCheck
+  deleteFoundationQualityCheck,
+   getFoundationCombinedByProject,
+  getAllFoundationCombined
+  
 } from "./FoundationQualityCheck.controller";
 import {
   createFoundationQualityCheckSchema,
@@ -52,6 +55,18 @@ router.put(
 router.delete(
   "/deleteFoundationQualityCheck/:id",
   deleteFoundationQualityCheck
+);
+
+
+router.get(
+  "/getFoundation/:projectId",
+  getFoundationCombinedByProject
+);
+
+// ✔ For admin (all projects)
+router.get(
+  "/getAllFoundation",
+  getAllFoundationCombined
 );
 
 export default router;
