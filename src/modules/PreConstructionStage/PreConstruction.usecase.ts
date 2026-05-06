@@ -72,9 +72,15 @@ export const getAllPreConstructionUsecase = async (projectId: string) => {
   return getAllPreConstructionDB(projectId);
 };
 
-export const getPreConstructionByIdUsecase = async (id: string) => {
-  const data = await getPreConstructionByIdDB(id);
-  if (!data) throw new Error("Not found");
+export const getPreConstructionByIdUsecase = async (
+  projectId: string
+) => {
+  const data =
+    await getPreConstructionByIdDB(projectId);
+
+  if (!data)
+    throw new Error("Not found");
+
   return data;
 };
 

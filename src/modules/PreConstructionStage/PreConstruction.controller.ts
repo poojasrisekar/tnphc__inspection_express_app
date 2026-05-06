@@ -52,20 +52,23 @@ export const getAllPreConstruction = async (req: Request, res: Response) => {
   }
 };
 
-export const getPreConstructionById = async (req: Request, res: Response) => {
+export const getPreConstructionById = async (
+  req: Request,
+  res: Response
+) => {
   try {
-    let { id } = req.params;
+    let { projectId } = req.params;
 
-    // ✅ FIX
-    if (Array.isArray(id)) {
-      id = id[0];
+    if (Array.isArray(projectId)) {
+      projectId = projectId[0];
     }
 
-    if (!id) {
-      throw new Error("Id is required");
+    if (!projectId) {
+      throw new Error("Project Id is required");
     }
 
-    const result = await getPreConstructionByIdUsecase(id);
+    const result =
+      await getPreConstructionByIdUsecase(projectId);
 
     res.status(200).json({
       success: true,

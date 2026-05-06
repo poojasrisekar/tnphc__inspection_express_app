@@ -14,10 +14,12 @@ export const getAllPreConstructionDB = (projectId: string) => {
   });
 };
 
-export const getPreConstructionByIdDB = (id: string) => {
+export const getPreConstructionByIdDB = (
+  projectId: string
+) => {
   return prisma.preConstructionInspection.findFirst({
     where: {
-      id,
+      projectId,
       isActive: true
     }
   });

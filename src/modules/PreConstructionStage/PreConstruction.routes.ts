@@ -28,7 +28,10 @@ router.post(
 router.get("/getAllPreConstruction", getAllPreConstruction);
 
 // GET BY ID
-router.get("/getPreConstruction/:id", getPreConstructionById);
+router.get(
+  "/getPreConstruction/:projectId",
+  getPreConstructionById
+);
 
 
 export default router;
