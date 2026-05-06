@@ -5,6 +5,8 @@ import {
   getSuperStructureFullViewController,
   createProgressController,
   createQualityController,
+  getProgressByProjectController,
+getQualityByProjectController,
   deleteProgressController
 } from "./superStructureProgress.controller";
 
@@ -36,6 +38,16 @@ router.post(
   ]),
   createQualityController
 );
+
+router.get(
+  "/progress/:projectId",
+  getProgressByProjectController
+);
+
+router.get(
+  "/quality/:projectId",
+  getQualityByProjectController
+);;
 
 // 🔹 DELETE
 router.delete("/progress/:id", deleteProgressController);

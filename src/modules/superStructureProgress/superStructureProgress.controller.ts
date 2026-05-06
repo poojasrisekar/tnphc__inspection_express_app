@@ -3,7 +3,9 @@ import {
   getSuperStructureFullViewUsecase,
   createProgressUsecase,
   createQualityUsecase,
-  deleteProgressUsecase
+  deleteProgressUsecase,
+  getProgressByProjectUsecase,
+  getQualityByProjectUsecase
 } from "./superStructureProgress.usecase";
 
 // 🔹 helper (VERY IMPORTANT)
@@ -79,5 +81,55 @@ export const deleteProgressController = async (
     });
   } catch (e: any) {
     res.status(500).json({ success: false, message: e.message });
+  }
+};
+
+export const getProgressByProjectController = async (
+  req: Request,
+  res: Response
+) => {
+  try {
+    const projectId = getSingleValue(
+      req.params.projectId
+    );
+
+    const data =
+      await getProgressByProjectUsecase(projectId);
+
+    res.status(200).json({
+      success: true,
+      data
+    });
+
+  } catch (e: any) {
+    res.status(400).json({
+      success: false,
+      message: e.message
+    });
+  }
+};
+
+export const getQualityByProjectController = async (
+  req: Request,
+  res: Response
+) => {
+  try {
+    const projectId = getSingleValue(
+      req.params.projectId
+    );
+
+    const data =
+      await getQualityByProjectUsecase(projectId);
+
+    res.status(200).json({
+      success: true,
+      data
+    });
+
+  } catch (e: any) {
+    res.status(400).json({
+      success: false,
+      message: e.message
+    });
   }
 };
