@@ -1,6 +1,6 @@
 import prisma from "../../shared/prisma";
 
-// 🔥 GET FULL VIEW
+//  GET FULL VIEW
 export const getSuperStructureFullViewService = async (projectId: string) => {
   const project = await prisma.project.findUnique({
     where: { id: projectId },
@@ -46,7 +46,7 @@ export const getSuperStructureFullViewService = async (projectId: string) => {
   };
 };
 
-// 🔥 UPSERT PROGRESS
+//  UPSERT PROGRESS
 export const upsertProgressDB = async (data: any) => {
   const existing = await prisma.superStructureProgress.findFirst({
     where: {
@@ -66,14 +66,14 @@ export const upsertProgressDB = async (data: any) => {
   return prisma.superStructureProgress.create({ data });
 };
 
-// 🔥 DELETE
+//  DELETE
 export const deleteProgressDB = (id: string) => {
   return prisma.superStructureProgress.delete({
     where: { id }
   });
 };
 
-// 🔥 UPSERT QUALITY
+//  UPSERT QUALITY
 export const upsertQualityDB = async (data: any) => {
   const existing = await prisma.superStructureQuality.findUnique({
     where: { projectId: data.projectId }
@@ -87,4 +87,29 @@ export const upsertQualityDB = async (data: any) => {
   }
 
   return prisma.superStructureQuality.create({ data });
+};
+
+
+export const getProgressByProjectService = async (
+  projectId: string
+) => {
+  return prisma.superStructureProgress.findMany({
+    where: {
+      projectId
+    },
+
+    orderBy: {
+      createdAt: "desc"
+    }
+  });
+};
+
+export const getQualityByProjectService = async (
+  projectId: string
+) => {
+  return prisma.superStructureQuality.findFirst({
+    where: {
+      projectId
+    }
+  });
 };

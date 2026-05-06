@@ -2,7 +2,9 @@ import {
   getSuperStructureFullViewService,
   upsertProgressDB,
   deleteProgressDB,
-  upsertQualityDB
+  upsertQualityDB,
+  getProgressByProjectService,
+  getQualityByProjectService
 } from "./superStructureProgress.service";
 
 // 🔹 GET
@@ -98,3 +100,14 @@ export const createQualityUsecase = async (body: any, files: any, req: any) => {
     qualityRemarks: body.qualityRemarks
   });
 };
+
+
+export const getProgressByProjectUsecase =
+  async (projectId: string) => {
+    return getProgressByProjectService(projectId);
+  };
+
+export const getQualityByProjectUsecase =
+  async (projectId: string) => {
+    return getQualityByProjectService(projectId);
+  };
