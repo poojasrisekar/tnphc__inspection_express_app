@@ -118,9 +118,15 @@ export const getAllPlinthStageUsecase = async (projectId: string) => {
   return getAllPlinthStageDB(projectId);
 };
 
-export const getPlinthStageByIdUsecase = async (id: string) => {
-  const data = await getPlinthStageByIdDB(id);
-  if (!data) throw new Error("Plinth stage record not found");
+export const getPlinthStageByIdUsecase = async (
+  projectId: string
+) => {
+  const data =
+    await getPlinthStageByIdDB(projectId);
+
+  if (!data)
+    throw new Error("Plinth stage record not found");
+
   return data;
 };
 

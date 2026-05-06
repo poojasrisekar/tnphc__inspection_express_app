@@ -37,7 +37,11 @@ router.post(
 );
 
 router.get("/getAllPlinthStage/:projectId", getAllPlinthStage);
-router.get("/getPlinthStage/:id", getPlinthStageById);
+
+router.get(
+  "/getPlinthStage/:projectId",
+  getPlinthStageById
+);
 
 router.put(
   "/updatePlinthStage/:id",

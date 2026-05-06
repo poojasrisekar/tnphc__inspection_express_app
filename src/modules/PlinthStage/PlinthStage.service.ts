@@ -10,8 +10,15 @@ export const getAllPlinthStageDB = (projectId: string) => {
   });
 };
 
-export const getPlinthStageByIdDB = (id: string) => {
-  return prisma.plinthStage.findUnique({ where: { id } });
+export const getPlinthStageByIdDB = (
+  projectId: string
+) => {
+  return prisma.plinthStage.findFirst({
+    where: {
+      projectId,
+      isActive: true
+    }
+  });
 };
 
 export const updatePlinthStageDB = (id: string, data: any) => {
