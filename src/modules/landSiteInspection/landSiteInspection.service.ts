@@ -6,6 +6,7 @@ const toNumber = (val: any) => {
   return isNaN(num) ? null : num;
 };
 
+// ✅ Delete sub-fields when parent flag is NOT "Yes"
 const cleanField = (obj: any, condition: boolean, fields: string[]) => {
   if (!condition) {
     fields.forEach((f) => delete obj[f]);
@@ -29,12 +30,16 @@ const parseInspectionData = (data: any) => {
     roadWidth: toNumber(data.roadWidth),
     serviceDistance: toNumber(data.serviceDistance),
 
-    // ✅ boolean conversion
+    // ✅ boolean conversion (Prisma stores this as Boolean, not YesNo enum)
     isNearWaterBody: data.isNearWaterBody === "Yes",
   };
 
-  // ✅ cleanup
-  cleanField(parsed, data.isEncroachment === "Yes", ["encroachmentPercent", "encroachmentType"]);
+  // ✅ Cleanup sub-fields when parent flag is NOT "Yes"
+  cleanField(parsed, data.isEncroachment === "Yes", [
+    "encroachmentPercent",
+    "encroachmentType",
+    "personEncroachingName",
+  ]);
   cleanField(parsed, data.isCourtCase === "Yes", ["caseDetails"]);
   cleanField(parsed, data.hasStructure === "Yes", ["structureDetails"]);
   cleanField(parsed, data.isLowLying === "Yes", ["waterDepth", "waterDurationDays"]);
@@ -48,8 +53,8 @@ const parseInspectionData = (data: any) => {
   return parsed;
 };
 
-// ✅ COMMON FILE FORMATTER
-const mapFiles = (files: any[], baseUrl: string) => {
+// ✅ FILE FORMATTER
+const mapFiles = (files: Express.Multer.File[], baseUrl: string) => {
   return (
     files?.map((file) => ({
       fileName: file.filename,
@@ -58,8 +63,34 @@ const mapFiles = (files: any[], baseUrl: string) => {
   );
 };
 
-// ✅ MULTI FILE HANDLER (NEW)
-const handleAllPhotos = (files: any, baseUrl: string) => {
+// ✅ CONVERT upload.any() ARRAY → named groups object
+// upload.any() returns: req.files = [{ fieldname: "encroachmentPhotos", ... }, ...]
+// We need:             { encroachmentPhotos: [...], structurePhotos: [...], ... }
+const groupFilesByFieldname = (
+  files: Express.Multer.File[]
+): { [fieldname: string]: Express.Multer.File[] } => {
+  const grouped: { [fieldname: string]: Express.Multer.File[] } = {};
+  if (!files || !Array.isArray(files)) return grouped;
+
+  for (const file of files) {
+    if (!grouped[file.fieldname]) {
+      grouped[file.fieldname] = [];
+    }
+    grouped[file.fieldname].push(file);
+  }
+  return grouped;
+};
+
+// ✅ MULTI FILE HANDLER
+const handleAllPhotos = (
+  rawFiles: Express.Multer.File[] | { [fieldname: string]: Express.Multer.File[] },
+  baseUrl: string
+) => {
+  // Support both upload.any() (array) and upload.fields() (object) formats
+  const files = Array.isArray(rawFiles)
+    ? groupFilesByFieldname(rawFiles)
+    : rawFiles;
+
   return {
     encroachmentPhotos: mapFiles(files?.encroachmentPhotos, baseUrl),
     structurePhotos: mapFiles(files?.structurePhotos, baseUrl),
@@ -81,6 +112,15 @@ export const createInspectionService = async (
   userId: string,
   baseUrl: string
 ) => {
+  // ✅ Validate project exists before inserting
+  const projectExists = await prisma.project.findUnique({
+    where: { id: body.projectId },
+  });
+
+  if (!projectExists) {
+    throw new Error(`Project with id "${body.projectId}" does not exist.`);
+  }
+
   const parsed = parseInspectionData(body);
 
   const photos = handleAllPhotos(files, baseUrl);
@@ -100,6 +140,15 @@ export const updateInspectionService = async (
   files: any,
   baseUrl: string
 ) => {
+  // ✅ Validate project exists before updating
+  const projectExists = await prisma.project.findUnique({
+    where: { id: body.projectId },
+  });
+
+  if (!projectExists) {
+    throw new Error(`Project with id "${body.projectId}" does not exist.`);
+  }
+
   const parsed = parseInspectionData(body);
 
   if (files) {

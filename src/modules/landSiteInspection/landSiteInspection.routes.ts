@@ -1,4 +1,5 @@
-import express from "express";
+import express, { Request, Response, NextFunction } from "express";
+import multer from "multer";
 import {
   createInspection,
   getAllInspection,
@@ -21,59 +22,60 @@ import {
 
 const router = express.Router();
 
+// ✅ upload.any() — accepts files in ANY order, mixed with text fields
+// Needed because the frontend sends photos inline between text fields
+const inspectionUpload = upload.any();
 
+// ✅ Multer error handler middleware
+const handleMulterError = (
+  err: any,
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  if (err instanceof multer.MulterError) {
+    return res.status(400).json({
+      success: false,
+      message: `File upload error: ${err.message}`,
+    });
+  }
+  next(err);
+};
+
+// ✅ CREATE
 router.post(
   "/createLandSiteInspection",
-  upload.fields([
-    { name: "encroachmentPhotos", maxCount: 3 },
-    { name: "structurePhotos", maxCount: 3 },
-    { name: "drainagePhotos", maxCount: 3 },
-    { name: "treesPhoto", maxCount: 3 },
-    { name: "powerLinePhotos", maxCount: 3 },
-    { name: "monumentPhotos", maxCount: 3 },
-    { name: "seaPhotos", maxCount: 3 },
-    { name: "forestPhotos", maxCount: 3 },
-    { name: "waterBodyPhotos", maxCount: 3 },
-    { name: "burialPhotos", maxCount: 3 },
-  ]),
+  inspectionUpload,
+  handleMulterError,
   validateRequest(createLandSiteInspectionSchema),
   createInspection
 );
 
-
+// ✅ GET ALL
 router.get(
   "/land-site-inspections",
   validateRequest(listLandSiteInspectionSchema, "query"),
   getAllInspection
 );
 
+// ✅ GET ONE
 router.get(
   "/land-site-inspections/:id",
   validateRequest(getLandSiteInspectionSchema, "params"),
   getInspectionById
 );
 
-
+// ✅ UPDATE
 router.put(
   "/land-site-inspections/:id",
-  upload.fields([
-    { name: "encroachmentPhotos", maxCount: 3 },
-    { name: "structurePhotos", maxCount: 3 },
-    { name: "drainagePhotos", maxCount: 3 },
-    { name: "treesPhoto", maxCount: 3 },
-    { name: "powerLinePhotos", maxCount: 3 },
-    { name: "monumentPhotos", maxCount: 3 },
-    { name: "seaPhotos", maxCount: 3 },
-    { name: "forestPhotos", maxCount: 3 },
-    { name: "waterBodyPhotos", maxCount: 3 },
-    { name: "burialPhotos", maxCount: 3 },
-  ]),
+  inspectionUpload,
+  handleMulterError,
   validateRequest(updateLandSiteInspectionParamsSchema, "params"),
   validateRequest(updateLandSiteInspectionSchema),
   updateInspection
 );
 
-
+// ✅ DELETE
 router.delete(
   "/land-site-inspections/:id",
   validateRequest(deleteLandSiteInspectionSchema, "params"),
