@@ -39,7 +39,7 @@ export const updateInspectionUsecase = async (
 };
 
 export const getAllInspectionUsecase = async (
-  projectId: string
+  projectId?: string
 ) => {
   return getAllInspectionService(projectId);
 };

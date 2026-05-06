@@ -80,11 +80,12 @@ export const getAllInspection = async (
   res: Response
 ) => {
   try {
-    const { projectId } = req.query;
+    
+const { projectId } = req.query;
 
-    const data = await getAllInspectionUsecase(
-      projectId as string
-    );
+const data = await getAllInspectionUsecase(
+  projectId as string | undefined
+);
 
     res.status(200).json({
       success: true,

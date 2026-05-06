@@ -106,5 +106,5 @@ export const updateLandSiteInspectionParamsSchema = Joi.object({
 });
 
 export const listLandSiteInspectionSchema = Joi.object({
-  projectId: Joi.string().required(),
+  projectId: Joi.string().optional(),
 });
