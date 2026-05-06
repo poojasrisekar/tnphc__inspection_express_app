@@ -53,14 +53,14 @@ router.post(
 
 // ✅ GET ALL
 router.get(
-  "/land-site-inspections",
+  "/getLandSiteInspection",
   validateRequest(listLandSiteInspectionSchema, "query"),
   getAllInspection
 );
 
 // ✅ GET ONE
 router.get(
-  "/land-site-inspections/:id",
+  "/getLandSiteInspection/:id",
   validateRequest(getLandSiteInspectionSchema, "params"),
   getInspectionById
 );
