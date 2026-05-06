@@ -4,13 +4,20 @@ import {
   getAllInspectionUsecase,
   getInspectionByIdUsecase,
   updateInspectionUsecase,
-  deleteInspectionUsecase
+  deleteInspectionUsecase,
 } from "./landSiteInspection.usecase";
 
-export const createInspection = async (req: Request, res: Response) => {
+export const createInspection = async (
+  req: Request,
+  res: Response
+) => {
   try {
     const userId = (req as any).user?.id;
-    const files = req.files as Express.Multer.File[];
+
+    const files = req.files as {
+      [fieldname: string]: Express.Multer.File[];
+    };
+
     const baseUrl = `${req.protocol}://${req.get("host")}`;
 
     const data = await createInspectionUsecase(
@@ -20,16 +27,31 @@ export const createInspection = async (req: Request, res: Response) => {
       baseUrl
     );
 
-    res.status(201).json({ success: true, data });
+    res.status(201).json({
+      success: true,
+      data,
+    });
   } catch (err: any) {
-    res.status(400).json({ success: false, message: err.message });
+    console.log(err);
+
+    res.status(400).json({
+      success: false,
+      message: err.message,
+    });
   }
 };
 
-export const updateInspection = async (req: Request, res: Response) => {
+export const updateInspection = async (
+  req: Request,
+  res: Response
+) => {
   try {
     const id = String(req.params.id);
-    const files = req.files as Express.Multer.File[];
+
+    const files = req.files as {
+      [fieldname: string]: Express.Multer.File[];
+    };
+
     const baseUrl = `${req.protocol}://${req.get("host")}`;
 
     const data = await updateInspectionUsecase(
@@ -39,44 +61,88 @@ export const updateInspection = async (req: Request, res: Response) => {
       baseUrl
     );
 
-    res.json({ success: true, data });
+    res.status(200).json({
+      success: true,
+      data,
+    });
   } catch (err: any) {
-    res.status(400).json({ success: false, message: err.message });
+    console.log(err);
+
+    res.status(400).json({
+      success: false,
+      message: err.message,
+    });
   }
 };
 
-export const getAllInspection = async (req: Request, res: Response) => {
+export const getAllInspection = async (
+  req: Request,
+  res: Response
+) => {
   try {
     const { projectId } = req.query;
 
-    const data = await getAllInspectionUsecase(projectId as string);
+    const data = await getAllInspectionUsecase(
+      projectId as string
+    );
 
-    res.json({ success: true, total: data.length, data });
+    res.status(200).json({
+      success: true,
+      total: data.length,
+      data,
+    });
   } catch (err: any) {
-    res.status(400).json({ success: false, message: err.message });
+    console.log(err);
+
+    res.status(400).json({
+      success: false,
+      message: err.message,
+    });
   }
 };
 
-export const getInspectionById = async (req: Request, res: Response) => {
+export const getInspectionById = async (
+  req: Request,
+  res: Response
+) => {
   try {
     const id = String(req.params.id);
 
     const data = await getInspectionByIdUsecase(id);
 
-    res.json({ success: true, data });
+    res.status(200).json({
+      success: true,
+      data,
+    });
   } catch (err: any) {
-    res.status(404).json({ success: false, message: err.message });
+    console.log(err);
+
+    res.status(404).json({
+      success: false,
+      message: err.message,
+    });
   }
 };
 
-export const deleteInspection = async (req: Request, res: Response) => {
+export const deleteInspection = async (
+  req: Request,
+  res: Response
+) => {
   try {
     const id = String(req.params.id);
 
     await deleteInspectionUsecase(id);
 
-    res.json({ success: true, message: "Deleted successfully" });
+    res.status(200).json({
+      success: true,
+      message: "Deleted successfully",
+    });
   } catch (err: any) {
-    res.status(400).json({ success: false, message: err.message });
+    console.log(err);
+
+    res.status(400).json({
+      success: false,
+      message: err.message,
+    });
   }
 };
