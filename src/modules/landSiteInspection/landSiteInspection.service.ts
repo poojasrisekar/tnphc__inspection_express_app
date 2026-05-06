@@ -29,11 +29,11 @@ const parseInspectionData = (data: any) => {
     roadWidth: toNumber(data.roadWidth),
     serviceDistance: toNumber(data.serviceDistance),
 
-    // ✅ boolean conversion (important)
+    // ✅ boolean conversion
     isNearWaterBody: data.isNearWaterBody === "Yes",
   };
 
-  // ✅ cleanup unwanted fields
+  // ✅ cleanup
   cleanField(parsed, data.isEncroachment === "Yes", ["encroachmentPercent", "encroachmentType"]);
   cleanField(parsed, data.isCourtCase === "Yes", ["caseDetails"]);
   cleanField(parsed, data.hasStructure === "Yes", ["structureDetails"]);
@@ -48,30 +48,44 @@ const parseInspectionData = (data: any) => {
   return parsed;
 };
 
-const handleFiles = (files: any[], baseUrl: string) => {
-  const photos =
+// ✅ COMMON FILE FORMATTER
+const mapFiles = (files: any[], baseUrl: string) => {
+  return (
     files?.map((file) => ({
       fileName: file.filename,
       url: `${baseUrl}/uploads/${file.filename}`,
-    })) || [];
+    })) || []
+  );
+};
 
-  if (photos.length > 3) {
-    throw new Error("Max 3 tree photos allowed");
-  }
-
-  return photos;
+// ✅ MULTI FILE HANDLER (NEW)
+const handleAllPhotos = (files: any, baseUrl: string) => {
+  return {
+    encroachmentPhotos: mapFiles(files?.encroachmentPhotos, baseUrl),
+    structurePhotos: mapFiles(files?.structurePhotos, baseUrl),
+    drainagePhotos: mapFiles(files?.drainagePhotos, baseUrl),
+    treesPhoto: mapFiles(files?.treesPhoto, baseUrl),
+    powerLinePhotos: mapFiles(files?.powerLinePhotos, baseUrl),
+    monumentPhotos: mapFiles(files?.monumentPhotos, baseUrl),
+    seaPhotos: mapFiles(files?.seaPhotos, baseUrl),
+    forestPhotos: mapFiles(files?.forestPhotos, baseUrl),
+    waterBodyPhotos: mapFiles(files?.waterBodyPhotos, baseUrl),
+    burialPhotos: mapFiles(files?.burialPhotos, baseUrl),
+  };
 };
 
 // ✅ CREATE
 export const createInspectionService = async (
   body: any,
-  files: any[],
+  files: any,
   userId: string,
   baseUrl: string
 ) => {
   const parsed = parseInspectionData(body);
 
-  parsed.treesPhoto = handleFiles(files, baseUrl);
+  const photos = handleAllPhotos(files, baseUrl);
+  Object.assign(parsed, photos);
+
   parsed.createdById = userId;
 
   return prisma.landSiteInspection.create({
@@ -83,13 +97,14 @@ export const createInspectionService = async (
 export const updateInspectionService = async (
   id: string,
   body: any,
-  files: any[],
+  files: any,
   baseUrl: string
 ) => {
   const parsed = parseInspectionData(body);
 
-  if (files?.length) {
-    parsed.treesPhoto = handleFiles(files, baseUrl);
+  if (files) {
+    const photos = handleAllPhotos(files, baseUrl);
+    Object.assign(parsed, photos);
   }
 
   return prisma.landSiteInspection.update({

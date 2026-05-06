@@ -1,7 +1,10 @@
 import express from "express";
 import { upload } from "../../utils/multer";
 import { validateRequest } from "../../middleware/validateRequest";
-import { createPreConstruction } from "./PreConstruction.controller";
+import { createPreConstruction,
+   getAllPreConstruction,
+  getPreConstructionById
+ } from "./PreConstruction.controller";
 import { createPreConstructionSchema } from "./PreConstruction.schema";
 
 const router = express.Router();
@@ -20,6 +23,12 @@ router.post(
   createPreConstruction
 );
 
+
+// GET ALL (with projectId)
+router.get("/getAllPreConstruction", getAllPreConstruction);
+
+// GET BY ID
+router.get("/getPreConstructionById/:id", getPreConstructionById);
 
 
 export default router;

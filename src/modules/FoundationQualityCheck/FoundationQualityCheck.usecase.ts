@@ -3,7 +3,9 @@ import {
   getAllFoundationQualityCheckDB,
   getFoundationQualityCheckByIdDB,
   updateFoundationQualityCheckDB,
-  deleteFoundationQualityCheckDB
+  deleteFoundationQualityCheckDB,
+   getFoundationCombinedByProjectDB,
+  getAllFoundationCombinedDB
 } from "./FoundationQualityCheck.service";
 
 export const createFoundationQualityCheckUsecase = async (
@@ -194,4 +196,16 @@ export const updateFoundationQualityCheckUsecase = async (
 
 export const deleteFoundationQualityCheckUsecase = async (id: string) => {
   return deleteFoundationQualityCheckDB(id);
+};
+
+export const getFoundationCombinedByProjectUsecase = async (
+  projectId: string
+) => {
+  if (!projectId) throw new Error("Project Id is required");
+  return getFoundationCombinedByProjectDB(projectId);
+};
+
+// 🔹 ALL PROJECTS
+export const getAllFoundationCombinedUsecase = async () => {
+  return getAllFoundationCombinedDB();
 };

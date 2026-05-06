@@ -4,7 +4,9 @@ import {
   getAllFoundationQualityCheckUsecase,
   getFoundationQualityCheckByIdUsecase,
   updateFoundationQualityCheckUsecase,
-  deleteFoundationQualityCheckUsecase
+  deleteFoundationQualityCheckUsecase,
+   getFoundationCombinedByProjectUsecase,
+  getAllFoundationCombinedUsecase
 } from "./FoundationQualityCheck.usecase";
 
 export const createFoundationQualityCheck = async (
@@ -81,5 +83,51 @@ export const deleteFoundationQualityCheck = async (
     res.status(200).json({ success: true, message: "Deleted" });
   } catch (err: any) {
     res.status(400).json({ success: false, message: err.message });
+  }
+};
+
+
+export const getFoundationCombinedByProject = async (
+  req: Request,
+  res: Response
+) => {
+  try {
+    const projectId = Array.isArray(req.params.projectId)
+      ? req.params.projectId[0]
+      : req.params.projectId;
+
+    const result = await getFoundationCombinedByProjectUsecase(projectId);
+
+    res.status(200).json({
+      success: true,
+      data: result
+    });
+
+  } catch (err: any) {
+    res.status(400).json({
+      success: false,
+      message: err.message
+    });
+  }
+};
+
+// 🔹 ALL PROJECTS (ADMIN)
+export const getAllFoundationCombined = async (
+  req: Request,
+  res: Response
+) => {
+  try {
+    const result = await getAllFoundationCombinedUsecase();
+
+    res.status(200).json({
+      success: true,
+      data: result
+    });
+
+  } catch (err: any) {
+    res.status(400).json({
+      success: false,
+      message: err.message
+    });
   }
 };
