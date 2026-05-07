@@ -1,54 +1,65 @@
 import express from "express";
 import { upload } from "../../utils/multer";
-import { validateRequest } from "../../middleware/validateRequest";
+
 import {
-  createExteriorsStage,
-  getAllExteriorsStage,
-  getExteriorsStageById,
-  updateExteriorsStage,
-  deleteExteriorsStage
+  getExteriorsFullViewController,
+  createExteriorsProgressController,
+  createExteriorsQualityController,
+  getExteriorsProgressByProjectController,
+  getExteriorsQualityByProjectController,
+  deleteExteriorsProgressController
 } from "./Exteriorsstage.controller";
-import {
-  createExteriorsStageSchema,
-  updateExteriorsStageSchema
-} from "./Exteriorsstage.schema";
 
 const router = express.Router();
 
-const uploadFields = upload.fields([
-  { name: "progressPhoto", maxCount: 5 },
-  { name: "cementPhoto", maxCount: 3 },
-  { name: "sandPhoto", maxCount: 3 },
-  { name: "sandSievePhoto", maxCount: 3 },
-  { name: "aggregatePhoto", maxCount: 3 },
-  { name: "waterPhoto", maxCount: 3 },
-  { name: "concretePhoto", maxCount: 3 },
-  { name: "concreteQualityPhoto", maxCount: 3 },
-  { name: "bricksPhoto", maxCount: 3 },
-  { name: "bricksQualityPhoto", maxCount: 3 },
-  { name: "plasteringPhoto", maxCount: 3 }
-]);
-
-router.post(
-  "/createExteriorsStage",
-  uploadFields,
-  validateRequest(createExteriorsStageSchema),
-  createExteriorsStage
-);
-
-router.get("/getAllExteriorsStage/:projectId", getAllExteriorsStage);
+// 🔹 FULL VIEW
 router.get(
-  "/getExteriorsStage/:projectId",
-  getExteriorsStageById
+  "/full/:projectId",
+  getExteriorsFullViewController
 );
 
-router.put(
-  "/updateExteriorsStage/:id",
-  uploadFields,
-  validateRequest(updateExteriorsStageSchema),
-  updateExteriorsStage
+// 🔹 PROGRESS
+router.post(
+  "/progress",
+  upload.fields([
+    { name: "progressPhoto", maxCount: 5 }
+  ]),
+  createExteriorsProgressController
 );
 
-router.delete("/deleteExteriorsStage/:id", deleteExteriorsStage);
+// 🔹 QUALITY
+router.post(
+  "/quality",
+  upload.fields([
+    { name: "cementPhoto", maxCount: 3 },
+    { name: "sandPhoto", maxCount: 3 },
+    { name: "sandSievePhoto", maxCount: 3 },
+    { name: "aggregatePhoto", maxCount: 3 },
+    { name: "waterPhoto", maxCount: 3 },
+    { name: "concretePhoto", maxCount: 3 },
+    { name: "concreteQualityPhoto", maxCount: 3 },
+    { name: "bricksPhoto", maxCount: 3 },
+    { name: "bricksQualityPhoto", maxCount: 3 },
+    { name: "plasteringPhoto", maxCount: 3 }
+  ]),
+  createExteriorsQualityController
+);
+
+// 🔹 GET
+router.get(
+  "/progress/:projectId",
+  getExteriorsProgressByProjectController
+);
+
+router.get(
+  "/quality/:projectId",
+  getExteriorsQualityByProjectController
+);
+
+// 🔹 DELETE
+router.delete(
+  "/progress/:id",
+  deleteExteriorsProgressController
+);
 
 export default router;

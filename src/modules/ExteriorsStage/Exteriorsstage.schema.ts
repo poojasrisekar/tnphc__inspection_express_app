@@ -1,179 +1,250 @@
 import Joi from "joi";
 
-export const createExteriorsStageSchema = Joi.object({
-  projectId: Joi.string().required(),
+const booleanField = Joi.boolean()
+  .truthy("true")
+  .falsy("false")
+  .optional()
+  .allow(null);
 
-  block: Joi.string().optional().allow(null, ""),
-  floor: Joi.string().optional().allow(null, ""),
-  stageOfWork: Joi.string().optional().allow(null, ""),
+// 🔹 PROGRESS
+export const createExteriorsProgressSchema =
+  Joi.object({
+    projectId: Joi.string()
+      .uuid()
+      .required(),
 
-  isCompleted: Joi.boolean().truthy("true").falsy("false").required(),
+    block: Joi.string()
+      .optional()
+      .allow("", null),
 
-  progressRemarks: Joi.string().optional().allow(null, ""),
+    floor: Joi.string()
+      .optional()
+      .allow("", null),
 
-  workStartedDate: Joi.date().optional().allow(null),
+    stageOfWork: Joi.string()
+      .optional()
+      .allow("", null),
 
-  isDelayed: Joi.boolean().truthy("true").falsy("false").optional().allow(null),
-  delayDays: Joi.number().integer().optional().allow(null),
-  delayReason: Joi.string().optional().allow(null, ""),
-  delayOther: Joi.string().optional().allow(null, ""),
+    isCompleted: Joi.boolean()
+      .truthy("true")
+      .falsy("false")
+      .required(),
 
-  // CEMENT
-  cementGradeId: Joi.string().optional().allow(null, ""),
-  cementBrandId: Joi.string().optional().allow(null, ""),
-  cementRemarks: Joi.string().optional().allow(null, ""),
-  cementLabTest: Joi.string().optional().allow(null, ""),
+    progressRemarks: Joi.string()
+      .optional()
+      .allow("", null),
 
-  // SAND
-  sandType: Joi.string().valid("RIVER", "M_SAND").optional().allow(null, ""),
-  sandLabTest: Joi.string().optional().allow(null, ""),
-  sandSieveTestDone: Joi.boolean()
-    .truthy("true")
-    .falsy("false")
-    .optional()
-    .allow(null),
-  sandSieveLabTest: Joi.string().optional().allow(null, ""),
+    progressPhoto: Joi.any()
+      .optional()
+  });
 
-  // AGGREGATE
-  aggregateSize: Joi.number().optional().allow(null),
-  aggregateLabTest: Joi.string().optional().allow(null, ""),
+// 🔹 QUALITY
+export const createExteriorsQualitySchema =
+  Joi.object({
 
-  // WATER
-  waterLabTest: Joi.string().optional().allow(null, ""),
+    projectId: Joi.string()
+      .uuid()
+      .required(),
 
-  // CONCRETE
-  concreteLabTest: Joi.string().optional().allow(null, ""),
-  concreteQualityTestDone: Joi.boolean()
-    .truthy("true")
-    .falsy("false")
-    .optional()
-    .allow(null),
-  concreteQualityLabTest: Joi.string().optional().allow(null, ""),
+    workStartedDate: Joi.date()
+      .optional()
+      .allow(null),
 
-  // BRICKS
-  bricksLabTest: Joi.string().optional().allow(null, ""),
-  bricksQualityTestDone: Joi.boolean()
-    .truthy("true")
-    .falsy("false")
-    .optional()
-    .allow(null),
-  bricksQualityLabTest: Joi.string().optional().allow(null, ""),
+    isDelayed: booleanField,
 
-  // PLASTERING
-  plasteringTestDone: Joi.boolean()
-    .truthy("true")
-    .falsy("false")
-    .optional()
-    .allow(null),
-  plasteringLabTest: Joi.string().optional().allow(null, ""),
-  plasteringRemarks: Joi.string().optional().allow(null, ""),
+    delayDays: Joi.number()
+      .integer()
+      .optional()
+      .allow(null),
 
-  // DOORS & WINDOWS
-  doorWindowType: Joi.string().optional().allow(null, ""),
-  upvcBrand: Joi.string().optional().allow(null, ""),
-  glassBrand: Joi.string().optional().allow(null, ""),
-  glassThickness: Joi.string().optional().allow(null, ""),
-  doorWindowRemarks: Joi.string().optional().allow(null, ""),
+    delayReason: Joi.string()
+      .optional()
+      .allow("", null),
 
-  // INTERIOR TILES
-  interiorFloorType: Joi.string().optional().allow(null, ""),
-  interiorTileBrand: Joi.string().optional().allow(null, ""),
-  interiorTileRemarks: Joi.string().optional().allow(null, ""),
+    delayOther: Joi.string()
+      .optional()
+      .allow("", null),
 
-  // EXTERIOR ROOF TILES
-  roofFloorType: Joi.string().optional().allow(null, ""),
-  roofTileBrand: Joi.string().optional().allow(null, ""),
-  roofTileRemarks: Joi.string().optional().allow(null, ""),
+    generalRemarks: Joi.string()
+      .optional()
+      .allow("", null),
 
-  // INTERIOR PAINTING
-  interiorPaintBrand: Joi.string().optional().allow(null, ""),
-  interiorPaintingQuality: Joi.string().optional().allow(null, ""),
+    // CEMENT
+    cementGradeId: Joi.string()
+      .optional()
+      .allow("", null),
 
-  // EXTERIOR PAINTING
-  exteriorPaintBrand: Joi.string().optional().allow(null, ""),
-  exteriorPaintingQuality: Joi.string().optional().allow(null, ""),
+    cementBrandId: Joi.string()
+      .optional()
+      .allow("", null),
 
-  qualityRemarks: Joi.string().optional().allow(null, "")
-});
+    cementRemarks: Joi.string()
+      .optional()
+      .allow("", null),
 
-export const updateExteriorsStageSchema = Joi.object({
-  block: Joi.string().optional().allow(null, ""),
-  floor: Joi.string().optional().allow(null, ""),
-  stageOfWork: Joi.string().optional().allow(null, ""),
+    cementLabTest: Joi.string()
+      .optional()
+      .allow("", null),
 
-  isCompleted: Joi.boolean().truthy("true").falsy("false").optional(),
+    cementPhoto: Joi.any()
+      .optional(),
 
-  progressRemarks: Joi.string().optional().allow(null, ""),
+    // SAND
+    sandType: Joi.string()
+      .valid("RIVER", "M_SAND")
+      .optional()
+      .allow("", null),
 
-  workStartedDate: Joi.date().optional().allow(null),
+    sandLabTest: Joi.string()
+      .optional()
+      .allow("", null),
 
-  isDelayed: Joi.boolean().truthy("true").falsy("false").optional().allow(null),
-  delayDays: Joi.number().integer().optional().allow(null),
-  delayReason: Joi.string().optional().allow(null, ""),
-  delayOther: Joi.string().optional().allow(null, ""),
+    sandPhoto: Joi.any()
+      .optional(),
 
-  cementGradeId: Joi.string().optional().allow(null, ""),
-  cementBrandId: Joi.string().optional().allow(null, ""),
-  cementRemarks: Joi.string().optional().allow(null, ""),
-  cementLabTest: Joi.string().optional().allow(null, ""),
+    sandSieveTestDone: booleanField,
 
-  sandType: Joi.string().valid("RIVER", "M_SAND").optional().allow(null, ""),
-  sandLabTest: Joi.string().optional().allow(null, ""),
-  sandSieveTestDone: Joi.boolean()
-    .truthy("true")
-    .falsy("false")
-    .optional()
-    .allow(null),
-  sandSieveLabTest: Joi.string().optional().allow(null, ""),
+    sandSieveLabTest: Joi.string()
+      .optional()
+      .allow("", null),
 
-  aggregateSize: Joi.number().optional().allow(null),
-  aggregateLabTest: Joi.string().optional().allow(null, ""),
+    sandSievePhoto: Joi.any()
+      .optional(),
 
-  waterLabTest: Joi.string().optional().allow(null, ""),
+    // AGGREGATE
+    aggregateSize: Joi.number()
+      .optional()
+      .allow(null),
 
-  concreteLabTest: Joi.string().optional().allow(null, ""),
-  concreteQualityTestDone: Joi.boolean()
-    .truthy("true")
-    .falsy("false")
-    .optional()
-    .allow(null),
-  concreteQualityLabTest: Joi.string().optional().allow(null, ""),
+    aggregateLabTest: Joi.string()
+      .optional()
+      .allow("", null),
 
-  bricksLabTest: Joi.string().optional().allow(null, ""),
-  bricksQualityTestDone: Joi.boolean()
-    .truthy("true")
-    .falsy("false")
-    .optional()
-    .allow(null),
-  bricksQualityLabTest: Joi.string().optional().allow(null, ""),
+    aggregatePhoto: Joi.any()
+      .optional(),
 
-  plasteringTestDone: Joi.boolean()
-    .truthy("true")
-    .falsy("false")
-    .optional()
-    .allow(null),
-  plasteringLabTest: Joi.string().optional().allow(null, ""),
-  plasteringRemarks: Joi.string().optional().allow(null, ""),
+    // WATER
+    waterLabTest: Joi.string()
+      .optional()
+      .allow("", null),
 
-  doorWindowType: Joi.string().optional().allow(null, ""),
-  upvcBrand: Joi.string().optional().allow(null, ""),
-  glassBrand: Joi.string().optional().allow(null, ""),
-  glassThickness: Joi.string().optional().allow(null, ""),
-  doorWindowRemarks: Joi.string().optional().allow(null, ""),
+    waterPhoto: Joi.any()
+      .optional(),
 
-  interiorFloorType: Joi.string().optional().allow(null, ""),
-  interiorTileBrand: Joi.string().optional().allow(null, ""),
-  interiorTileRemarks: Joi.string().optional().allow(null, ""),
+    // CONCRETE
+    concreteLabTest: Joi.string()
+      .optional()
+      .allow("", null),
 
-  roofFloorType: Joi.string().optional().allow(null, ""),
-  roofTileBrand: Joi.string().optional().allow(null, ""),
-  roofTileRemarks: Joi.string().optional().allow(null, ""),
+    concretePhoto: Joi.any()
+      .optional(),
 
-  interiorPaintBrand: Joi.string().optional().allow(null, ""),
-  interiorPaintingQuality: Joi.string().optional().allow(null, ""),
+    concreteQualityTestDone: booleanField,
 
-  exteriorPaintBrand: Joi.string().optional().allow(null, ""),
-  exteriorPaintingQuality: Joi.string().optional().allow(null, ""),
+    concreteQualityLabTest: Joi.string()
+      .optional()
+      .allow("", null),
 
-  qualityRemarks: Joi.string().optional().allow(null, "")
-});
+    concreteQualityPhoto: Joi.any()
+      .optional(),
+
+    // BRICKS
+    bricksLabTest: Joi.string()
+      .optional()
+      .allow("", null),
+
+    bricksPhoto: Joi.any()
+      .optional(),
+
+    bricksQualityTestDone: booleanField,
+
+    bricksQualityLabTest: Joi.string()
+      .optional()
+      .allow("", null),
+
+    bricksQualityPhoto: Joi.any()
+      .optional(),
+
+    // PLASTERING
+    plasteringTestDone: booleanField,
+
+    plasteringLabTest: Joi.string()
+      .optional()
+      .allow("", null),
+
+    plasteringPhoto: Joi.any()
+      .optional(),
+
+    plasteringRemarks: Joi.string()
+      .optional()
+      .allow("", null),
+
+    // DOORS & WINDOWS
+    doorWindowType: Joi.string()
+      .optional()
+      .allow("", null),
+
+    upvcBrand: Joi.string()
+      .optional()
+      .allow("", null),
+
+    glassBrand: Joi.string()
+      .optional()
+      .allow("", null),
+
+    glassThickness: Joi.string()
+      .optional()
+      .allow("", null),
+
+    doorWindowRemarks: Joi.string()
+      .optional()
+      .allow("", null),
+
+    // INTERIOR TILES
+    interiorFloorType: Joi.string()
+      .optional()
+      .allow("", null),
+
+    interiorTileBrand: Joi.string()
+      .optional()
+      .allow("", null),
+
+    interiorTileRemarks: Joi.string()
+      .optional()
+      .allow("", null),
+
+    // ROOF TILES
+    roofFloorType: Joi.string()
+      .optional()
+      .allow("", null),
+
+    roofTileBrand: Joi.string()
+      .optional()
+      .allow("", null),
+
+    roofTileRemarks: Joi.string()
+      .optional()
+      .allow("", null),
+
+    // INTERIOR PAINTING
+    interiorPaintBrand: Joi.string()
+      .optional()
+      .allow("", null),
+
+    interiorPaintingQuality: Joi.string()
+      .optional()
+      .allow("", null),
+
+    // EXTERIOR PAINTING
+    exteriorPaintBrand: Joi.string()
+      .optional()
+      .allow("", null),
+
+    exteriorPaintingQuality: Joi.string()
+      .optional()
+      .allow("", null),
+
+    qualityRemarks: Joi.string()
+      .optional()
+      .allow("", null)
+  });

@@ -1,82 +1,159 @@
 import { Request, Response } from "express";
+
 import {
-  createInteriorsStageUsecase,
-  getAllInteriorsStageUsecase,
-  getInteriorsStageByIdUsecase,
-  updateInteriorsStageUsecase,
-  deleteInteriorsStageUsecase
+  getInteriorsFullViewUsecase,
+  createInteriorsProgressUsecase,
+  createInteriorsQualityUsecase,
+  getInteriorsProgressByProjectUsecase,
+  getInteriorsQualityByProjectUsecase,
+  deleteInteriorsProgressUsecase
 } from "./InteriorsStage.usecase";
 
-export const createInteriorsStage = async (req: Request, res: Response) => {
-  try {
-    const userId = (req as any).user?.id;
-    const result = await createInteriorsStageUsecase(
-      req.body,
-      req.files,
-      req,
-      userId
-    );
-    res.status(201).json({ success: true, message: "Created", data: result });
-  } catch (err: any) {
-    res.status(400).json({ success: false, message: err.message });
-  }
+const getSingleValue = (val: any): string => {
+  return Array.isArray(val) ? val[0] : val;
 };
 
-export const getAllInteriorsStage = async (req: Request, res: Response) => {
-  try {
-    const projectId = req.params.projectId as string;
-    const result = await getAllInteriorsStageUsecase(projectId);
-    res.status(200).json({ success: true, data: result });
-  } catch (err: any) {
-    res.status(400).json({ success: false, message: err.message });
-  }
-};
+// 🔹 FULL VIEW
+export const getInteriorsFullViewController =
+  async (req: Request, res: Response) => {
+    try {
+      const projectId = getSingleValue(
+        req.params.projectId
+      );
 
-export const getInteriorsStageById = async (
-  req: Request,
-  res: Response
-) => {
-  try {
-    const projectId = req.params.projectId as string;
+      const data =
+        await getInteriorsFullViewUsecase(projectId);
 
-    const result =
-      await getInteriorsStageByIdUsecase(projectId);
+      res.status(200).json({
+        success: true,
+        data
+      });
 
-    res.status(200).json({
-      success: true,
-      data: result
-    });
-  } catch (err: any) {
-    res.status(404).json({
-      success: false,
-      message: err.message
-    });
-  }
-};
+    } catch (e: any) {
+      res.status(500).json({
+        success: false,
+        message: e.message
+      });
+    }
+  };
 
-export const updateInteriorsStage = async (req: Request, res: Response) => {
-  try {
-    const id = req.params.id as string;
-    const userId = (req as any).user?.id;
-    const result = await updateInteriorsStageUsecase(
-      id,
-      req.body,
-      req.files,
-      req,
-      userId
-    );
-    res.status(200).json({ success: true, message: "Updated", data: result });
-  } catch (err: any) {
-    res.status(400).json({ success: false, message: err.message });
-  }
-};
+// 🔹 CREATE PROGRESS
+export const createInteriorsProgressController =
+  async (req: Request, res: Response) => {
+    try {
+      const data =
+        await createInteriorsProgressUsecase(
+          req.body,
+          req.files,
+          req
+        );
 
-export const deleteInteriorsStage = async (req: Request, res: Response) => {
-  try {
-    const id = req.params.id as string;
-    await deleteInteriorsStageUsecase(id);
-    res.status(200).json({ success: true, message: "Deleted" });
-  } catch (err: any) {
-    res.status(400).json({ success: false, message: err.message });
-  }
-};
+      res.status(200).json({
+        success: true,
+        data
+      });
+
+    } catch (e: any) {
+      res.status(400).json({
+        success: false,
+        message: e.message
+      });
+    }
+  };
+
+// 🔹 CREATE QUALITY
+export const createInteriorsQualityController =
+  async (req: Request, res: Response) => {
+    try {
+      const data =
+        await createInteriorsQualityUsecase(
+          req.body,
+          req.files,
+          req
+        );
+
+      res.status(200).json({
+        success: true,
+        data
+      });
+
+    } catch (e: any) {
+      res.status(400).json({
+        success: false,
+        message: e.message
+      });
+    }
+  };
+
+// 🔹 GET PROGRESS
+export const getInteriorsProgressByProjectController =
+  async (req: Request, res: Response) => {
+    try {
+      const projectId = getSingleValue(
+        req.params.projectId
+      );
+
+      const data =
+        await getInteriorsProgressByProjectUsecase(
+          projectId
+        );
+
+      res.status(200).json({
+        success: true,
+        data
+      });
+
+    } catch (e: any) {
+      res.status(400).json({
+        success: false,
+        message: e.message
+      });
+    }
+  };
+
+// 🔹 GET QUALITY
+export const getInteriorsQualityByProjectController =
+  async (req: Request, res: Response) => {
+    try {
+      const projectId = getSingleValue(
+        req.params.projectId
+      );
+
+      const data =
+        await getInteriorsQualityByProjectUsecase(
+          projectId
+        );
+
+      res.status(200).json({
+        success: true,
+        data
+      });
+
+    } catch (e: any) {
+      res.status(400).json({
+        success: false,
+        message: e.message
+      });
+    }
+  };
+
+// 🔹 DELETE
+export const deleteInteriorsProgressController =
+  async (req: Request, res: Response) => {
+    try {
+      const id = getSingleValue(req.params.id);
+
+      await deleteInteriorsProgressUsecase(id);
+
+      res.status(200).json({
+        success: true,
+        message: "Deleted successfully"
+      });
+
+    } catch (e: any) {
+      res.status(500).json({
+        success: false,
+        message: e.message
+      });
+    }
+  };

@@ -208,8 +208,10 @@ model project {
   foundationProgresses       FoundationProgress[]
   foundationQualityChecks    FoundationQualityCheck[]
   plinthStages               PlinthStage[]
-  interiorsStages            InteriorsStage[]
-  exteriorsStages            ExteriorsStage[]
+  interiorsProgress interiorsProgress[]
+interiorsQuality interiorsQuality?
+  exteriorsProgress exteriorsProgress[]
+exteriorsQuality exteriorsQuality?
   BuildingInspection         BuildingInspection[]
   DevelopmentWork            DevelopmentWork[]
   TakeoverBuildingInsepction TakeoverBuildingInspection[]
@@ -619,214 +621,233 @@ model PlinthStage {
   project project @relation(fields: [projectId], references: [id])
 }
 
-model InteriorsStage {
+model interiorsProgress {
   id        String @id @default(uuid())
   projectId String
 
-  block       String? // Block A / B / etc.
-  floor       String? // Ground / First / Terrace
-  stageOfWork String? // Plumbing / Electrical / etc.
+  project project @relation(fields: [projectId], references: [id])
+
+  block String?
+  floor String?
+  stageOfWork String?
 
   isCompleted Boolean
 
   progressPhoto Json?
-
   progressRemarks String?
+
+  status interiorsStatus @default(NOT_STARTED)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model interiorsQuality {
+  id        String @id @default(uuid())
+  projectId String @unique
+
+  project project @relation(fields: [projectId], references: [id])
 
   workStartedDate DateTime?
 
-  isDelay          Boolean?
-  delayDays        Int?
-  delayReason      String?
+  isDelay Boolean?
+  delayDays Int?
+
+  delayReason String?
   delayOtherReason String?
 
   // CEMENT
   cementGradeId String?
   cementBrandId String?
   cementRemarks String?
-
   cementLabTest String?
-  cementPhoto   Json?
+  cementPhoto Json?
 
   // SAND
   sandType String?
-
   sandLabTest String?
-  sandPhoto   Json?
+  sandPhoto Json?
 
   sandSieveTestDone Boolean?
-
   sandSieveLabTest String?
-  sandSievePhoto   Json?
+  sandSievePhoto Json?
 
   // AGGREGATE
   aggregateSize Float?
-
   aggregateLabTest String?
-  aggregatePhoto   Json?
+  aggregatePhoto Json?
 
   // WATER
   waterLabTest String?
-  waterPhoto   Json?
+  waterPhoto Json?
 
   // CONCRETE
   concreteLabTest String?
-  concretePhoto   Json?
+  concretePhoto Json?
 
   concreteQualityTestDone Boolean?
-
   concreteQualityLabTest String?
-  concreteQualityPhoto   Json?
+  concreteQualityPhoto Json?
 
   // BRICKS
   bricksLabTest String?
-  bricksPhoto   Json?
+  bricksPhoto Json?
 
   bricksQualityTestDone Boolean?
-
   bricksQualityLabTest String?
-  bricksQualityPhoto   Json?
+  bricksQualityPhoto Json?
 
-  //  PLASTERING
+  // PLASTERING
   plasteringTestDone Boolean?
-
   plasteringLabTest String?
-  plasteringPhoto   Json?
+  plasteringPhoto Json?
 
-  //  DOORS & WINDOWS
-  doorWoodType   String?
-  upvcBrand      String?
-  glassBrand     String?
+  // DOORS & WINDOWS
+  doorWoodType String?
+  upvcBrand String?
+  glassBrand String?
   glassThickness String?
 
-  //  TILES
-  floorType   String?
-  tileBrand   String?
+  // TILES
+  floorType String?
+  tileBrand String?
   tileRemarks String?
 
-  //  PAINTING
-  paintBrand      String?
+  // PAINTING
+  paintBrand String?
   paintingQuality String?
 
   qualityRemarks String?
 
-  createdAt   DateTime @default(now()) @map("created_at")
-  updatedAt   DateTime @updatedAt @map("updated_at")
-  createdById String?  @map("created_by")
-  updatedById String?  @map("updated_by")
-  isActive    Boolean  @default(true) @map("is_active")
-
-  project project @relation(fields: [projectId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
-model ExteriorsStage {
+enum interiorsStatus {
+  NOT_STARTED
+  IN_PROGRESS
+  COMPLETED
+}
+
+model exteriorsProgress {
   id        String @id @default(uuid())
   projectId String
 
-  block       String?
-  floor       String?
+  project project @relation(fields: [projectId], references: [id])
+
+  block String?
+  floor String?
   stageOfWork String?
+
   isCompleted Boolean
 
   progressPhoto Json?
+  progressRemarks String?
+
+  status exteriorsStatus @default(NOT_STARTED)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model exteriorsQuality {
+  id        String @id @default(uuid())
+  projectId String @unique
+
+  project project @relation(fields: [projectId], references: [id])
 
   workStartedDate DateTime?
 
   isDelayed Boolean?
 
-  delayDays   Int?
+  delayDays Int?
   delayReason String?
-  delayOther  String?
+  delayOther String?
 
-  progressRemarks String?
+  generalRemarks String?
 
   // CEMENT
   cementGradeId String?
   cementBrandId String?
   cementRemarks String?
-
   cementLabTest String?
-  cementPhoto   Json?
+  cementPhoto Json?
 
   // SAND
   sandType String?
-
   sandLabTest String?
-  sandPhoto   Json?
+  sandPhoto Json?
 
   sandSieveTestDone Boolean?
-
   sandSieveLabTest String?
-  sandSievePhoto   Json?
+  sandSievePhoto Json?
 
   // AGGREGATE
   aggregateSize Float?
-
   aggregateLabTest String?
-  aggregatePhoto   Json?
+  aggregatePhoto Json?
 
   // WATER
   waterLabTest String?
-  waterPhoto   Json?
+  waterPhoto Json?
 
   // CONCRETE
   concreteLabTest String?
-  concretePhoto   Json?
+  concretePhoto Json?
 
   concreteQualityTestDone Boolean?
-
   concreteQualityLabTest String?
-  concreteQualityPhoto   Json?
+  concreteQualityPhoto Json?
 
   // BRICKS
   bricksLabTest String?
-  bricksPhoto   Json?
+  bricksPhoto Json?
 
   bricksQualityTestDone Boolean?
-
   bricksQualityLabTest String?
-  bricksQualityPhoto   Json?
+  bricksQualityPhoto Json?
 
-  //  PLASTERING
+  // PLASTERING
   plasteringTestDone Boolean?
-  plasteringLabTest  String?
-  plasteringPhoto    Json?
-  plasteringRemarks  String?
+  plasteringLabTest String?
+  plasteringPhoto Json?
+  plasteringRemarks String?
 
-  //  DOORS & WINDOWS
-  doorWindowType    String?
-  upvcBrand         String?
-  glassBrand        String?
-  glassThickness    String?
+  // DOORS & WINDOWS
+  doorWindowType String?
+  upvcBrand String?
+  glassBrand String?
+  glassThickness String?
   doorWindowRemarks String?
 
-  //  INTERIOR TILES
-  interiorFloorType   String?
-  interiorTileBrand   String?
+  // INTERIOR TILES
+  interiorFloorType String?
+  interiorTileBrand String?
   interiorTileRemarks String?
 
-  //  EXTERIOR ROOF TILES
-  roofFloorType   String?
-  roofTileBrand   String?
+  // ROOF TILES
+  roofFloorType String?
+  roofTileBrand String?
   roofTileRemarks String?
 
-  //  INTERIOR PAINTING
-  interiorPaintBrand      String?
+  // INTERIOR PAINTING
+  interiorPaintBrand String?
   interiorPaintingQuality String?
 
-  //  EXTERIOR PAINTING
-  exteriorPaintBrand      String?
+  // EXTERIOR PAINTING
+  exteriorPaintBrand String?
   exteriorPaintingQuality String?
 
   qualityRemarks String?
 
-  createdAt   DateTime @default(now()) @map("created_at")
-  updatedAt   DateTime @updatedAt @map("updated_at")
-  createdById String?  @map("created_by")
-  updatedById String?  @map("updated_by")
-  isActive    Boolean  @default(true) @map("is_active")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
 
-  project project @relation(fields: [projectId], references: [id])
+enum exteriorsStatus {
+  NOT_STARTED
+  IN_PROGRESS
+  COMPLETED
 }
 
 model BuildingInspection {
