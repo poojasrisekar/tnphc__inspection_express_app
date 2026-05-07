@@ -975,6 +975,8 @@ model superStructureQuality {
 
   delayReason      String?
   delayOtherReason String?
+  generalRemarks String?
+  
 
   cementGradeId String?
   cementBrandId String?
@@ -1012,6 +1014,9 @@ model superStructureQuality {
   bricksQualityTestDone Boolean?
   bricksQualityLabTest String?
   bricksQualityPhoto   Json?
+    brickWallAlignmentDone      Boolean?
+  brickWallAlignmentRemarks   String?
+  brickWallAlignmentPhoto     Json?
 
   qualityRemarks String?
 

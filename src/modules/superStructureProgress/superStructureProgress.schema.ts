@@ -31,6 +31,9 @@ export const createQualitySchema = Joi.object({
 
   delayReason: Joi.string().optional().allow(null, ""),
   delayOtherReason: Joi.string().optional().allow(null, ""),
+  generalRemarks: Joi.string()
+  .optional()
+  .allow(null, ""),
 
   // CEMENT
   cementGradeId: Joi.string().optional().allow(null, ""),
@@ -78,6 +81,13 @@ export const createQualitySchema = Joi.object({
   bricksQualityTestDone: booleanField,
   bricksQualityLabTest: Joi.string().optional().allow(null, ""),
   bricksQualityPhoto: Joi.any().optional(),
+  brickWallAlignmentDone: booleanField,
+
+brickWallAlignmentRemarks: Joi.string()
+  .optional()
+  .allow(null, ""),
+
+brickWallAlignmentPhoto: Joi.any().optional(),
 
   // FINAL
   qualityRemarks: Joi.string().optional().allow(null, "")

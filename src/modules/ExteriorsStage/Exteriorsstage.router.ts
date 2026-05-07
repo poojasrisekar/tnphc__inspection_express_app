@@ -37,7 +37,10 @@ router.post(
 );
 
 router.get("/getAllExteriorsStage/:projectId", getAllExteriorsStage);
-router.get("/getExteriorsStage/:id", getExteriorsStageById);
+router.get(
+  "/getExteriorsStage/:projectId",
+  getExteriorsStageById
+);
 
 router.put(
   "/updateExteriorsStage/:id",
