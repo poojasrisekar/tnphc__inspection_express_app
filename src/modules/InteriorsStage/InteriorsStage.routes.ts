@@ -37,7 +37,10 @@ router.post(
 );
 
 router.get("/getAllInteriorsStage/:projectId", getAllInteriorsStage);
-router.get("/getInteriorsStage/:id", getInteriorsStageById);
+router.get(
+  "/getInteriorsStage/:projectId",
+  getInteriorsStageById
+);
 
 router.put(
   "/updateInteriorsStage/:id",
