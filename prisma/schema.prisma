@@ -638,6 +638,8 @@ model interiorsProgress {
 
   status interiorsStatus @default(NOT_STARTED)
 
+  isActive Boolean @default(true)
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
@@ -718,7 +720,7 @@ model interiorsQuality {
   paintingQuality String?
 
   qualityRemarks String?
-
+   isActive Boolean @default(true)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
@@ -745,6 +747,7 @@ model exteriorsProgress {
   progressRemarks String?
 
   status exteriorsStatus @default(NOT_STARTED)
+  isActive Boolean @default(true)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -839,6 +842,7 @@ model exteriorsQuality {
   exteriorPaintingQuality String?
 
   qualityRemarks String?
+  isActive Boolean @default(true)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -978,6 +982,8 @@ model superStructureProgress {
 
   status superStructureStatus @default(NOT_STARTED)
 
+  isActive Boolean @default(true)
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -1040,6 +1046,8 @@ model superStructureQuality {
   brickWallAlignmentPhoto     Json?
 
   qualityRemarks String?
+
+  isActive Boolean @default(true)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

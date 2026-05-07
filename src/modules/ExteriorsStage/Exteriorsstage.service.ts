@@ -6,12 +6,25 @@ export const getExteriorsFullViewService =
 
     const project =
       await prisma.project.findUnique({
-        where: { id: projectId },
+        where: {
+          id: projectId
+        },
 
         include: {
+
           SuperStructure: true,
-          exteriorsProgress: true,
-          exteriorsQuality: true
+
+          exteriorsProgress: {
+            where: {
+              isActive: true
+            }
+          },
+
+          exteriorsQuality: {
+            where: {
+              isActive: true
+            }
+          }
         }
       });
 
@@ -28,7 +41,9 @@ export const getExteriorsFullViewService =
           );
 
         return {
-          blockName: block.blockName,
+
+          blockName:
+            block.blockName,
 
           totalFloors:
             block.totalFloors,
@@ -53,7 +68,9 @@ export const getExteriorsFullViewService =
       });
 
     return {
-      projectId: project.id,
+
+      projectId:
+        project.id,
 
       projectName:
         project.projectName,
@@ -78,16 +95,30 @@ export const upsertExteriorsProgressDB =
     const existing =
       await prisma.exteriorsProgress.findFirst({
         where: {
-          projectId: data.projectId,
-          block: data.block,
-          floor: data.floor,
-          stageOfWork: data.stageOfWork
+
+          projectId:
+            data.projectId,
+
+          block:
+            data.block,
+
+          floor:
+            data.floor,
+
+          stageOfWork:
+            data.stageOfWork,
+
+          isActive: true
         }
       });
 
     if (existing) {
+
       return prisma.exteriorsProgress.update({
-        where: { id: existing.id },
+        where: {
+          id: existing.id
+        },
+
         data
       });
     }
@@ -102,17 +133,23 @@ export const upsertExteriorsQualityDB =
   async (data: any) => {
 
     const existing =
-      await prisma.exteriorsQuality.findUnique({
+      await prisma.exteriorsQuality.findFirst({
         where: {
-          projectId: data.projectId
+
+          projectId:
+            data.projectId,
+
+          isActive: true
         }
       });
 
     if (existing) {
+
       return prisma.exteriorsQuality.update({
         where: {
-          projectId: data.projectId
+          id: existing.id
         },
+
         data
       });
     }
@@ -127,7 +164,12 @@ export const getExteriorsProgressByProjectService =
   async (projectId: string) => {
 
     return prisma.exteriorsProgress.findMany({
-      where: { projectId },
+      where: {
+
+        projectId,
+
+        isActive: true
+      },
 
       orderBy: {
         createdAt: "desc"
@@ -140,15 +182,26 @@ export const getExteriorsQualityByProjectService =
   async (projectId: string) => {
 
     return prisma.exteriorsQuality.findFirst({
-      where: { projectId }
+      where: {
+
+        projectId,
+
+        isActive: true
+      }
     });
   };
 
-// 🔹 DELETE
+// 🔹 DELETE (SOFT DELETE)
 export const deleteExteriorsProgressDB =
   (id: string) => {
 
-    return prisma.exteriorsProgress.delete({
-      where: { id }
+    return prisma.exteriorsProgress.update({
+      where: {
+        id
+      },
+
+      data: {
+        isActive: false
+      }
     });
   };

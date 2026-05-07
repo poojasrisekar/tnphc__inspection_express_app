@@ -24,6 +24,8 @@ import  buildingInspectionRoutes  from "../modules/BuildingInspection/BuildingIn
 import  TakeoverBuildingInspectionRoutes from "../modules/takeoverBuildingInspection/takeoverBuildingInspection.router"; 
 import takeoverDevelopmentRoutes from "../modules/takeoverDevelopmentWork/takeoverDevelopmentWork.route";
 import superStructureProgressRoutes from "../modules/superStructureProgress/superStructureProgress.routes";
+import adminReportsRoute
+from "../modules/adminReports/adminReports.route";
 
 
 
@@ -53,6 +55,10 @@ router.use("/development-work", baseAuth, developmentWorkRoutes);
 router.use("/takeover-buildinginspection", baseAuth,TakeoverBuildingInspectionRoutes);
 router.use("/takeover-developmentwork", baseAuth, takeoverDevelopmentRoutes);
 router.use("/superstructure",baseAuth,superStructureProgressRoutes);
+router.use(
+  "/admin-reports",
+  adminReportsRoute
+);
 
 
 
