@@ -6,12 +6,25 @@ export const getInteriorsFullViewService =
 
     const project =
       await prisma.project.findUnique({
-        where: { id: projectId },
+        where: {
+          id: projectId
+        },
 
         include: {
+
           SuperStructure: true,
-          interiorsProgress: true,
-          interiorsQuality: true
+
+          interiorsProgress: {
+            where: {
+              isActive: true
+            }
+          },
+
+          interiorsQuality: {
+            where: {
+              isActive: true
+            }
+          }
         }
       });
 
@@ -28,7 +41,9 @@ export const getInteriorsFullViewService =
           );
 
         return {
-          blockName: block.blockName,
+
+          blockName:
+            block.blockName,
 
           totalFloors:
             block.totalFloors,
@@ -53,7 +68,9 @@ export const getInteriorsFullViewService =
       });
 
     return {
-      projectId: project.id,
+
+      projectId:
+        project.id,
 
       projectName:
         project.projectName,
@@ -78,16 +95,30 @@ export const upsertInteriorsProgressDB =
     const existing =
       await prisma.interiorsProgress.findFirst({
         where: {
-          projectId: data.projectId,
-          block: data.block,
-          floor: data.floor,
-          stageOfWork: data.stageOfWork
+
+          projectId:
+            data.projectId,
+
+          block:
+            data.block,
+
+          floor:
+            data.floor,
+
+          stageOfWork:
+            data.stageOfWork,
+
+          isActive: true
         }
       });
 
     if (existing) {
+
       return prisma.interiorsProgress.update({
-        where: { id: existing.id },
+        where: {
+          id: existing.id
+        },
+
         data
       });
     }
@@ -102,17 +133,23 @@ export const upsertInteriorsQualityDB =
   async (data: any) => {
 
     const existing =
-      await prisma.interiorsQuality.findUnique({
+      await prisma.interiorsQuality.findFirst({
         where: {
-          projectId: data.projectId
+
+          projectId:
+            data.projectId,
+
+          isActive: true
         }
       });
 
     if (existing) {
+
       return prisma.interiorsQuality.update({
         where: {
-          projectId: data.projectId
+          id: existing.id
         },
+
         data
       });
     }
@@ -128,7 +165,10 @@ export const getInteriorsProgressByProjectService =
 
     return prisma.interiorsProgress.findMany({
       where: {
-        projectId
+
+        projectId,
+
+        isActive: true
       },
 
       orderBy: {
@@ -143,16 +183,25 @@ export const getInteriorsQualityByProjectService =
 
     return prisma.interiorsQuality.findFirst({
       where: {
-        projectId
+
+        projectId,
+
+        isActive: true
       }
     });
   };
 
-// 🔹 DELETE
+// 🔹 DELETE (SOFT DELETE)
 export const deleteInteriorsProgressDB =
   (id: string) => {
 
-    return prisma.interiorsProgress.delete({
-      where: { id }
+    return prisma.interiorsProgress.update({
+      where: {
+        id
+      },
+
+      data: {
+        isActive: false
+      }
     });
   };
