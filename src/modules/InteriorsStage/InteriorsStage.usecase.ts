@@ -136,9 +136,17 @@ export const getAllInteriorsStageUsecase = async (projectId: string) => {
   return getAllInteriorsStageDB(projectId);
 };
 
-export const getInteriorsStageByIdUsecase = async (id: string) => {
-  const data = await getInteriorsStageByIdDB(id);
-  if (!data) throw new Error("Interiors stage record not found");
+export const getInteriorsStageByIdUsecase = async (
+  projectId: string
+) => {
+  const data =
+    await getInteriorsStageByIdDB(projectId);
+
+  if (!data)
+    throw new Error(
+      "Interiors stage record not found"
+    );
+
   return data;
 };
 

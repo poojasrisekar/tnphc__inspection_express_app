@@ -10,8 +10,15 @@ export const getAllInteriorsStageDB = (projectId: string) => {
   });
 };
 
-export const getInteriorsStageByIdDB = (id: string) => {
-  return prisma.interiorsStage.findUnique({ where: { id } });
+export const getInteriorsStageByIdDB = (
+  projectId: string
+) => {
+  return prisma.interiorsStage.findFirst({
+    where: {
+      projectId,
+      isActive: true
+    }
+  });
 };
 
 export const updateInteriorsStageDB = (id: string, data: any) => {
