@@ -2,7 +2,8 @@ import { Request, Response } from "express";
 import {
   createBuildingInspectionUsecase,
   getAllBuildingInspectionUsecase,
-  getBuildingInspectionByIdUsecase,
+  
+  getBuildingInspectionByProjectIdUsecase,
   updateBuildingInspectionUsecase,
   deleteBuildingInspectionUsecase
 } from "./BuildingInspection.usecase";
@@ -27,13 +28,25 @@ export const getAllBuildingInspection = async (req: Request, res: Response) => {
   }
 };
 
-export const getBuildingInspectionById = async (req: Request, res: Response) => {
+export const getBuildingInspectionByProjectId = async (
+  req: Request,
+  res: Response
+) => {
   try {
-    const id = req.params.id as string;
-    const result = await getBuildingInspectionByIdUsecase(id);
-    res.status(200).json({ success: true, data: result });
+    const projectId = req.params.projectId as string;
+
+    const result =
+      await getBuildingInspectionByProjectIdUsecase(projectId);
+
+    res.status(200).json({
+      success: true,
+      data: result
+    });
   } catch (err: any) {
-    res.status(404).json({ success: false, message: err.message });
+    res.status(404).json({
+      success: false,
+      message: err.message
+    });
   }
 };
 

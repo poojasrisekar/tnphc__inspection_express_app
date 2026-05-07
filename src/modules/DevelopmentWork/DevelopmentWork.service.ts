@@ -24,3 +24,13 @@ export const deleteDevelopmentWorkDB = (id: string) => {
     data: { isActive: false }
   });
 };
+export const getDevelopmentWorkByProjectIdDB = (
+  projectId: string
+) => {
+  return prisma.developmentWork.findMany({
+    where: {
+      projectId,
+      isActive: true
+    }
+  });
+};

@@ -1,7 +1,8 @@
 import {
   createBuildingInspectionDB,
   getAllBuildingInspectionDB,
-  getBuildingInspectionByIdDB,
+  
+  getBuildingInspectionByProjectIdDB,
   updateBuildingInspectionDB,
   deleteBuildingInspectionDB
 } from "./BuildingInspection.service";
@@ -189,9 +190,16 @@ export const getAllBuildingInspectionUsecase = async (projectId: string) => {
 };
 
 // ─── GET BY ID ────────────────────────────────────────────────────────────
-export const getBuildingInspectionByIdUsecase = async (id: string) => {
-  const data = await getBuildingInspectionByIdDB(id);
-  if (!data) throw new Error("Building inspection record not found");
+export const getBuildingInspectionByProjectIdUsecase = async (
+  projectId: string
+) => {
+  const data =
+    await getBuildingInspectionByProjectIdDB(projectId);
+
+  if (!data || data.length === 0) {
+    throw new Error("Building inspection record not found");
+  }
+
   return data;
 };
 

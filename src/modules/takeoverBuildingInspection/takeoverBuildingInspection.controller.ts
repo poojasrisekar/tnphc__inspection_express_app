@@ -3,6 +3,7 @@ import {
   createTakeoverBuildingInspectionUsecase,
   getAllTakeoverBuildingInspectionUsecase,
   getTakeoverBuildingInspectionByIdUsecase,
+  getTakeoverBuildingInspectionByProjectIdUsecase,
   updateTakeoverBuildingInspectionUsecase,
   deleteTakeoverBuildingInspectionUsecase
 } from "./takeoverBuildingInspection.usecase";
@@ -55,5 +56,26 @@ export const deleteTakeoverBuildingInspection = async (req: Request, res: Respon
     res.status(200).json({ success: true, message: "Deleted" });
   } catch (err: any) {
     res.status(400).json({ success: false, message: err.message });
+  }
+};
+export const getTakeoverBuildingInspectionByProjectId = async (
+  req: Request,
+  res: Response
+) => {
+  try {
+    const projectId = req.params.projectId as string;
+
+    const result =
+      await getTakeoverBuildingInspectionByProjectIdUsecase(projectId);
+
+    res.status(200).json({
+      success: true,
+      data: result
+    });
+  } catch (err: any) {
+    res.status(404).json({
+      success: false,
+      message: err.message
+    });
   }
 };

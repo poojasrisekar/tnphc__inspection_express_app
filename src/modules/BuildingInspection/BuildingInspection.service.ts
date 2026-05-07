@@ -10,8 +10,15 @@ export const getAllBuildingInspectionDB = (projectId: string) => {
   });
 };
 
-export const getBuildingInspectionByIdDB = (id: string) => {
-  return prisma.buildingInspection.findUnique({ where: { id } });
+export const getBuildingInspectionByProjectIdDB = (
+  projectId: string
+) => {
+  return prisma.buildingInspection.findMany({
+    where: {
+      projectId,
+      isActive: true
+    }
+  });
 };
 
 export const updateBuildingInspectionDB = (id: string, data: any) => {

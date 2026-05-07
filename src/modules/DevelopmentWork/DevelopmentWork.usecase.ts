@@ -2,6 +2,7 @@ import {
   createDevelopmentWorkDB,
   getAllDevelopmentWorkDB,
   getDevelopmentWorkByIdDB,
+  getDevelopmentWorkByProjectIdDB,
   updateDevelopmentWorkDB,
   deleteDevelopmentWorkDB
 } from "./DevelopmentWork.service";
@@ -575,4 +576,16 @@ export const updateDevelopmentWorkUsecase = async (
 // ─── DELETE ───────────────────────────────────────────────────────────────
 export const deleteDevelopmentWorkUsecase = async (id: string) => {
   return deleteDevelopmentWorkDB(id);
+};
+export const getDevelopmentWorkByProjectIdUsecase = async (
+  projectId: string
+) => {
+  const data =
+    await getDevelopmentWorkByProjectIdDB(projectId);
+
+  if (!data || data.length === 0) {
+    throw new Error("Development work record not found");
+  }
+
+  return data;
 };

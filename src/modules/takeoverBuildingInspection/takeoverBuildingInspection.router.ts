@@ -5,6 +5,7 @@ import {
   createTakeoverBuildingInspection,
   getAllTakeoverBuildingInspection,
   getTakeoverBuildingInspectionById,
+  getTakeoverBuildingInspectionByProjectId,
   updateTakeoverBuildingInspection,
   deleteTakeoverBuildingInspection
 } from "./takeoverBuildingInspection.controller";
@@ -70,7 +71,11 @@ router.post(
 );
 
 router.get("/getAllTakeoverBuildingInspection/:projectId", getAllTakeoverBuildingInspection);
-router.get("/getTakeoverBuildingInspection/:id",          getTakeoverBuildingInspectionById);
+router.get("/getTakeoverBuildingInspectionByid/:id",          getTakeoverBuildingInspectionById);
+router.get(
+  "/getTakeoverBuildingInspection/:projectId",
+  getTakeoverBuildingInspectionByProjectId
+);
 
 router.put(
   "/updateTakeoverBuildingInspection/:id",
