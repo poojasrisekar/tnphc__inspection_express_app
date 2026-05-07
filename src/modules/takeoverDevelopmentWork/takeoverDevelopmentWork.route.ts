@@ -21,7 +21,12 @@ const uploadFields = upload.fields([
 
 router.post("/createTakeoverDevelopmentWork", uploadFields, ctrl.createTakeoverDevelopmentWork);
 router.get("/getAllTakeoverDevelopmentWork/:projectId", ctrl.getAllTakeoverDevelopmentWork);
-router.get("/getTakeoverDevelopmentWork/:id", ctrl.getTakeoverDevelopmentWorkById);
+router.get("/getTakeoverDevelopmentWorkByid/:id", ctrl.getTakeoverDevelopmentWorkById);
+
+router.get(
+  "/getTakeoverDevelopmentWork/:projectId",
+  ctrl.getTakeoverDevelopmentWorkByProjectId
+);
 router.put("/updateTakeoverDevelopmentWork/:id", uploadFields, ctrl.updateTakeoverDevelopmentWork);
 router.delete("/deleteTakeoverDevelopmentWork/:id", ctrl.deleteTakeoverDevelopmentWork);
 

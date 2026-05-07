@@ -2,6 +2,7 @@ import {
   createTakeoverBuildingInspectionDB,
   getAllTakeoverBuildingInspectionDB,
   getTakeoverBuildingInspectionByIdDB,
+  getTakeoverBuildingInspectionByProjectIdDB,
   updateTakeoverBuildingInspectionDB,
   deleteTakeoverBuildingInspectionDB
 } from "./takeoverBuildingInspection.service";
@@ -684,4 +685,18 @@ export const updateTakeoverBuildingInspectionUsecase = async (
 // ─── DELETE ───────────────────────────────────────────────────────────────
 export const deleteTakeoverBuildingInspectionUsecase = async (id: string) => {
   return deleteTakeoverBuildingInspectionDB(id);
+};
+export const getTakeoverBuildingInspectionByProjectIdUsecase = async (
+  projectId: string
+) => {
+  const data =
+    await getTakeoverBuildingInspectionByProjectIdDB(projectId);
+
+  if (!data || data.length === 0) {
+    throw new Error(
+      "Takeover building inspection record not found"
+    );
+  }
+
+  return data;
 };

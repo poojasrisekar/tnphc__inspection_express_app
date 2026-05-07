@@ -5,6 +5,7 @@ import {
   createDevelopmentWork,
   getAllDevelopmentWork,
   getDevelopmentWorkById,
+  getDevelopmentWorkByProjectId,
   updateDevelopmentWork,
   deleteDevelopmentWork
 } from "./DevelopmentWork.controller";
@@ -47,7 +48,11 @@ router.post(
 );
 
 router.get("/getAllDevelopmentWork/:projectId", getAllDevelopmentWork);
-router.get("/getDevelopmentWork/:id",           getDevelopmentWorkById);
+router.get("/getDevelopmentWorkByid/:id",           getDevelopmentWorkById);
+router.get(
+  "/getDevelopmentWork/:projectId",
+  getDevelopmentWorkByProjectId
+);
 
 router.put(
   "/updateDevelopmentWork/:id",

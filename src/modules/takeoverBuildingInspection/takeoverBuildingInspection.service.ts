@@ -24,3 +24,13 @@ export const deleteTakeoverBuildingInspectionDB = (id: string) => {
     data: { isActive: false }
   });
 };
+export const getTakeoverBuildingInspectionByProjectIdDB = (
+  projectId: string
+) => {
+  return prisma.takeoverBuildingInspection.findMany({
+    where: {
+      projectId,
+      isActive: true
+    }
+  });
+};

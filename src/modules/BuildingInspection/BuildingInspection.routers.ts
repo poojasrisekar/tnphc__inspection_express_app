@@ -4,7 +4,8 @@ import { validateRequest } from "../../middleware/validateRequest";
 import {
   createBuildingInspection,
   getAllBuildingInspection,
-  getBuildingInspectionById,
+  getBuildingInspectionByProjectId,
+  
   updateBuildingInspection,
   deleteBuildingInspection
 } from "./BuildingInspection.controller";
@@ -70,7 +71,10 @@ router.post(
 );
 
 router.get("/getAllBuildingInspection/:projectId", getAllBuildingInspection);
-router.get("/getBuildingInspection/:id", getBuildingInspectionById);
+router.get(
+  "/getBuildingInspection/:projectId",
+  getBuildingInspectionByProjectId
+);
 
 router.put(
   "/updateBuildingInspection/:id",

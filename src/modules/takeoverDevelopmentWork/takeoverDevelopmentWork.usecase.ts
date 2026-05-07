@@ -2,6 +2,7 @@ import {
   createTakeoverDevelopmentWorkDB,
   getAllTakeoverDevelopmentWorkDB,
   getTakeoverDevelopmentWorkByIdDB,
+  getTakeoverDevelopmentWorkByProjectIdDB,
   updateTakeoverDevelopmentWorkDB,
   deleteTakeoverDevelopmentWorkDB
 } from "./TakeoverDevelopmentWork.service";
@@ -491,4 +492,16 @@ export const updateTakeoverDevelopmentWorkUsecase = async (id: string, body: any
 
 export const deleteTakeoverDevelopmentWorkUsecase = async (id: string) => {
   return deleteTakeoverDevelopmentWorkDB(id);
+};
+export const getTakeoverDevelopmentWorkByProjectIdUsecase = async (
+  projectId: string
+) => {
+  const data =
+    await getTakeoverDevelopmentWorkByProjectIdDB(projectId);
+
+  if (!data || data.length === 0) {
+    throw new Error("Takeover development work not found");
+  }
+
+  return data;
 };
