@@ -59,6 +59,7 @@ export const createQualityUsecase = async (body: any, files: any, req: any) => {
 
     delayReason: body.delayReason,
     delayOtherReason: body.delayOtherReason,
+    generalRemarks: body.generalRemarks,
 
     cementGradeId: body.cementGradeId,
     cementBrandId: body.cementBrandId,
@@ -66,9 +67,17 @@ export const createQualityUsecase = async (body: any, files: any, req: any) => {
     cementLabTest: body.cementLabTest,
     cementPhoto: getFiles("cementPhoto"),
 
-    sandType: body.sandType,
-    sandLabTest: body.sandLabTest,
-    sandPhoto: getFiles("sandPhoto"),
+  sandType: body.sandType,
+sandLabTest: body.sandLabTest,
+sandPhoto: getFiles("sandPhoto"),
+
+sandSieveTestDone:
+  body.sandSieveTestDone === "true" ||
+  body.sandSieveTestDone === true,
+
+sandSieveLabTest: body.sandSieveLabTest,
+
+sandSievePhoto: getFiles("sandSievePhoto"),
 
     steelGradeId: body.steelGradeId,
     steelBrandId: body.steelBrandId,
@@ -96,6 +105,15 @@ export const createQualityUsecase = async (body: any, files: any, req: any) => {
     bricksQualityTestDone: body.bricksQualityTestDone === "true",
     bricksQualityLabTest: body.bricksQualityLabTest,
     bricksQualityPhoto: getFiles("bricksQualityPhoto"),
+    brickWallAlignmentDone:
+  body.brickWallAlignmentDone === "true" ||
+  body.brickWallAlignmentDone === true,
+
+brickWallAlignmentRemarks:
+  body.brickWallAlignmentRemarks,
+
+brickWallAlignmentPhoto:
+  getFiles("brickWallAlignmentPhoto"),
 
     qualityRemarks: body.qualityRemarks
   });

@@ -32,13 +32,25 @@ export const getAllExteriorsStage = async (req: Request, res: Response) => {
   }
 };
 
-export const getExteriorsStageById = async (req: Request, res: Response) => {
+export const getExteriorsStageById = async (
+  req: Request,
+  res: Response
+) => {
   try {
-    const id = req.params.id as string;
-    const result = await getExteriorsStageByIdUsecase(id);
-    res.status(200).json({ success: true, data: result });
+    const projectId = req.params.projectId as string;
+
+    const result =
+      await getExteriorsStageByIdUsecase(projectId);
+
+    res.status(200).json({
+      success: true,
+      data: result
+    });
   } catch (err: any) {
-    res.status(404).json({ success: false, message: err.message });
+    res.status(404).json({
+      success: false,
+      message: err.message
+    });
   }
 };
 

@@ -10,8 +10,15 @@ export const getAllExteriorsStageDB = (projectId: string) => {
   });
 };
 
-export const getExteriorsStageByIdDB = (id: string) => {
-  return prisma.exteriorsStage.findUnique({ where: { id } });
+export const getExteriorsStageByIdDB = (
+  projectId: string
+) => {
+  return prisma.exteriorsStage.findFirst({
+    where: {
+      projectId,
+      isActive: true
+    }
+  });
 };
 
 export const updateExteriorsStageDB = (id: string, data: any) => {

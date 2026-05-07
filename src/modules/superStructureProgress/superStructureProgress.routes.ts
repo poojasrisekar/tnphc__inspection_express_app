@@ -22,19 +22,20 @@ router.post(
   createProgressController
 );
 
-// 🔹 QUALITY
 router.post(
   "/quality",
   upload.fields([
     { name: "cementPhoto" },
     { name: "sandPhoto" },
+    { name: "sandSievePhoto" },
     { name: "steelPhoto" },
     { name: "aggregatePhoto" },
     { name: "waterPhoto" },
     { name: "concretePhoto" },
     { name: "concreteQualityPhoto" },
     { name: "bricksPhoto" },
-    { name: "bricksQualityPhoto" }
+    { name: "bricksQualityPhoto" },
+    { name: "brickWallAlignmentPhoto" }
   ]),
   createQualityController
 );
