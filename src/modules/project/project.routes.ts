@@ -27,12 +27,23 @@ router.post(
   createProjectController
 );
 
+
+// ✅ GET ALL PROJECTS
 router.get(
-  "/getAllProjects",
+  "/getProjects",
   validateRequest(getAllProjectsSchema, "query"),
   getAllProjectsController
 );
 
+
+// ✅ GET USER ASSIGNED PROJECTS
+router.get(
+  "/getProjects/:userId",
+  getProjectsByUserController
+);
+
+
+// ✅ GET SINGLE PROJECT DETAILS
 router.get(
   "/getProjectById/:id",
   validateRequest(getProjectByIdSchema, "params"),
@@ -51,11 +62,9 @@ router.patch(
   deleteProjectController
 );
 
-router.get("/getProjectDashboard", getProjectDashboardController);
-
 router.get(
-  "/getProjectsByUser/:userId",
-  getProjectsByUserController
+  "/getProjectDashboard",
+  getProjectDashboardController
 );
 
 export default router;
