@@ -1,29 +1,32 @@
-import {
-  createBrandService,
-  getBrandByIdService,
-  updateBrandService,
-  deleteBrandService,
-  listBrandsService,
-} from "./brand.service";
+import * as service from "./brand.service";
 
-export const createBrandUsecase = async (data: any) => {
-  return createBrandService(data);
+export const createBrandUsecase = async (
+  data: any
+) => {
+  return service.createBrandService(data);
 };
 
-export const getBrandByIdUsecase = async (id: string) => {
-  const brand = await getBrandByIdService(id);
-  if (!brand) throw new Error("Brand not found");
-  return brand;
+export const getBrandByIdUsecase = async (
+  id: string
+) => {
+  return service.getBrandByIdService(id);
 };
 
-export const updateBrandUsecase = async (id: string, data: any) => {
-  return updateBrandService(id, data);
+export const updateBrandUsecase = async (
+  id: string,
+  data: any
+) => {
+  return service.updateBrandService(id, data);
 };
 
-export const deleteBrandUsecase = async (id: string) => {
-  return deleteBrandService(id);
+export const deleteBrandUsecase = async (
+  id: string
+) => {
+  return service.deleteBrandService(id);
 };
 
-export const listBrandsUsecase = async (query: any) => {
-  return listBrandsService(query);
+export const listBrandsUsecase = async (
+  query: any
+) => {
+  return service.listBrandsService(query);
 };

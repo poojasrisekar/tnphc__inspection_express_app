@@ -1,52 +1,24 @@
-import {
-  createMaterialService,
-  getMaterialByIdService,
-  updateMaterialService,
-  deleteMaterialService,
-  listMaterialsService,
-  getMaterials,
-} from "./material.service";
+import * as service from "./material.service";
 
 export const createMaterialUsecase = async (data: any) => {
-  return createMaterialService(data);
+  return service.createMaterialService(data);
 };
 
 export const getMaterialByIdUsecase = async (id: string) => {
-  const material = await getMaterialByIdService(id);
-  if (!material) throw new Error("Material not found");
-  return material;
+  return service.getMaterialByIdService(id);
 };
 
-export const updateMaterialUsecase = async (id: string, data: any) => {
-  return updateMaterialService(id, data);
+export const updateMaterialUsecase = async (
+  id: string,
+  data: any
+) => {
+  return service.updateMaterialService(id, data);
 };
 
 export const deleteMaterialUsecase = async (id: string) => {
-  return deleteMaterialService(id);
+  return service.deleteMaterialService(id);
 };
 
 export const listMaterialsUsecase = async (query: any) => {
-  return listMaterialsService(query);
-};
-
-export const getMaterialsUsecase = async (query: any) => {
-  const data = await getMaterials(query);
-
-  // 👉 Optional: transform response for UI
-  const formatted = data.map((material) => ({
-    id: material.id,
-    name: material.name,
-
-    brands: material.brands.map((brand) => ({
-      id: brand.id,
-      name: brand.name,
-
-      grades: brand.grades.map((grade) => ({
-        id: grade.id,
-        name: grade.name,
-      })),
-    })),
-  }));
-
-  return formatted;
+  return service.listMaterialsService(query);
 };

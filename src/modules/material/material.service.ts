@@ -1,25 +1,82 @@
 import prisma from "../../shared/prisma";
 
 export const createMaterialService = async (data: any) => {
+  const existing = await prisma.material.findFirst({
+    where: {
+      name: {
+        equals: data.name.trim(),
+        mode: "insensitive",
+      },
+      isActive: true,
+    },
+  });
+
+  if (existing) {
+    throw new Error("Material already exists");
+  }
+
   return prisma.material.create({
     data: {
-      name: data.name,
+      name: data.name.trim(),
       createdById: data.userId || null,
     },
   });
 };
 
 export const getMaterialByIdService = async (id: string) => {
-  return prisma.material.findUnique({
-    where: { id },
+  const material = await prisma.material.findFirst({
+    where: {
+      id,
+      isActive: true,
+    },
+    include: {
+      brands: {
+        where: {
+          isActive: true,
+        },
+        include: {
+          grades: {
+            where: {
+              isActive: true,
+            },
+          },
+        },
+      },
+    },
   });
+
+  if (!material) {
+    throw new Error("Material not found");
+  }
+
+  return material;
 };
 
-export const updateMaterialService = async (id: string, data: any) => {
+export const updateMaterialService = async (
+  id: string,
+  data: any
+) => {
+  const existing = await prisma.material.findFirst({
+    where: {
+      name: {
+        equals: data.name.trim(),
+        mode: "insensitive",
+      },
+      NOT: {
+        id,
+      },
+      isActive: true,
+    },
+  });
+
+  if (existing) {
+    throw new Error("Material already exists");
+  }
+
   return prisma.material.update({
     where: { id },
     data: {
-      name: data.name,
+      name: data.name.trim(),
       updatedById: data.userId || null,
     },
   });
@@ -29,13 +86,17 @@ export const deleteMaterialService = async (id: string) => {
   return prisma.material.update({
     where: { id },
     data: {
-      isActive: false, // soft delete
+      isActive: false,
     },
   });
 };
 
 export const listMaterialsService = async (query: any) => {
-  const { pageNumber = 1, pageSize = 10, search } = query;
+  console.log("QUERY =>", query);
+
+  const pageNumber = Number(query.pageNumber) || 1;
+  const pageSize = Number(query.pageSize) || 10;
+  const search = query.search?.trim();
 
   const skip = (pageNumber - 1) * pageSize;
 
@@ -50,69 +111,41 @@ export const listMaterialsService = async (query: any) => {
     };
   }
 
+  console.log("WHERE =>", where);
+
   const [data, total] = await Promise.all([
     prisma.material.findMany({
       where,
       skip,
       take: pageSize,
-      orderBy: { createdAt: "asc" },
+      orderBy: {
+        createdAt: "desc",
+      },
+      include: {
+        brands: {
+          where: {
+            isActive: true,
+          },
+          include: {
+            grades: {
+              where: {
+                isActive: true,
+              },
+            },
+          },
+        },
+      },
     }),
-    prisma.material.count({ where }),
+
+    prisma.material.count({
+      where,
+    }),
   ]);
 
   return {
-    data,
     total,
     pageNumber,
     pageSize,
+    data,
   };
-};
-
-
-export const getMaterials = async (query: any) => {
-  const { search, materialId, brandId, gradeId } = query;
-
-  const where: any = {
-    isActive: true,
-  };
-
-  // 🔍 Search
-  if (search) {
-    where.name = {
-      contains: search,
-      mode: "insensitive",
-    };
-  }
-
-  // 🎯 Material filter
-  if (materialId) {
-    where.id = materialId;
-  }
-
-  // 🔥 RELATION FILTER (MERGED CORRECTLY)
-  if (brandId || gradeId) {
-    where.brands = {
-      some: {
-        ...(brandId && { id: brandId }),
-        ...(gradeId && {
-          grades: {
-            some: {
-              id: gradeId,
-            },
-          },
-        }),
-      },
-    };
-  }
-
-  return prisma.material.findMany({
-    where,
-    include: {
-      brands: {
-        include: {
-          grades: true,
-        },
-      },
-    },
-  });
 };

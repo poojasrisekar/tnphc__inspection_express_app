@@ -1,45 +1,46 @@
 import { Router } from "express";
+
 import * as controller from "./brand.controller";
+
 import { validateRequest } from "../../middleware/validateRequest";
 
 import {
-  brandSchema,
+  createBrandSchema,
   updateBrandSchema,
-  getBrandByIdSchema,
-  updateBrandParamsSchema,
-  listBrandsSchema,
+  brandIdSchema,
+  listBrandSchema,
 } from "./brand.schema";
 
 const router = Router();
 
 router.post(
-  "/createBrand",
-  validateRequest(brandSchema),
+  "/",
+  validateRequest(createBrandSchema),
   controller.createBrand
 );
 
 router.get(
-  "/listBrands",
-  validateRequest(listBrandsSchema, "query"),
+  "/",
+  validateRequest(listBrandSchema, "query"),
   controller.listBrands
 );
 
 router.get(
-  "/getBrandById/:id",
-  validateRequest(getBrandByIdSchema, "params"),
+  "/:id",
+  validateRequest(brandIdSchema, "params"),
   controller.getBrandById
 );
 
 router.put(
-  "/updateBrand/:id",
-  validateRequest(updateBrandParamsSchema, "params"),
+  "/:id",
+  validateRequest(brandIdSchema, "params"),
   validateRequest(updateBrandSchema),
   controller.updateBrand
 );
 
 router.delete(
-  "/deleteBrand/:id",
-  validateRequest(updateBrandParamsSchema, "params"),
+  "/:id",
+  validateRequest(brandIdSchema, "params"),
   controller.deleteBrand
 );
 

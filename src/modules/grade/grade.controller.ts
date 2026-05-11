@@ -1,84 +1,115 @@
 import { Request, Response } from "express";
 import * as usecase from "./grade.usecase";
 
-export const createGrade = async (req: Request, res: Response) => {
+export const createGrade = async (
+  req: Request,
+  res: Response
+) => {
   try {
     const result = await usecase.createGradeUsecase({
       ...req.body,
       userId: req.user?.id,
     });
 
-    res.json({
+    return res.status(201).json({
       success: true,
       message: "Grade created successfully",
       data: result,
     });
   } catch (error: any) {
-    res.status(500).json({ success: false, message: error.message });
+    return res.status(400).json({
+      success: false,
+      message: error.message,
+    });
   }
 };
 
-export const getGradeById = async (req: Request, res: Response) => {
+export const getGradeById = async (
+  req: Request,
+  res: Response
+) => {
   try {
-        const id = String(req.params.id); // ✅ FIX
+    const id = String(req.params.id);
 
-    const result = await usecase.getGradeByIdUsecase(id);
+    const result =
+      await usecase.getGradeByIdUsecase(id);
 
-    res.json({
+    return res.status(200).json({
       success: true,
       data: result,
     });
   } catch (error: any) {
-    res.status(404).json({ success: false, message: error.message });
+    return res.status(404).json({
+      success: false,
+      message: error.message,
+    });
   }
 };
 
-export const updateGrade = async (req: Request, res: Response) => {
+export const updateGrade = async (
+  req: Request,
+  res: Response
+) => {
   try {
-        const id = String(req.params.id); // ✅ FIX
+    const id = String(req.params.id);
 
-    const result = await usecase.updateGradeUsecase(
-      id,
-      {
+    const result =
+      await usecase.updateGradeUsecase(id, {
         ...req.body,
         userId: req.user?.id,
-      }
-    );
+      });
 
-    res.json({
+    return res.status(200).json({
       success: true,
       message: "Grade updated successfully",
       data: result,
     });
   } catch (error: any) {
-    res.status(500).json({ success: false, message: error.message });
+    return res.status(400).json({
+      success: false,
+      message: error.message,
+    });
   }
 };
 
-export const deleteGrade = async (req: Request, res: Response) => {
+export const deleteGrade = async (
+  req: Request,
+  res: Response
+) => {
   try {
-    const id = String(req.params.id); // ✅ FIX
+    const id = String(req.params.id);
+
     await usecase.deleteGradeUsecase(id);
 
-    res.json({
+    return res.status(200).json({
       success: true,
       message: "Grade deleted successfully",
     });
   } catch (error: any) {
-    res.status(500).json({ success: false, message: error.message });
+    return res.status(400).json({
+      success: false,
+      message: error.message,
+    });
   }
 };
 
-export const listGrades = async (req: Request, res: Response) => {
+export const listGrades = async (
+  req: Request,
+  res: Response
+) => {
   try {
-    const result = await usecase.listGradesUsecase(req.query);
+    const result =
+      await usecase.listGradesUsecase(req.query);
 
-    res.json({
+    return res.status(200).json({
       success: true,
       message: "Grades fetched successfully",
       data: result,
     });
   } catch (error: any) {
-    res.status(500).json({ success: false, message: error.message });
+    return res.status(500).json({
+      success: false,
+      message: error.message,
+    });
   }
 };

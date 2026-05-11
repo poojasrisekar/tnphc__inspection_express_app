@@ -295,53 +295,65 @@ model stage {
 model material {
   id          String   @id @default(uuid()) @db.VarChar(36)
   code        Int      @unique @default(autoincrement())
-  name        String   @map("material_name") @db.VarChar(255)
+
+  name        String   @unique @map("material_name") @db.VarChar(255)
+
   createdAt   DateTime @default(now()) @map("created_at")
   updatedAt   DateTime @updatedAt @map("updated_at")
+
   createdById String?  @map("created_by")
   updatedById String?  @map("updated_by")
+
   isActive    Boolean  @default(true) @map("is_active")
 
-  brands brand[]
+  brands      brand[]
 
   @@index([code])
 }
 
 model brand {
-  id   String @id @default(uuid()) @db.VarChar(36)
-  code Int    @unique @default(autoincrement())
-  name String @map("brand_name") @db.VarChar(255)
+  id          String   @id @default(uuid()) @db.VarChar(36)
+  code        Int      @unique @default(autoincrement())
 
-  materialId String
-  material   material @relation(fields: [materialId], references: [id])
+  name        String   @map("brand_name") @db.VarChar(255)
+
+  materialId  String
+  material    material @relation(fields: [materialId], references: [id])
+
+  grades      grade[]
 
   createdAt   DateTime @default(now()) @map("created_at")
   updatedAt   DateTime @updatedAt @map("updated_at")
+
   createdById String?  @map("created_by")
   updatedById String?  @map("updated_by")
+
   isActive    Boolean  @default(true) @map("is_active")
 
-  grades  grade[]
-  masters Master[]
+  @@unique([materialId, name])
 
   @@index([code])
   @@index([materialId])
 }
 
 model grade {
-  id   String @id @default(uuid()) @db.VarChar(36)
-  code Int    @default(autoincrement())
-  name String @map("grade_name") @db.VarChar(255)
+  id          String   @id @default(uuid()) @db.VarChar(36)
+  code        Int      @unique @default(autoincrement())
 
-  brandId String
-  brand   brand  @relation(fields: [brandId], references: [id])
+  name        String   @map("grade_name") @db.VarChar(255)
+
+  brandId     String
+  brand       brand    @relation(fields: [brandId], references: [id])
 
   createdAt   DateTime @default(now()) @map("created_at")
   updatedAt   DateTime @updatedAt @map("updated_at")
+
   createdById String?  @map("created_by")
   updatedById String?  @map("updated_by")
+
   isActive    Boolean  @default(true) @map("is_active")
-  masters     Master[]
+
+  @@unique([brandId, name])
 
   @@index([code])
   @@index([brandId])
@@ -359,27 +371,7 @@ enum YesNo {
   No
 }
 
-model Master {
-  id   String @id @default(uuid()) @db.VarChar(36)
-  code Int    @unique @default(autoincrement())
 
-  brandId String
-  gradeId String
-
-  materialName String @map("material_name") @db.VarChar(255)
-
-  brand brand @relation(fields: [brandId], references: [id])
-  grade grade @relation(fields: [gradeId], references: [id])
-
-  createdAt   DateTime @default(now()) @map("created_at")
-  updatedAt   DateTime @updatedAt @map("updated_at")
-  createdById String?  @map("created_by")
-  updatedById String?  @map("updated_by")
-  isActive    Boolean  @default(true) @map("is_active")
-
-  @@index([brandId])
-  @@index([gradeId])
-}
 
 model PreConstructionInspection {
   id        String @id @default(uuid())

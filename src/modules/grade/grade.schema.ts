@@ -1,26 +1,22 @@
 import joi from "joi";
 
-export const gradeSchema = joi.object({
-  name: joi.string().required(),
-  brandId: joi.string().required(),
+export const createGradeSchema = joi.object({
+  name: joi.string().trim().required(),
+  brandId: joi.string().uuid().required(),
 });
 
 export const updateGradeSchema = joi.object({
-  name: joi.string(),
-  // brandId: joi.string(),
+  name: joi.string().trim().optional(),
+  brandId: joi.string().uuid().optional(),
 });
 
-export const getGradeByIdSchema = joi.object({
-  id: joi.string().required(),
+export const gradeIdSchema = joi.object({
+  id: joi.string().uuid().required(),
 });
 
-export const updateGradeParamsSchema = joi.object({
-  id: joi.string().required(),
-});
-
-export const listGradesSchema = joi.object({
-  pageNumber: joi.number().integer(),
-  pageSize: joi.number().integer(),
+export const listGradeSchema = joi.object({
   search: joi.string().optional(),
-  brandId: joi.string().optional(), // 🔥 important for dropdown
+  brandId: joi.string().uuid().optional(),
+  pageNumber: joi.number().optional(),
+  pageSize: joi.number().optional(),
 });

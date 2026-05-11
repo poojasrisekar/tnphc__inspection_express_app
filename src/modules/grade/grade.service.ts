@@ -1,6 +1,34 @@
 import prisma from "../../shared/prisma";
 
 export const createGradeService = async (data: any) => {
+  const brand = await prisma.brand.findFirst({
+    where: {
+      id: data.brandId,
+      isActive: true,
+    },
+  });
+
+  if (!brand) {
+    throw new Error("Brand not found");
+  }
+
+  const existing = await prisma.grade.findFirst({
+    where: {
+      brandId: data.brandId,
+      name: {
+        equals: data.name,
+        mode: "insensitive",
+      },
+      isActive: true,
+    },
+  });
+
+  if (existing) {
+    throw new Error(
+      "Grade already exists for this brand"
+    );
+  }
+
   return prisma.grade.create({
     data: {
       name: data.name,
@@ -10,22 +38,69 @@ export const createGradeService = async (data: any) => {
   });
 };
 
-export const getGradeByIdService = async (id: string) => {
-  return prisma.grade.findUnique({
-    where: { id },
+export const getGradeByIdService = async (
+  id: string
+) => {
+  const grade = await prisma.grade.findFirst({
+    where: {
+      id,
+      isActive: true,
+    },
     include: {
       brand: {
         include: {
-          material: true, // 🔥 useful for UI cards
+          material: true,
         },
       },
     },
   });
+
+  if (!grade) {
+    throw new Error("Grade not found");
+  }
+
+  return grade;
 };
 
-export const updateGradeService = async (id: string, data: any) => {
+export const updateGradeService = async (
+  id: string,
+  data: any
+) => {
+  const grade = await prisma.grade.findFirst({
+    where: {
+      id,
+      isActive: true,
+    },
+  });
+
+  if (!grade) {
+    throw new Error("Grade not found");
+  }
+
+  const existing = await prisma.grade.findFirst({
+    where: {
+      brandId: data.brandId,
+      name: {
+        equals: data.name,
+        mode: "insensitive",
+      },
+      NOT: {
+        id,
+      },
+      isActive: true,
+    },
+  });
+
+  if (existing) {
+    throw new Error(
+      "Grade already exists for this brand"
+    );
+  }
+
   return prisma.grade.update({
-    where: { id },
+    where: {
+      id,
+    },
     data: {
       name: data.name,
       brandId: data.brandId,
@@ -34,16 +109,22 @@ export const updateGradeService = async (id: string, data: any) => {
   });
 };
 
-export const deleteGradeService = async (id: string) => {
+export const deleteGradeService = async (
+  id: string
+) => {
   return prisma.grade.update({
-    where: { id },
+    where: {
+      id,
+    },
     data: {
-      isActive: false, // soft delete
+      isActive: false,
     },
   });
 };
 
-export const listGradesService = async (query: any) => {
+export const listGradesService = async (
+  query: any
+) => {
   const {
     pageNumber = 1,
     pageSize = 10,
@@ -51,7 +132,8 @@ export const listGradesService = async (query: any) => {
     brandId,
   } = query;
 
-  const skip = (pageNumber - 1) * pageSize;
+  const skip =
+    (Number(pageNumber) - 1) * Number(pageSize);
 
   const where: any = {
     isActive: true,
@@ -65,37 +147,35 @@ export const listGradesService = async (query: any) => {
   }
 
   if (brandId) {
-    where.brandId = brandId; // 🔥 dropdown filter
+    where.brandId = brandId;
   }
 
   const [data, total] = await Promise.all([
     prisma.grade.findMany({
       where,
       skip,
-      take: pageSize,
-      orderBy: { createdAt: "desc" },
+      take: Number(pageSize),
+      orderBy: {
+        createdAt: "desc",
+      },
       include: {
         brand: {
-          select: {
-            id: true,
-            name: true,
-            material: {
-              select: {
-                id: true,
-                name: true,
-              },
-            },
+          include: {
+            material: true,
           },
         },
       },
     }),
-    prisma.grade.count({ where }),
+
+    prisma.grade.count({
+      where,
+    }),
   ]);
 
   return {
-    data,
     total,
-    pageNumber,
-    pageSize,
+    pageNumber: Number(pageNumber),
+    pageSize: Number(pageSize),
+    data,
   };
 };
