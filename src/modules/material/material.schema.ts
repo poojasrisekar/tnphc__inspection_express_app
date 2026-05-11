@@ -1,29 +1,19 @@
 import joi from "joi";
 
-export const materialSchema = joi.object({
-    name: joi.string().required(),});
+export const createMaterialSchema = joi.object({
+  name: joi.string().trim().required(),
+});
 
 export const updateMaterialSchema = joi.object({
-    name: joi.string(),
+  name: joi.string().trim().optional(),
 });
 
-export const getMaterialById = joi.object({
-    id: joi.string().required(),
+export const materialIdSchema = joi.object({
+  id: joi.string().uuid().required(),
 });
 
-export const updateMaterialParamsSchema = joi.object({
-    id: joi.string().required(),
-});
-
-export const listMaterialsSchema = joi.object({
-  pageNumber: joi.number().integer(),
-  pageSize: joi.number().integer(),
+export const listMaterialSchema = joi.object({
   search: joi.string().optional(),
-});
-
-export const getMaterialsSchema = joi.object({
-  materialId: joi.string().uuid().optional(),
-  brandId: joi.string().uuid().optional(),
-  gradeId: joi.string().uuid().optional(),
-  search: joi.string().optional(),
+  pageNumber: joi.number().optional(),
+  pageSize: joi.number().optional(),
 });

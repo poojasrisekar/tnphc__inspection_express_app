@@ -1,26 +1,22 @@
 import joi from "joi";
 
-export const brandSchema = joi.object({
-  name: joi.string().required(),
-  materialId: joi.string().required(),
+export const createBrandSchema = joi.object({
+  name: joi.string().trim().required(),
+  materialId: joi.string().uuid().required(),
 });
 
 export const updateBrandSchema = joi.object({
-  name: joi.string(),
-  // materialId: joi.string(),
+  name: joi.string().trim().optional(),
+  materialId: joi.string().uuid().optional(),
 });
 
-export const getBrandByIdSchema = joi.object({
-  id: joi.string().required(),
+export const brandIdSchema = joi.object({
+  id: joi.string().uuid().required(),
 });
 
-export const updateBrandParamsSchema = joi.object({
-  id: joi.string().required(),
-});
-
-export const listBrandsSchema = joi.object({
-  pageNumber: joi.number().integer(),
-  pageSize: joi.number().integer(),
+export const listBrandSchema = joi.object({
   search: joi.string().optional(),
-  materialId: joi.string().optional(), // 🔥 important for dropdown
+  materialId: joi.string().uuid().optional(),
+  pageNumber: joi.number().optional(),
+  pageSize: joi.number().optional(),
 });

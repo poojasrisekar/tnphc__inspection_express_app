@@ -1,31 +1,105 @@
 import prisma from "../../shared/prisma";
 
+import { Prisma } from "@prisma/client";
+
 export const createBrandService = async (data: any) => {
-  return prisma.brand.create({
-    data: {
-      name: data.name,
-      materialId: data.materialId,
-      createdById: data.userId || null,
+  const material = await prisma.material.findFirst({
+    where: {
+      id: data.materialId,
+      isActive: true,
     },
   });
+
+  if (!material) {
+    throw new Error("Material not found");
+  }
+
+  const existing = await prisma.brand.findFirst({
+    where: {
+      materialId: data.materialId,
+      name: {
+        equals: data.name.trim(),
+        mode: "insensitive",
+      },
+      isActive: true,
+    },
+  });
+
+  if (existing) {
+    throw new Error(
+      "Brand already exists for this material"
+    );
+  }
+
+  try {
+    return await prisma.brand.create({
+      data: {
+        name: data.name.trim(),
+        materialId: data.materialId,
+        createdById: data.userId || null,
+      },
+    });
+  } catch (error: any) {
+    if (
+      error instanceof Prisma.PrismaClientKnownRequestError &&
+      error.code === "P2002"
+    ) {
+      throw new Error("Duplicate brand code found");
+    }
+
+    throw error;
+  }
 };
 
-export const getBrandByIdService = async (id: string) => {
-  return prisma.brand.findUnique({
-    where: { id },
-  include: {
-        material: {
-          select: {
-            id:true,
-            code: true,
-            name: true,
-          },
+export const getBrandByIdService = async (
+  id: string
+) => {
+  const brand = await prisma.brand.findFirst({
+    where: {
+      id,
+      isActive: true,
+    },
+    include: {
+      material: true,
+      grades: {
+        where: {
+          isActive: true,
         },
       },
+    },
   });
+
+  if (!brand) {
+    throw new Error("Brand not found");
+  }
+
+  return brand;
 };
 
-export const updateBrandService = async (id: string, data: any) => {
+export const updateBrandService = async (
+  id: string,
+  data: any
+) => {
+  const existing = await prisma.brand.findFirst({
+    where: {
+      materialId: data.materialId,
+      name: {
+        equals: data.name,
+        mode: "insensitive",
+      },
+      NOT: {
+        id,
+      },
+      isActive: true,
+    },
+  });
+
+  if (existing) {
+    throw new Error(
+      "Brand already exists for this material"
+    );
+  }
+
   return prisma.brand.update({
     where: { id },
     data: {
@@ -36,16 +110,20 @@ export const updateBrandService = async (id: string, data: any) => {
   });
 };
 
-export const deleteBrandService = async (id: string) => {
+export const deleteBrandService = async (
+  id: string
+) => {
   return prisma.brand.update({
     where: { id },
     data: {
-      isActive: false, // soft delete
+      isActive: false,
     },
   });
 };
 
-export const listBrandsService = async (query: any) => {
+export const listBrandsService = async (
+  query: any
+) => {
   const {
     pageNumber = 1,
     pageSize = 10,
@@ -53,7 +131,8 @@ export const listBrandsService = async (query: any) => {
     materialId,
   } = query;
 
-  const skip = (pageNumber - 1) * pageSize;
+  const skip =
+    (Number(pageNumber) - 1) * Number(pageSize);
 
   const where: any = {
     isActive: true,
@@ -67,34 +146,34 @@ export const listBrandsService = async (query: any) => {
   }
 
   if (materialId) {
-    where.materialId = materialId; // 🔥 filter by material
+    where.materialId = materialId;
   }
 
   const [data, total] = await Promise.all([
     prisma.brand.findMany({
       where,
       skip,
-      take: pageSize,
-      orderBy: { createdAt: "asc" },
+      take: Number(pageSize),
+      orderBy: {
+        createdAt: "desc",
+      },
       include: {
-        material: {
-          select: {
-            id:true,
-            code: true,
-            name: true,
+        material: true,
+        grades: {
+          where: {
+            isActive: true,
           },
         },
       },
     }),
+
     prisma.brand.count({ where }),
   ]);
 
   return {
-    data,
     total,
-    pageNumber,
-    pageSize,
+    pageNumber: Number(pageNumber),
+    pageSize: Number(pageSize),
+    data,
   };
 };
-
-

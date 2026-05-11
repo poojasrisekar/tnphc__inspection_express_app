@@ -4,7 +4,7 @@ import prisma from "../../shared/prisma";
 
 export const createProjectService = async (data: any) => {
 
-  // ✅ officer validation
+  
   if (data.officerId) {
     const officerExists = await prisma.officer.findUnique({
       where: { id: data.officerId }
@@ -12,7 +12,7 @@ export const createProjectService = async (data: any) => {
     if (!officerExists) throw new Error("Invalid officerId");
   }
 
-  // ✅ assigned user validation
+  
   if (data.assignedUserId) {
     const userExists = await prisma.user.findUnique({
       where: { id: data.assignedUserId }
@@ -20,7 +20,7 @@ export const createProjectService = async (data: any) => {
     if (!userExists) throw new Error("Invalid assignedUserId");
   }
 
-  // ✅ department / special unit validation
+  
   if (!data.departmentId && !data.specialUnitId) {
     throw new Error("At least one of departmentId or specialUnitId is required");
   }
@@ -32,7 +32,7 @@ export const createProjectService = async (data: any) => {
 
   return await prisma.$transaction(async (tx) => {
 
-    // ✅ Create Project
+    
     const project = await tx.project.create({
       data: {
         districtId: data.districtId,
@@ -49,12 +49,12 @@ export const createProjectService = async (data: any) => {
       }
     });
 
-    // ✅ SuperStructure with CUSTOM floors
+    
     if (Array.isArray(data.superStructure) && data.superStructure.length > 0) {
 
       const superStructureData = data.superStructure.map((b: any) => {
 
-        // 🔥 Validation (important)
+        
         if (!Array.isArray(b.floors) || b.floors.length === 0) {
           throw new Error(`Floors required for block ${b.blockName}`);
         }
@@ -127,7 +127,7 @@ export const getAllProjectsService = async (query: any) => {
         department: true,
         specialUnit: true,
         SuperStructure: true,
-        assignedUser: true // ✅ NEW
+        assignedUser: true 
       },
       orderBy: { createdAt: "desc" },
       skip,
@@ -146,7 +146,7 @@ export const getAllProjectsService = async (query: any) => {
     stage: p.stages?.[0]?.name ?? null,
     status: p.status,
 
-    // ✅ NEW
+    
     assignedUserName: p.assignedUser?.userName ?? null,
     selectedStageIds: p.selectedStageIds,
     stageCount: p.stages.length,
@@ -172,7 +172,7 @@ export const getProjectByIdService = async (id: string) => {
       department: true,
       officer: true,
       stages: true,
-      assignedUser: true, // ✅ NEW
+      assignedUser: true, 
       SuperStructure: true,
       SuperStructureProgress: true
     }
@@ -192,7 +192,7 @@ export const getProjectByIdService = async (id: string) => {
     departmentName: project.department?.name ?? null,
     officerName: project.officer?.name ?? null,
 
-    // ✅ NEW
+    
     assignedUserId: project.assignedUserId,
     assignedUserName: project.assignedUser?.userName ?? null,
     selectedStageIds: project.selectedStageIds,
@@ -226,7 +226,7 @@ export const updateProjectService = async (id: string, data: any) => {
       if (!officerExists) throw new Error("Invalid officerId");
     }
 
-    // ✅ assigned user validation
+    
     if (data.assignedUserId) {
       const userExists = await tx.user.findUnique({
         where: { id: data.assignedUserId }
@@ -252,7 +252,7 @@ export const updateProjectService = async (id: string, data: any) => {
         projectName: data.projectName,
         status: data.status,
 
-        // ✅ NEW
+        
         assignedUserId: data.assignedUserId,
         selectedStageIds: data.stageId,
 
@@ -376,7 +376,7 @@ export const getProjectsByUserService = async (userId: string) => {
     stageCount: p.stages.length,
     selectedStageIds: p.selectedStageIds,
 
-    // ✅ BLOCK-WISE FLOORS (your requirement)
+    
     superStructure: p.SuperStructure.map((b) => ({
       blockName: b.blockName,
       totalFloors: b.totalFloors

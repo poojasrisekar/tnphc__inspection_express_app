@@ -1,29 +1,32 @@
-import {
-  createGradeService,
-  getGradeByIdService,
-  updateGradeService,
-  deleteGradeService,
-  listGradesService,
-} from "./grade.service";
+import * as service from "./grade.service";
 
-export const createGradeUsecase = async (data: any) => {
-  return createGradeService(data);
+export const createGradeUsecase = async (
+  data: any
+) => {
+  return service.createGradeService(data);
 };
 
-export const getGradeByIdUsecase = async (id: string) => {
-  const grade = await getGradeByIdService(id);
-  if (!grade) throw new Error("Grade not found");
-  return grade;
+export const getGradeByIdUsecase = async (
+  id: string
+) => {
+  return service.getGradeByIdService(id);
 };
 
-export const updateGradeUsecase = async (id: string, data: any) => {
-  return updateGradeService(id, data);
+export const updateGradeUsecase = async (
+  id: string,
+  data: any
+) => {
+  return service.updateGradeService(id, data);
 };
 
-export const deleteGradeUsecase = async (id: string) => {
-  return deleteGradeService(id);
+export const deleteGradeUsecase = async (
+  id: string
+) => {
+  return service.deleteGradeService(id);
 };
 
-export const listGradesUsecase = async (query: any) => {
-  return listGradesService(query);
+export const listGradesUsecase = async (
+  query: any
+) => {
+  return service.listGradesService(query);
 };

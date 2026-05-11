@@ -1,45 +1,46 @@
 import { Router } from "express";
+
 import * as controller from "./grade.controller";
+
 import { validateRequest } from "../../middleware/validateRequest";
 
 import {
-  gradeSchema,
+  createGradeSchema,
   updateGradeSchema,
-  getGradeByIdSchema,
-  updateGradeParamsSchema,
-  listGradesSchema,
+  gradeIdSchema,
+  listGradeSchema,
 } from "./grade.schema";
 
 const router = Router();
 
 router.post(
-  "/createGrade",
-  validateRequest(gradeSchema),
+  "/",
+  validateRequest(createGradeSchema),
   controller.createGrade
 );
 
 router.get(
-  "/listGrades",
-  validateRequest(listGradesSchema, "query"),
+  "/",
+  validateRequest(listGradeSchema, "query"),
   controller.listGrades
 );
 
 router.get(
-  "/getGradeById/:id",
-  validateRequest(getGradeByIdSchema, "params"),
+  "/:id",
+  validateRequest(gradeIdSchema, "params"),
   controller.getGradeById
 );
 
 router.put(
-  "/updateGrade/:id",
-  validateRequest(updateGradeParamsSchema, "params"),
+  "/:id",
+  validateRequest(gradeIdSchema, "params"),
   validateRequest(updateGradeSchema),
   controller.updateGrade
 );
 
 router.delete(
-  "/deleteGrade/:id",
-  validateRequest(updateGradeParamsSchema, "params"),
+  "/:id",
+  validateRequest(gradeIdSchema, "params"),
   controller.deleteGrade
 );
 
