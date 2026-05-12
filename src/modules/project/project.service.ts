@@ -190,58 +190,62 @@ export const getAllProjectsService = async (query: any) => {
   };
 };
 
-export const getProjectByIdService = async (id: string) => {
-  const project = await prisma.project.findUnique({
-    where: { id },
+export const getProjectsByUserService = async (
+  userId?: string
+) => {
+
+  const whereCondition: any = {
+    isActive: true
+  };
+
+  // ✅ FILTER USER PROJECTS
+  if (userId) {
+    whereCondition.assignedUserId = userId;
+  }
+
+  const projects = await prisma.project.findMany({
+    where: whereCondition,
+
     include: {
-      district: true,
-      specialUnit: true,
-      department: true,
       officer: true,
       stages: true,
-      assignedUser: true, 
-      SuperStructure: true,
-      SuperStructureProgress: true
+      department: true,
+      specialUnit: true,
+      SuperStructure: true
+    },
+
+    orderBy: {
+      createdAt: "desc"
     }
   });
 
-  if (!project) throw new Error("Project not found");
+  return projects.map((p) => ({
+    id: p.id,
 
-  return {
-    id: project.id,
-    code: project.code,
-    projectName: project.projectName,
-    locationName: project.locationName,
-    status: project.status,
+    projectName: p.projectName,
 
-    districtName: project.district?.name ?? null,
-    specialUnitName: project.specialUnit?.name ?? null,
-    departmentName: project.department?.name ?? null,
-    officerName: project.officer?.name ?? null,
+    locationName: p.locationName,
 
-    
-    assignedUserId: project.assignedUserId,
-    assignedUserName: project.assignedUser?.userName ?? null,
-    selectedStageIds: project.selectedStageIds,
+    officerName: p.officer?.name ?? null,
 
-    stageNames: project.stages.map((s) => s.name),
+    unitName:
+      p.department?.name ||
+      p.specialUnit?.name ||
+      null,
 
-    blocks: project.SuperStructure.map((b) => {
-      const progress = project.SuperStructureProgress.find(
-        (p) => p.blockName === b.blockName
-      );
+    stageCount: p.stages.length,
 
-      return {
-        blockName: b.blockName,
-        totalFloors: b.totalFloors,
-        currentFloor: progress?.floorName ?? null,
-        status: progress?.status ?? "NOT_STARTED"
-      };
-    }),
+    selectedStageIds: p.selectedStageIds,
 
-    createdAt: project.createdAt,
-    updatedAt: project.updatedAt
-  };
+    superStructure: p.SuperStructure.map((b) => ({
+      blockName: b.blockName,
+      totalFloors: b.totalFloors
+    })),
+
+    status: p.status,
+
+    createdAt: p.createdAt
+  }));
 };
 
 export const updateProjectService = async (id: string, data: any) => {
@@ -374,42 +378,126 @@ export const getProjectDashboardService = async () => {
     completedBlocks
   };
 };
+export const getProjectByIdService = async (
+  id: string
+) => {
 
+  const project = await prisma.project.findUnique({
+    where: { id },
 
-export const getProjectsByUserService = async (userId: string) => {
-  const projects = await prisma.project.findMany({
-    where: {
-      assignedUserId: userId,
-      isActive: true
-    },
     include: {
+      district: true,
+      specialUnit: true,
+      department: true,
       officer: true,
       stages: true,
-      department: true,
-      specialUnit: true,
-      SuperStructure: true 
-    },
-    orderBy: { createdAt: "desc" }
+      assignedUser: true,
+      SuperStructure: true,
+      SuperStructureProgress: true
+    }
   });
 
-  return projects.map((p) => ({
-    id: p.id,
-    projectName: p.projectName,
-    locationName: p.locationName,
+  if (!project) {
+    throw new Error("Project not found");
+  }
 
-    officerName: p.officer?.name ?? null,
-    unitName: p.department?.name || p.specialUnit?.name || null,
+  return {
+    id: project.id,
+    code: project.code,
 
-    stageCount: p.stages.length,
-    selectedStageIds: p.selectedStageIds,
+    projectName: project.projectName,
+
+    locationName: project.locationName,
+
+    status: project.status,
+
+    districtName:
+      project.district?.name ?? null,
+
+    specialUnitName:
+      project.specialUnit?.name ?? null,
+
+    departmentName:
+      project.department?.name ?? null,
+
+    officerName:
+      project.officer?.name ?? null,
+
+    assignedUserId:
+      project.assignedUserId,
+
+    assignedUserName:
+      project.assignedUser?.userName ?? null,
+
+    selectedStageIds:
+      project.selectedStageIds,
+
+    stageNames:
+      project.stages.map((s) => s.name),
+
+    blocks:
+      project.SuperStructure.map((b) => {
+
+        const progress =
+          project.SuperStructureProgress.find(
+            (p) => p.blockName === b.blockName
+          );
+
+        return {
+          blockName: b.blockName,
+
+          totalFloors: b.totalFloors,
+
+          currentFloor:
+            progress?.floorName ?? null,
+
+          status:
+            progress?.status ?? "NOT_STARTED"
+        };
+      }),
+
+    createdAt: project.createdAt,
+
+    updatedAt: project.updatedAt
+  };
+};
+
+
+// export const getProjectsByUserService = async (userId: string) => {
+
+//   const projects = await prisma.project.findMany({
+//     where: {
+//       assignedUserId: userId,
+//       isActive: true
+//     },
+//     include: {
+//       officer: true,
+//       stages: true,
+//       department: true,
+//       specialUnit: true,
+//       SuperStructure: true 
+//     },
+//     orderBy: { createdAt: "desc" }
+//   });
+
+//   return projects.map((p) => ({
+//     id: p.id,
+//     projectName: p.projectName,
+//     locationName: p.locationName,
+
+//     officerName: p.officer?.name ?? null,
+//     unitName: p.department?.name || p.specialUnit?.name || null,
+
+//     stageCount: p.stages.length,
+//     selectedStageIds: p.selectedStageIds,
 
     
-    superStructure: p.SuperStructure.map((b) => ({
-      blockName: b.blockName,
-      totalFloors: b.totalFloors
-    })),
+//     superStructure: p.SuperStructure.map((b) => ({
+//       blockName: b.blockName,
+//       totalFloors: b.totalFloors
+//     })),
 
-    status: p.status,
-    createdAt: p.createdAt
-  }));
-};
+//     status: p.status,
+//     createdAt: p.createdAt
+//   }));
+// };
