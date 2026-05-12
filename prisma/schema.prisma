@@ -1050,3 +1050,53 @@ enum superStructureStatus {
   IN_PROGRESS
   COMPLETED
 }
+
+
+model masterDropdownType {
+  id          String   @id @default(uuid()) @db.VarChar(36)
+  code        Int      @unique @default(autoincrement())
+
+  name        String   @db.VarChar(255)
+  key         String   @unique @db.VarChar(255)
+
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  createdById String?  @map("created_by")
+  updatedById String?  @map("updated_by")
+
+  isActive    Boolean  @default(true) @map("is_active")
+
+  categories  masterDropdownCategory[]
+
+  @@map("master_dropdown_types")
+}
+
+
+
+model masterDropdownCategory {
+  id          String   @id @default(uuid()) @db.VarChar(36)
+  code        Int      @unique @default(autoincrement())
+
+  typeId      String
+  type        masterDropdownType @relation(fields: [typeId], references: [id])
+
+  label       String   @db.VarChar(255)
+  value       String   @db.VarChar(255)
+
+  sortOrder   Int?     @default(1)
+
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  createdById String?  @map("created_by")
+  updatedById String?  @map("updated_by")
+
+  isActive    Boolean  @default(true) @map("is_active")
+
+  @@unique([typeId, value])
+
+  @@index([typeId])
+
+  @@map("master_dropdown_categories")
+}
