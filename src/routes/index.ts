@@ -26,6 +26,7 @@ import takeoverDevelopmentRoutes from "../modules/takeoverDevelopmentWork/takeov
 import superStructureProgressRoutes from "../modules/superStructureProgress/superStructureProgress.routes";
 import adminReportsRoute
 from "../modules/adminReports/adminReports.route";
+import masterDropdownRoutes from "../modules/masterDropdown/masterDropdown.routes";
 
 
 
@@ -34,6 +35,7 @@ const router = Router();
 router.use("/auth", userRoutes);
 router.use("/roles",baseAuth, rolesRouter);
 router.use("/special-units",baseAuth, specialUnitRoutes);
+router.use("/master-dropdown", baseAuth, masterDropdownRoutes);
 router.use("/districts",baseAuth,districtRoutes);
 router.use("/projects",baseAuth, projectRoutes);
 router.use("/officers",baseAuth, officerRoutes); 
