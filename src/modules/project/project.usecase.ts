@@ -8,10 +8,16 @@ import {
   getProjectsByUserService
 } from "./project.service";
 
-export const createProjectUsecase = async (data: any) => {
+
+// ✅ CREATE
+export const createProjectUsecase = async (
+  data: any
+) => {
   return await createProjectService(data);
 };
 
+
+// ✅ GET ALL PROJECTS
 export const getAllProjectsUsecase = async ({
   pageNumber,
   pageSize,
@@ -29,10 +35,9 @@ export const getAllProjectsUsecase = async ({
   districtId?: string;
   departmentId?: string;
   specialUnitId?: string;
-
-  // ✅ ADD THIS
   userId?: string;
 }) => {
+
   return getAllProjectsService({
     pageNumber,
     pageSize,
@@ -43,28 +48,59 @@ export const getAllProjectsUsecase = async ({
     specialUnitId,
     userId
   });
+
 };
 
-export const getProjectByIdUsecase = async (id: string) => {
+
+// ✅ GET PROJECT BY ID
+export const getProjectByIdUsecase = async (
+  id: string
+) => {
+
   const project = await getProjectByIdService(id);
 
-  if (!project) throw new Error("Project not found");
+  if (!project) {
+    throw new Error("Project not found");
+  }
 
   return project;
 };
 
-export const updateProjectUsecase = async (id: string, data: any) => {
-  return await updateProjectService(id, data);
-};
 
-export const deleteProjectUsecase = async (id: string) => {
-  return await deleteProjectService(id);
-};
+// ✅ GET USER PROJECTS
+export const getProjectsByUserUsecase = async (
+  userId?: string
+) => {
 
-export const getProjectDashboardUsecase = async () => {
-  return getProjectDashboardService();
-};
-
-export const getProjectsByUserUsecase = async (userId: string) => {
   return await getProjectsByUserService(userId);
+
+};
+
+
+// ✅ UPDATE
+export const updateProjectUsecase = async (
+  id: string,
+  data: any
+) => {
+
+  return await updateProjectService(id, data);
+
+};
+
+
+// ✅ DELETE
+export const deleteProjectUsecase = async (
+  id: string
+) => {
+
+  return await deleteProjectService(id);
+
+};
+
+
+// ✅ DASHBOARD
+export const getProjectDashboardUsecase = async () => {
+
+  return getProjectDashboardService();
+
 };

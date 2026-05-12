@@ -6,7 +6,8 @@ import {
   getProjectByIdController,
   updateProjectController,
   deleteProjectController,
-  getProjectDashboardController
+  getProjectDashboardController,
+  getProjectsByUserController
 } from "./project.controller";
 
 import { validateRequest } from "../../middleware/validateRequest";
@@ -31,14 +32,6 @@ router.post(
 
 
 // ✅ GET ALL PROJECTS
-// ✅ GET USER ASSIGNED PROJECTS USING QUERY PARAM
-//
-// EXAMPLES:
-// /getProjects
-// /getProjects?userId=123
-// /getProjects?pageNumber=1&pageSize=10
-// /getProjects?userId=123&search=test
-//
 router.get(
   "/getProjects",
   validateRequest(getAllProjectsSchema, "query"),
@@ -46,7 +39,21 @@ router.get(
 );
 
 
-// ✅ GET SINGLE PROJECT DETAILS
+// ✅ GET ALL ASSIGNED PROJECTS
+router.get(
+  "/getAssignedProjects",
+  getProjectsByUserController
+);
+
+
+// ✅ GET USER WISE ASSIGNED PROJECTS
+router.get(
+  "/getAssignedProjects/:userId",
+  getProjectsByUserController
+);
+
+
+// ✅ GET PROJECT BY ID
 router.get(
   "/getProjectById/:id",
   validateRequest(getProjectByIdSchema, "params"),
