@@ -27,7 +27,7 @@ import superStructureProgressRoutes from "../modules/superStructureProgress/supe
 import adminReportsRoute
 from "../modules/adminReports/adminReports.route";
 import masterDropdownRoutes from "../modules/masterDropdown/masterDropdown.routes";
-
+import dropdownRoutes from "../modules/dropdown/dropdown.route";
 
 
 const router = Router();
@@ -36,6 +36,7 @@ router.use("/auth", userRoutes);
 router.use("/roles",baseAuth, rolesRouter);
 router.use("/special-units",baseAuth, specialUnitRoutes);
 router.use("/master-dropdown", baseAuth, masterDropdownRoutes);
+router.use("/dropdown", baseAuth, dropdownRoutes);
 router.use("/districts",baseAuth,districtRoutes);
 router.use("/projects",baseAuth, projectRoutes);
 router.use("/officers",baseAuth, officerRoutes); 
