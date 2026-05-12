@@ -91,7 +91,10 @@ export const getAllProjectsService = async (query: any) => {
     status,
     districtId,
     departmentId,
-    specialUnitId
+    specialUnitId,
+
+    // ✅ ADD THIS
+    userId
   } = query;
 
   const { skip, take } = pageConfig({
@@ -103,7 +106,9 @@ export const getAllProjectsService = async (query: any) => {
     throw new Error("Provide either departmentId OR specialUnitId, not both");
   }
 
-  const whereCondition: any = { isActive: true };
+  const whereCondition: any = {
+    isActive: true
+  };
 
   if (districtId) whereCondition.districtId = districtId;
 
@@ -115,8 +120,15 @@ export const getAllProjectsService = async (query: any) => {
   }
 
   if (status) whereCondition.status = status;
+
   if (departmentId) whereCondition.departmentId = departmentId;
+
   if (specialUnitId) whereCondition.specialUnitId = specialUnitId;
+
+  // ✅ FILTER USER PROJECTS
+  if (userId) {
+    whereCondition.assignedUserId = userId;
+  }
 
   const [data, totalRecords] = await Promise.all([
     prisma.project.findMany({
@@ -127,32 +139,47 @@ export const getAllProjectsService = async (query: any) => {
         department: true,
         specialUnit: true,
         SuperStructure: true,
-        assignedUser: true 
+        assignedUser: true
       },
       orderBy: { createdAt: "desc" },
       skip,
       take
     }),
-    prisma.project.count({ where: whereCondition })
+
+    prisma.project.count({
+      where: whereCondition
+    })
   ]);
 
   const formattedData = data.map((p) => ({
     id: p.id,
     projectName: p.projectName,
     locationName: p.locationName,
+
     officerName: p.officer?.name ?? null,
 
-    unitName: p.department?.name || p.specialUnit?.name || null,
+    unitName:
+      p.department?.name ||
+      p.specialUnit?.name ||
+      null,
+
     stage: p.stages?.[0]?.name ?? null,
+
     status: p.status,
 
-    
-    assignedUserName: p.assignedUser?.userName ?? null,
+    assignedUserName:
+      p.assignedUser?.userName ?? null,
+
     selectedStageIds: p.selectedStageIds,
+
     stageCount: p.stages.length,
 
     totalBlocks: p.SuperStructure.length,
-    totalFloors: p.SuperStructure.reduce((sum, b) => sum + b.totalFloors, 0),
+
+    totalFloors: p.SuperStructure.reduce(
+      (sum, b) => sum + b.totalFloors,
+      0
+    ),
 
     createdAt: p.createdAt
   }));

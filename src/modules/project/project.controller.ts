@@ -36,10 +36,12 @@ export const getAllProjectsController = async (req: Request, res: Response) => {
     const search = req.query.search as string | undefined;
     const status = req.query.status as StatusType;
 
-    // ✅ ADD THESE (THIS IS THE FIX)
     const districtId = getSingleValue(req.query.districtId);
     const departmentId = getSingleValue(req.query.departmentId);
     const specialUnitId = getSingleValue(req.query.specialUnitId);
+
+    // ✅ ADD THIS
+    const userId = getSingleValue(req.query.userId);
 
     const result = await getAllProjectsUsecase({
       pageNumber,
@@ -48,7 +50,8 @@ export const getAllProjectsController = async (req: Request, res: Response) => {
       status,
       districtId,
       departmentId,
-      specialUnitId
+      specialUnitId,
+      userId
     });
 
     res.status(200).json({

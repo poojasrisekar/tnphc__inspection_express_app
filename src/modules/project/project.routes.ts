@@ -1,12 +1,12 @@
 import express from "express";
+
 import {
   createProjectController,
   getAllProjectsController,
   getProjectByIdController,
   updateProjectController,
   deleteProjectController,
-  getProjectDashboardController,
-  getProjectsByUserController
+  getProjectDashboardController
 } from "./project.controller";
 
 import { validateRequest } from "../../middleware/validateRequest";
@@ -21,6 +21,8 @@ import {
 
 const router = express.Router();
 
+
+// ✅ CREATE PROJECT
 router.post(
   "/createProject",
   validateRequest(createProjectSchema, "body"),
@@ -29,17 +31,18 @@ router.post(
 
 
 // ✅ GET ALL PROJECTS
+// ✅ GET USER ASSIGNED PROJECTS USING QUERY PARAM
+//
+// EXAMPLES:
+// /getProjects
+// /getProjects?userId=123
+// /getProjects?pageNumber=1&pageSize=10
+// /getProjects?userId=123&search=test
+//
 router.get(
   "/getProjects",
   validateRequest(getAllProjectsSchema, "query"),
   getAllProjectsController
-);
-
-
-// ✅ GET USER ASSIGNED PROJECTS
-router.get(
-  "/getProjects/:userId",
-  getProjectsByUserController
 );
 
 
@@ -50,18 +53,24 @@ router.get(
   getProjectByIdController
 );
 
+
+// ✅ UPDATE PROJECT
 router.put(
   "/updateProject/:id",
   validateRequest(updateProjectSchema, "body"),
   updateProjectController
 );
 
+
+// ✅ DELETE PROJECT
 router.patch(
   "/deleteProject/:id",
   validateRequest(deleteProjectSchema, "params"),
   deleteProjectController
 );
 
+
+// ✅ PROJECT DASHBOARD
 router.get(
   "/getProjectDashboard",
   getProjectDashboardController
