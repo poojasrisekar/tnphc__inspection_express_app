@@ -81,6 +81,7 @@ export const updateParamsSchema = Joi.object({
 
 export const getAllProjectsSchema = Joi.object({
   pageNumber: Joi.number().integer().min(1).default(1),
+
   pageSize: Joi.number().integer().min(1).max(100).default(10),
 
   search: Joi.string().trim().optional(),
@@ -98,7 +99,9 @@ export const getAllProjectsSchema = Joi.object({
   departmentId: Joi.string().uuid().optional(),
   specialUnitId: Joi.string().uuid().optional(),
 
+  // ✅ ADD THIS
+  userId: Joi.string().uuid().optional()
+
 })
-//  BEST CHOICE (explained below)
 .nand("departmentId", "specialUnitId")
 .required();

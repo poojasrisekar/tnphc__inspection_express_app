@@ -19,7 +19,8 @@ export const getAllProjectsUsecase = async ({
   status,
   districtId,
   departmentId,
-  specialUnitId
+  specialUnitId,
+  userId
 }: {
   pageNumber?: string;
   pageSize?: string;
@@ -28,6 +29,9 @@ export const getAllProjectsUsecase = async ({
   districtId?: string;
   departmentId?: string;
   specialUnitId?: string;
+
+  // ✅ ADD THIS
+  userId?: string;
 }) => {
   return getAllProjectsService({
     pageNumber,
@@ -36,7 +40,8 @@ export const getAllProjectsUsecase = async ({
     status,
     districtId,
     departmentId,
-    specialUnitId
+    specialUnitId,
+    userId
   });
 };
 
