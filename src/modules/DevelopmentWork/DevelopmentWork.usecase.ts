@@ -236,10 +236,17 @@ export const getAllDevelopmentWorkUsecase = async (projectId: string) => {
   return getAllDevelopmentWorkDB(projectId);
 };
 
-// ─── GET BY ID ────────────────────────────────────────────────────────────
-export const getDevelopmentWorkByIdUsecase = async (id: string) => {
-  const data = await getDevelopmentWorkByIdDB(id);
-  if (!data) throw new Error("Development work record not found");
+// ─── GET BY PROJECT ID ──────────────────────────────────────────────────────
+export const getDevelopmentWorkByProjectIdUsecase = async (
+  projectId: string
+) => {
+  const data =
+    await getDevelopmentWorkByProjectIdDB(projectId);
+
+  if (!data) {
+    throw new Error("Development work record not found");
+  }
+
   return data;
 };
 
@@ -251,6 +258,14 @@ export const updateDevelopmentWorkUsecase = async (
   req: any,
   userId?: string
 ) => {
+
+  const existing =
+    await getDevelopmentWorkByIdDB(id);
+
+  if (!existing) {
+    throw new Error("Development work not found");
+  }
+
   const baseUrl = `${req.protocol}://${req.get("host")}`;
 
   const getFiles = (field: string) =>
@@ -259,316 +274,326 @@ export const updateDevelopmentWorkUsecase = async (
       url: `${baseUrl}/uploads/${file.filename}`
     }));
 
-  const hasAny = (...keys: string[]) => keys.some(k => body[k] !== undefined);
-  const hasFiles = (...fields: string[]) => fields.some(f => (files?.[f] || []).length > 0);
+  const data: any = {
+    updatedById: userId
+  };
 
-  const data: any = { updatedById: userId };
+  // ================= SUMP PUMP =================
 
-  // SUMP & PUMP ROOM
-  if (
-    hasAny(
-      "completionPercentage",
-      "sumpCapacity", "sumpCapacityRemarks",
-      "sumpQuality", "sumpQualityRemarks",
-      "pumpsAsPerSpec", "pumpsSpecRemarks",
-      "standbyPumps", "standbyPumpsRemarks",
-      "pumpsWorking", "pumpsWorkingRemarks"
-    ) ||
-    hasFiles("sumpCapacityPhotos", "sumpQualityPhotos", "pumpsSpecPhotos", "standbyPumpsPhotos", "pumpsWorkingPhotos")
-  ) {
-    data.sumpPump = {
-      ...(body.completionPercentage !== undefined && {
-        completionPercentage: body.completionPercentage || null
-      }),
+  data.sumpPump = {
+    ...(existing as any).sumpPump,
 
-      ...(body.sumpCapacity !== undefined && {
-        sumpCapacity: toBool(body.sumpCapacity)
-          ? {
-              value: true,
-              remarks: body.sumpCapacityRemarks || null,
-              photos: getFiles("sumpCapacityPhotos")
-            }
-          : { value: false }
-      }),
+    ...(body.completionPercentage !== undefined && {
+      completionPercentage: body.completionPercentage
+    }),
 
-      ...(body.sumpQuality !== undefined && {
-        sumpQuality: toBool(body.sumpQuality)
-          ? {
-              value: true,
-              remarks: body.sumpQualityRemarks || null,
-              photos: getFiles("sumpQualityPhotos")
-            }
-          : { value: false }
-      }),
+    ...(body.sumpCapacity !== undefined && {
+      sumpCapacity: {
+        value: toBool(body.sumpCapacity),
+        remarks: body.sumpCapacityRemarks || null,
 
-      ...(body.pumpsAsPerSpec !== undefined && {
-        pumpsAsPerSpec: toBool(body.pumpsAsPerSpec)
-          ? {
-              value: true,
-              remarks: body.pumpsSpecRemarks || null,
-              photos: getFiles("pumpsSpecPhotos")
-            }
-          : { value: false }
-      }),
+        photos:
+          getFiles("sumpCapacityPhotos").length > 0
+            ? getFiles("sumpCapacityPhotos")
+            : (existing as any)?.sumpPump?.sumpCapacity?.photos || [],
+      },
+    }),
 
-      ...(body.standbyPumps !== undefined && {
-        standbyPumps: toBool(body.standbyPumps)
-          ? {
-              value: true,
-              remarks: body.standbyPumpsRemarks || null,
-              photos: getFiles("standbyPumpsPhotos")
-            }
-          : { value: false }
-      }),
+    ...(body.sumpQuality !== undefined && {
+      sumpQuality: {
+        value: toBool(body.sumpQuality),
+        remarks: body.sumpQualityRemarks || null,
 
-      ...(body.pumpsWorking !== undefined && {
-        pumpsWorking: toBool(body.pumpsWorking)
-          ? {
-              value: true,
-              remarks: body.pumpsWorkingRemarks || null,
-              photos: getFiles("pumpsWorkingPhotos")
-            }
-          : { value: false }
-      })
-    };
-  }
+        photos:
+          getFiles("sumpQualityPhotos").length > 0
+            ? getFiles("sumpQualityPhotos")
+            : (existing as any)?.sumpPump?.sumpQuality?.photos || [],
+      },
+    }),
 
-  // BOREWELL
-  if (
-    hasAny(
-      "borewellCompletionPercentage",
-      "borewellDepth",
-      "borewellWorking", "borewellRemarks",
-      "waterQuality"
-    ) ||
-    hasFiles("borewellPhotos", "borewellLabReport")
-  ) {
-    data.borewell = {
-      ...(body.borewellCompletionPercentage !== undefined && {
-        completionPercentage: body.borewellCompletionPercentage || null
-      }),
-      ...(body.borewellDepth !== undefined && {
-        depth: body.borewellDepth || null
-      }),
-      ...(body.borewellWorking !== undefined && {
-        isWorking: toBool(body.borewellWorking)
-          ? {
-              value: true,
-              remarks: body.borewellRemarks || null,
-              photos: getFiles("borewellPhotos")
-            }
-          : { value: false }
-      }),
-      ...(body.waterQuality !== undefined && {
-        waterQuality: body.waterQuality || null
-      }),
-      ...(hasFiles("borewellLabReport") && {
-        labReport: getFiles("borewellLabReport")
-      })
-    };
-  }
+    ...(body.pumpsAsPerSpec !== undefined && {
+      pumpsAsPerSpec: {
+        value: toBool(body.pumpsAsPerSpec),
+        remarks: body.pumpsSpecRemarks || null,
 
-  // INSPECTION CHAMBER
-  if (
-    hasAny("inspectionChamberCompletionPercentage", "inspectionChamberProper", "inspectionChamberRemarks")
-  ) {
-    data.inspectionChamber = {
-      ...(body.inspectionChamberCompletionPercentage !== undefined && {
-        completionPercentage: body.inspectionChamberCompletionPercentage || null
-      }),
-      ...(body.inspectionChamberProper !== undefined && {
-        isProper: toBool(body.inspectionChamberProper)
-          ? {
-              value: true,
-              remarks: body.inspectionChamberRemarks || null
-            }
-          : { value: false }
-      })
-    };
-  }
+        photos:
+          getFiles("pumpsSpecPhotos").length > 0
+            ? getFiles("pumpsSpecPhotos")
+            : (existing as any)?.sumpPump?.pumpsAsPerSpec?.photos || [],
+      },
+    }),
 
-  // STORM WATER DRAINS
-  if (
-    hasAny("stormWaterCompletionPercentage", "stormWaterDrainsProper", "stormWaterDrainsRemarks")
-  ) {
-    data.stormWaterDrains = {
-      ...(body.stormWaterCompletionPercentage !== undefined && {
-        completionPercentage: body.stormWaterCompletionPercentage || null
-      }),
-      ...(body.stormWaterDrainsProper !== undefined && {
-        isProper: toBool(body.stormWaterDrainsProper)
-          ? {
-              value: true,
-              remarks: body.stormWaterDrainsRemarks || null
-            }
-          : { value: false }
-      })
-    };
-  }
+    ...(body.standbyPumps !== undefined && {
+      standbyPumps: {
+        value: toBool(body.standbyPumps),
+        remarks: body.standbyPumpsRemarks || null,
 
-  // SULLAGE DRAIN
-  if (
-    hasAny("sullageDrainCompletionPercentage", "sullageDrainProper", "sullageDrainRemarks")
-  ) {
-    data.sullageDrain = {
-      ...(body.sullageDrainCompletionPercentage !== undefined && {
-        completionPercentage: body.sullageDrainCompletionPercentage || null
-      }),
-      ...(body.sullageDrainProper !== undefined && {
-        isProper: toBool(body.sullageDrainProper)
-          ? {
-              value: true,
-              remarks: body.sullageDrainRemarks || null
-            }
-          : { value: false }
-      })
-    };
-  }
+        photos:
+          getFiles("standbyPumpsPhotos").length > 0
+            ? getFiles("standbyPumpsPhotos")
+            : (existing as any)?.sumpPump?.standbyPumps?.photos || [],
+      },
+    }),
 
-  // ROAD
-  if (hasAny("roadType", "roadQuality") || hasFiles("roadPhotos")) {
-    data.road = {
-      ...(body.roadType !== undefined && {
-        roadType: body.roadType || null
-      }),
-      ...(body.roadQuality !== undefined && {
-        quality: body.roadQuality || null
-      }),
-      ...(hasFiles("roadPhotos") && {
-        photos: getFiles("roadPhotos")
-      })
-    };
-  }
+    ...(body.pumpsWorking !== undefined && {
+      pumpsWorking: {
+        value: toBool(body.pumpsWorking),
+        remarks: body.pumpsWorkingRemarks || null,
 
-  // PAVER BLOCK
-  if (
-    hasAny("paverBlockCompletionPercentage", "paverBlockProper", "paverBlockRemarks")
-  ) {
-    data.paverBlock = {
-      ...(body.paverBlockCompletionPercentage !== undefined && {
-        completionPercentage: body.paverBlockCompletionPercentage || null
-      }),
-      ...(body.paverBlockProper !== undefined && {
-        isProper: toBool(body.paverBlockProper)
-          ? {
-              value: true,
-              remarks: body.paverBlockRemarks || null
-            }
-          : { value: false }
-      })
-    };
-  }
+        photos:
+          getFiles("pumpsWorkingPhotos").length > 0
+            ? getFiles("pumpsWorkingPhotos")
+            : (existing as any)?.sumpPump?.pumpsWorking?.photos || [],
+      },
+    }),
+  };
 
-  // COMPOUND WALL
-  if (
-    hasAny(
-      "compoundWallQuality", "compoundWallQualityRemarks",
-      "compoundWallExpansionJoints", "compoundWallExpansionRemarks",
-      "compoundWallAirVents", "compoundWallAirVentsRemarks"
-    ) ||
-    hasFiles("compoundWallQualityPhotos", "compoundWallExpansionPhotos", "compoundWallAirVentsPhotos")
-  ) {
-    data.compoundWall = {
-      ...(body.compoundWallQuality !== undefined && {
-        quality: toBool(body.compoundWallQuality)
-          ? {
-              value: true,
-              remarks: body.compoundWallQualityRemarks || null,
-              photos: getFiles("compoundWallQualityPhotos")
-            }
-          : { value: false }
-      }),
+  // ================= BOREWELL =================
 
-      ...(body.compoundWallExpansionJoints !== undefined && {
-        expansionJoints: toBool(body.compoundWallExpansionJoints)
-          ? {
-              value: true,
-              remarks: body.compoundWallExpansionRemarks || null,
-              photos: getFiles("compoundWallExpansionPhotos")
-            }
-          : { value: false }
-      }),
+  data.borewell = {
+    ...(existing as any).borewell,
 
-      ...(body.compoundWallAirVents !== undefined && {
-        airVents: toBool(body.compoundWallAirVents)
-          ? {
-              value: true,
-              remarks: body.compoundWallAirVentsRemarks || null,
-              photos: getFiles("compoundWallAirVentsPhotos")
-            }
-          : { value: false }
-      })
-    };
-  }
+    ...(body.borewellCompletionPercentage !== undefined && {
+      completionPercentage:
+        body.borewellCompletionPercentage,
+    }),
 
-  // RAIN WATER HARVESTING
-  if (
-    hasAny("rainWaterCompletionPercentage", "rainWaterPits", "rainWaterProper", "rainWaterRemarks")
-  ) {
-    data.rainWaterHarvesting = {
-      ...(body.rainWaterCompletionPercentage !== undefined && {
-        completionPercentage: body.rainWaterCompletionPercentage || null
-      }),
-      ...(body.rainWaterPits !== undefined && {
-        numberOfPits: body.rainWaterPits || null
-      }),
-      ...(body.rainWaterProper !== undefined && {
-        isProper: toBool(body.rainWaterProper)
-          ? {
-              value: true,
-              remarks: body.rainWaterRemarks || null
-            }
-          : { value: false }
-      })
-    };
-  }
+    ...(body.borewellDepth !== undefined && {
+      depth: body.borewellDepth,
+    }),
 
-  // LANDSCAPING
-  if (
-    hasAny("landScapingCompletionPercentage", "landScapingProper", "landScapingRemarks")
-  ) {
-    data.landScaping = {
-      ...(body.landScapingCompletionPercentage !== undefined && {
-        completionPercentage: body.landScapingCompletionPercentage || null
-      }),
-      ...(body.landScapingProper !== undefined && {
-        isProper: toBool(body.landScapingProper)
-          ? {
-              value: true,
-              remarks: body.landScapingRemarks || null
-            }
-          : { value: false }
-      })
-    };
-  }
+    ...(body.borewellWorking !== undefined && {
+      isWorking: {
+        value: toBool(body.borewellWorking),
+        remarks: body.borewellRemarks || null,
 
-  // OTHER DEFECTS
-  if (
-    hasAny("otherDefectsDescription", "otherDefectsCategory", "otherDefectsLocation") ||
-    hasFiles("otherDefectsPhotos")
-  ) {
-    data.otherDefects = {
-      ...(body.otherDefectsDescription !== undefined && {
-        description: body.otherDefectsDescription || null
-      }),
-      ...(body.otherDefectsCategory !== undefined && {
-        category: body.otherDefectsCategory || null
-      }),
-      ...(body.otherDefectsLocation !== undefined && {
-        location: body.otherDefectsLocation || null
-      }),
-      ...(hasFiles("otherDefectsPhotos") && {
-        photos: getFiles("otherDefectsPhotos")
-      })
-    };
-  }
+        photos:
+          getFiles("borewellPhotos").length > 0
+            ? getFiles("borewellPhotos")
+            : (existing as any)?.borewell?.isWorking?.photos || [],
+      },
+    }),
 
-  // GENERAL REMARKS
-  if (hasAny("generalRemarks")) {
-    data.generalRemarks = {
-      remarks: body.generalRemarks || null
-    };
-  }
+    ...(body.waterQuality !== undefined && {
+      waterQuality: body.waterQuality,
+    }),
+
+    ...(getFiles("borewellLabReport").length > 0 && {
+      labReport: getFiles("borewellLabReport"),
+    }),
+  };
+
+  // ================= INSPECTION CHAMBER =================
+
+  data.inspectionChamber = {
+    ...(existing as any).inspectionChamber,
+
+    ...(body.inspectionChamberCompletionPercentage !== undefined && {
+      completionPercentage:
+        body.inspectionChamberCompletionPercentage,
+    }),
+
+    ...(body.inspectionChamberProper !== undefined && {
+      isProper: {
+        value: toBool(body.inspectionChamberProper),
+        remarks:
+          body.inspectionChamberRemarks || null,
+      },
+    }),
+  };
+
+  // ================= STORM WATER =================
+
+  data.stormWaterDrains = {
+    ...(existing as any).stormWaterDrains,
+
+    ...(body.stormWaterCompletionPercentage !== undefined && {
+      completionPercentage:
+        body.stormWaterCompletionPercentage,
+    }),
+
+    ...(body.stormWaterDrainsProper !== undefined && {
+      isProper: {
+        value: toBool(body.stormWaterDrainsProper),
+        remarks:
+          body.stormWaterDrainsRemarks || null,
+      },
+    }),
+  };
+
+  // ================= SULLAGE =================
+
+  data.sullageDrain = {
+    ...(existing as any).sullageDrain,
+
+    ...(body.sullageDrainCompletionPercentage !== undefined && {
+      completionPercentage:
+        body.sullageDrainCompletionPercentage,
+    }),
+
+    ...(body.sullageDrainProper !== undefined && {
+      isProper: {
+        value: toBool(body.sullageDrainProper),
+        remarks:
+          body.sullageDrainRemarks || null,
+      },
+    }),
+  };
+
+  // ================= ROAD =================
+
+  data.road = {
+    ...(existing as any).road,
+
+    ...(body.roadType !== undefined && {
+      roadType: body.roadType,
+    }),
+
+    ...(body.roadQuality !== undefined && {
+      quality: body.roadQuality,
+    }),
+
+    ...(getFiles("roadPhotos").length > 0 && {
+      photos: getFiles("roadPhotos"),
+    }),
+  };
+
+  // ================= PAVER BLOCK =================
+
+  data.paverBlock = {
+    ...(existing as any).paverBlock,
+
+    ...(body.paverBlockCompletionPercentage !== undefined && {
+      completionPercentage:
+        body.paverBlockCompletionPercentage,
+    }),
+
+    ...(body.paverBlockProper !== undefined && {
+      isProper: {
+        value: toBool(body.paverBlockProper),
+        remarks:
+          body.paverBlockRemarks || null,
+      },
+    }),
+  };
+
+  // ================= COMPOUND WALL =================
+
+  data.compoundWall = {
+    ...(existing as any).compoundWall,
+
+    ...(body.compoundWallQuality !== undefined && {
+      quality: {
+        value: toBool(body.compoundWallQuality),
+        remarks:
+          body.compoundWallQualityRemarks || null,
+
+        photos:
+          getFiles("compoundWallQualityPhotos").length > 0
+            ? getFiles("compoundWallQualityPhotos")
+            : (existing as any)?.compoundWall?.quality?.photos || [],
+      },
+    }),
+
+    ...(body.compoundWallExpansionJoints !== undefined && {
+      expansionJoints: {
+        value: toBool(body.compoundWallExpansionJoints),
+        remarks:
+          body.compoundWallExpansionRemarks || null,
+
+        photos:
+          getFiles("compoundWallExpansionPhotos").length > 0
+            ? getFiles("compoundWallExpansionPhotos")
+            : (existing as any)?.compoundWall?.expansionJoints?.photos || [],
+      },
+    }),
+
+    ...(body.compoundWallAirVents !== undefined && {
+      airVents: {
+        value: toBool(body.compoundWallAirVents),
+        remarks:
+          body.compoundWallAirVentsRemarks || null,
+
+        photos:
+          getFiles("compoundWallAirVentsPhotos").length > 0
+            ? getFiles("compoundWallAirVentsPhotos")
+            : (existing as any)?.compoundWall?.airVents?.photos || [],
+      },
+    }),
+  };
+
+  // ================= RAIN WATER =================
+
+  data.rainWaterHarvesting = {
+    ...(existing as any).rainWaterHarvesting,
+
+    ...(body.rainWaterCompletionPercentage !== undefined && {
+      completionPercentage:
+        body.rainWaterCompletionPercentage,
+    }),
+
+    ...(body.rainWaterPits !== undefined && {
+      numberOfPits: body.rainWaterPits,
+    }),
+
+    ...(body.rainWaterProper !== undefined && {
+      isProper: {
+        value: toBool(body.rainWaterProper),
+        remarks:
+          body.rainWaterRemarks || null,
+      },
+    }),
+  };
+
+  // ================= LANDSCAPING =================
+
+  data.landScaping = {
+    ...(existing as any).landScaping,
+
+    ...(body.landScapingCompletionPercentage !== undefined && {
+      completionPercentage:
+        body.landScapingCompletionPercentage,
+    }),
+
+    ...(body.landScapingProper !== undefined && {
+      isProper: {
+        value: toBool(body.landScapingProper),
+        remarks:
+          body.landScapingRemarks || null,
+      },
+    }),
+  };
+
+  // ================= OTHER DEFECTS =================
+
+  data.otherDefects = {
+    ...(existing as any).otherDefects,
+
+    ...(body.otherDefectsDescription !== undefined && {
+      description: body.otherDefectsDescription,
+    }),
+
+    ...(body.otherDefectsCategory !== undefined && {
+      category: body.otherDefectsCategory,
+    }),
+
+    ...(body.otherDefectsLocation !== undefined && {
+      location: body.otherDefectsLocation,
+    }),
+
+    ...(getFiles("otherDefectsPhotos").length > 0 && {
+      photos: getFiles("otherDefectsPhotos"),
+    }),
+  };
+
+  // ================= GENERAL REMARKS =================
+
+  data.generalRemarks = {
+    remarks:
+      body.generalRemarks ??
+      (existing as any)?.generalRemarks?.remarks ??
+      null,
+  };
 
   return updateDevelopmentWorkDB(id, data);
 };
@@ -577,15 +602,15 @@ export const updateDevelopmentWorkUsecase = async (
 export const deleteDevelopmentWorkUsecase = async (id: string) => {
   return deleteDevelopmentWorkDB(id);
 };
-export const getDevelopmentWorkByProjectIdUsecase = async (
-  projectId: string
-) => {
-  const data =
-    await getDevelopmentWorkByProjectIdDB(projectId);
+// export const getDevelopmentWorkByProjectIdUsecase = async (
+//   projectId: string
+// ) => {
+//   const data =
+//     await getDevelopmentWorkByProjectIdDB(projectId);
 
-  if (!data || data.length === 0) {
-    throw new Error("Development work record not found");
-  }
+//   if (!data || data.length === 0) {
+//     throw new Error("Development work record not found");
+//   }
 
-  return data;
-};
+//   return data;
+// };

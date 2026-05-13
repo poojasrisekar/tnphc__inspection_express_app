@@ -1,37 +1,77 @@
 import prisma from "../../shared/prisma";
 
-export const createTakeoverDevelopmentWorkDB = (data: any) => {
-  return prisma.takeoverDevelopmentWork.create({ data });
-};
-
-export const getAllTakeoverDevelopmentWorkDB = (projectId: string) => {
-  return prisma.takeoverDevelopmentWork.findMany({
-    where: { projectId, isActive: true }
+// CREATE
+export const createTakeoverDevelopmentWorkDB = async (
+  data: any
+) => {
+  return prisma.takeoverDevelopmentWork.create({
+    data,
   });
 };
 
-export const getTakeoverDevelopmentWorkByIdDB = (id: string) => {
-  return prisma.takeoverDevelopmentWork.findUnique({ where: { id } });
-};
-
-export const updateTakeoverDevelopmentWorkDB = (id: string, data: any) => {
-  return prisma.takeoverDevelopmentWork.update({ where: { id }, data });
-};
-
-export const deleteTakeoverDevelopmentWorkDB = (id: string) => {
-  return prisma.takeoverDevelopmentWork.update({
-    where: { id },
-    data: { isActive: false }
-  });
-};
-
-export const getTakeoverDevelopmentWorkByProjectIdDB = (
+// GET ALL (LATEST FIRST)
+export const getAllTakeoverDevelopmentWorkDB = async (
   projectId: string
 ) => {
   return prisma.takeoverDevelopmentWork.findMany({
     where: {
       projectId,
-      isActive: true
-    }
+      isActive: true,
+    },
+
+    orderBy: {
+      createdAt: "desc",
+    },
+  });
+};
+
+// GET BY ID
+export const getTakeoverDevelopmentWorkByIdDB = async (
+  id: string
+) => {
+  return prisma.takeoverDevelopmentWork.findFirst({
+    where: {
+      id,
+      isActive: true,
+    },
+  });
+};
+
+// GET LATEST BY PROJECT
+export const getTakeoverDevelopmentWorkByProjectIdDB =
+  async (projectId: string) => {
+    return prisma.takeoverDevelopmentWork.findFirst({
+      where: {
+        projectId,
+        isActive: true,
+      },
+
+      orderBy: {
+        createdAt: "desc",
+      },
+    });
+  };
+
+// UPDATE
+export const updateTakeoverDevelopmentWorkDB = async (
+  id: string,
+  data: any
+) => {
+  return prisma.takeoverDevelopmentWork.update({
+    where: { id },
+    data,
+  });
+};
+
+// DELETE
+export const deleteTakeoverDevelopmentWorkDB = async (
+  id: string
+) => {
+  return prisma.takeoverDevelopmentWork.update({
+    where: { id },
+
+    data: {
+      isActive: false,
+    },
   });
 };
