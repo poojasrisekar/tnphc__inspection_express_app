@@ -67,7 +67,7 @@ router.get(
 
 // ✅ UPDATE
 router.put(
-  "/land-site-inspections/:id",
+  "/landSiteInspections/:id",
   inspectionUpload,
   handleMulterError,
   validateRequest(updateLandSiteInspectionParamsSchema, "params"),
@@ -77,7 +77,7 @@ router.put(
 
 // ✅ DELETE
 router.delete(
-  "/land-site-inspections/:id",
+  "/landSiteInspections/:id",
   validateRequest(deleteLandSiteInspectionSchema, "params"),
   deleteInspection
 );
