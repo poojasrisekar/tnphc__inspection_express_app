@@ -20,7 +20,7 @@ const commonFields = {
 
   // BOREWELL
   borewellCompletionPercentage: numField,
-  borewellDepth:                strField,
+  borewellDepth:                numField,
   borewellWorking:              boolField,
   borewellRemarks:              strField,
   waterQuality:                 strField,
