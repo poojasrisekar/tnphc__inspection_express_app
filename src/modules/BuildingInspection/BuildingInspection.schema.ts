@@ -7,21 +7,25 @@ export const createBuildingInspectionSchema = Joi.object({
   structureAlignment: Joi.boolean().truthy("true").falsy("false").optional(),
   structureLocation: Joi.string().optional().allow(null, ""),
   structureDefectReport: Joi.string().optional().allow(null, ""),
+  structureRemarks: Joi.string().optional().allow(null, ""),
 
   // PAINTING
   paintingIsQualityOk: Joi.boolean().truthy("true").falsy("false").optional(),
   paintingLocation: Joi.string().optional().allow(null, ""),
   paintingDefectReport: Joi.string().optional().allow(null, ""),
+  paintingRemarks: Joi.string().optional().allow(null, ""),
 
   // TILING & FLOORING
   tilingIsQualityOk: Joi.boolean().truthy("true").falsy("false").optional(),
   tilingLocation: Joi.string().optional().allow(null, ""),
   tilingDefectReport: Joi.string().optional().allow(null, ""),
+  tilingRemarks: Joi.string().optional().allow(null, ""),
 
   // FALSE CEILING
   falseCeilingIsQualityOk: Joi.boolean().truthy("true").falsy("false").optional(),
   falseCeilingLocation: Joi.string().optional().allow(null, ""),
   falseCeilingDefectReport: Joi.string().optional().allow(null, ""),
+  falseCeilingRemarks: Joi.string().optional().allow(null, ""),
 
   // PLUMBING SYSTEM
   plumbingWaterSupply: Joi.boolean().truthy("true").falsy("false").optional(),
@@ -31,6 +35,8 @@ export const createBuildingInspectionSchema = Joi.object({
   plumbingLeakage: Joi.boolean().truthy("true").falsy("false").optional(),
   plumbingLeakageLocation: Joi.string().optional().allow(null, ""),
   plumbingLeakageDefect: Joi.string().optional().allow(null, ""),
+
+  plumbingRemarks: Joi.string().optional().allow(null, ""),
 
   // ELECTRICAL SYSTEM
   electricalSwitchQuality: Joi.boolean().truthy("true").falsy("false").optional(),
@@ -47,6 +53,8 @@ export const createBuildingInspectionSchema = Joi.object({
 
   electricalELCB: Joi.string().optional().allow(null, ""),
 
+  electricalRemarks: Joi.string().optional().allow(null, ""),
+
   // DOORS & WINDOWS
   dwQuality: Joi.boolean().truthy("true").falsy("false").optional(),
   dwQualityRemarks: Joi.string().optional().allow(null, ""),
@@ -54,12 +62,16 @@ export const createBuildingInspectionSchema = Joi.object({
   dwOperation: Joi.boolean().truthy("true").falsy("false").optional(),
   dwOperationRemarks: Joi.string().optional().allow(null, ""),
 
+  dwRemarks: Joi.string().optional().allow(null, ""),
+
   // LIFTS
   liftWorking: Joi.boolean().truthy("true").falsy("false").optional(),
   liftWorkingRemarks: Joi.string().optional().allow(null, ""),
 
   liftSafety: Joi.boolean().truthy("true").falsy("false").optional(),
   liftSafetyRemarks: Joi.string().optional().allow(null, ""),
+
+  liftRemarks: Joi.string().optional().allow(null, ""),
 
   // FIRE FIGHTING SYSTEM
   fireSystems: Joi.alternatives()
@@ -81,6 +93,8 @@ export const createBuildingInspectionSchema = Joi.object({
     )
     .optional(),
 
+  fireRemarks: Joi.string().optional().allow(null, ""),
+
   // TERRACE INSPECTION
   terraceRoofTiles: Joi.boolean().truthy("true").falsy("false").optional(),
   terraceRoofTilesRemarks: Joi.string().optional().allow(null, ""),
@@ -91,7 +105,9 @@ export const createBuildingInspectionSchema = Joi.object({
   terraceLeakageTest: Joi.boolean().truthy("true").falsy("false").optional(),
   terraceLeakageRemarks: Joi.string().optional().allow(null, ""),
   terraceTestDate: Joi.string().isoDate().optional().allow(null, ""),
-  terraceConductedBy: Joi.string().optional().allow(null, "")
+  terraceConductedBy: Joi.string().optional().allow(null, ""),
+
+  terraceRemarks: Joi.string().optional().allow(null, "")
 });
 
 export const updateBuildingInspectionSchema = Joi.object({
@@ -99,21 +115,25 @@ export const updateBuildingInspectionSchema = Joi.object({
   structureAlignment: Joi.boolean().truthy("true").falsy("false").optional(),
   structureLocation: Joi.string().optional().allow(null, ""),
   structureDefectReport: Joi.string().optional().allow(null, ""),
+  structureRemarks: Joi.string().optional().allow(null, ""),
 
   // PAINTING
   paintingIsQualityOk: Joi.boolean().truthy("true").falsy("false").optional(),
   paintingLocation: Joi.string().optional().allow(null, ""),
   paintingDefectReport: Joi.string().optional().allow(null, ""),
+  paintingRemarks: Joi.string().optional().allow(null, ""),
 
   // TILING & FLOORING
   tilingIsQualityOk: Joi.boolean().truthy("true").falsy("false").optional(),
   tilingLocation: Joi.string().optional().allow(null, ""),
   tilingDefectReport: Joi.string().optional().allow(null, ""),
+  tilingRemarks: Joi.string().optional().allow(null, ""),
 
   // FALSE CEILING
   falseCeilingIsQualityOk: Joi.boolean().truthy("true").falsy("false").optional(),
   falseCeilingLocation: Joi.string().optional().allow(null, ""),
   falseCeilingDefectReport: Joi.string().optional().allow(null, ""),
+  falseCeilingRemarks: Joi.string().optional().allow(null, ""),
 
   // PLUMBING SYSTEM
   plumbingWaterSupply: Joi.boolean().truthy("true").falsy("false").optional(),
@@ -123,6 +143,8 @@ export const updateBuildingInspectionSchema = Joi.object({
   plumbingLeakage: Joi.boolean().truthy("true").falsy("false").optional(),
   plumbingLeakageLocation: Joi.string().optional().allow(null, ""),
   plumbingLeakageDefect: Joi.string().optional().allow(null, ""),
+
+  plumbingRemarks: Joi.string().optional().allow(null, ""),
 
   // ELECTRICAL SYSTEM
   electricalSwitchQuality: Joi.boolean().truthy("true").falsy("false").optional(),
@@ -139,6 +161,8 @@ export const updateBuildingInspectionSchema = Joi.object({
 
   electricalELCB: Joi.string().optional().allow(null, ""),
 
+  electricalRemarks: Joi.string().optional().allow(null, ""),
+
   // DOORS & WINDOWS
   dwQuality: Joi.boolean().truthy("true").falsy("false").optional(),
   dwQualityRemarks: Joi.string().optional().allow(null, ""),
@@ -146,12 +170,16 @@ export const updateBuildingInspectionSchema = Joi.object({
   dwOperation: Joi.boolean().truthy("true").falsy("false").optional(),
   dwOperationRemarks: Joi.string().optional().allow(null, ""),
 
+  dwRemarks: Joi.string().optional().allow(null, ""),
+
   // LIFTS
   liftWorking: Joi.boolean().truthy("true").falsy("false").optional(),
   liftWorkingRemarks: Joi.string().optional().allow(null, ""),
 
   liftSafety: Joi.boolean().truthy("true").falsy("false").optional(),
   liftSafetyRemarks: Joi.string().optional().allow(null, ""),
+
+  liftRemarks: Joi.string().optional().allow(null, ""),
 
   // FIRE FIGHTING SYSTEM
   fireSystems: Joi.alternatives()
@@ -173,6 +201,8 @@ export const updateBuildingInspectionSchema = Joi.object({
     )
     .optional(),
 
+  fireRemarks: Joi.string().optional().allow(null, ""),
+
   // TERRACE INSPECTION
   terraceRoofTiles: Joi.boolean().truthy("true").falsy("false").optional(),
   terraceRoofTilesRemarks: Joi.string().optional().allow(null, ""),
@@ -183,5 +213,7 @@ export const updateBuildingInspectionSchema = Joi.object({
   terraceLeakageTest: Joi.boolean().truthy("true").falsy("false").optional(),
   terraceLeakageRemarks: Joi.string().optional().allow(null, ""),
   terraceTestDate: Joi.string().isoDate().optional().allow(null, ""),
-  terraceConductedBy: Joi.string().optional().allow(null, "")
+  terraceConductedBy: Joi.string().optional().allow(null, ""),
+
+  terraceRemarks: Joi.string().optional().allow(null, "")
 });

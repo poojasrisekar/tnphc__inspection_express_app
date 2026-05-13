@@ -5,7 +5,6 @@ import {
   createBuildingInspection,
   getAllBuildingInspection,
   getBuildingInspectionByProjectId,
-  
   updateBuildingInspection,
   deleteBuildingInspection
 } from "./BuildingInspection.controller";
@@ -71,6 +70,7 @@ router.post(
 );
 
 router.get("/getAllBuildingInspection/:projectId", getAllBuildingInspection);
+
 router.get(
   "/getBuildingInspection/:projectId",
   getBuildingInspectionByProjectId

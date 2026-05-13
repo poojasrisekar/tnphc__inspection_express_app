@@ -1,7 +1,6 @@
 import {
   createBuildingInspectionDB,
   getAllBuildingInspectionDB,
-  
   getBuildingInspectionByProjectIdDB,
   updateBuildingInspectionDB,
   deleteBuildingInspectionDB
@@ -33,46 +32,50 @@ export const createBuildingInspectionUsecase = async (
   const data = {
     projectId: body.projectId,
 
-    // STRUCTURE
+    // ── STRUCTURE ──────────────────────────────────────────────────────────
     structure: {
-      alignment:         toBool(body.structureAlignment),
-      alignmentPhoto:    getFiles("structureAlignmentPhoto"),
-      location:          body.structureLocation        || null,
-      defectReport:      body.structureDefectReport    || null,
+      alignment:          toBool(body.structureAlignment),
+      alignmentPhoto:     getFiles("structureAlignmentPhoto"),
+      location:           body.structureLocation        || null,
+      defectReport:       body.structureDefectReport    || null,
+      remarks:            body.structureRemarks         || null,
       concreteCubeReport: getFiles("structureConcreteCubeReport"),
-      cementReport:      getFiles("structureCementReport"),
-      steelReport:       getFiles("structureSteelReport"),
-      waterReport:       getFiles("structureWaterReport"),
-      sandReport:        getFiles("structureSandReport"),
-      aggregateReport:   getFiles("structureAggregateReport"),
-      bricksReport:      getFiles("structureBricksReport")
+      cementReport:       getFiles("structureCementReport"),
+      steelReport:        getFiles("structureSteelReport"),
+      waterReport:        getFiles("structureWaterReport"),
+      sandReport:         getFiles("structureSandReport"),
+      aggregateReport:    getFiles("structureAggregateReport"),
+      bricksReport:       getFiles("structureBricksReport")
     },
 
-    // PAINTING
+    // ── PAINTING ───────────────────────────────────────────────────────────
     painting: {
       isQualityOk:  toBool(body.paintingIsQualityOk),
       defectPhoto:  getFiles("paintingDefectPhoto"),
-      location:     body.paintingLocation    || null,
-      defectReport: body.paintingDefectReport || null
+      location:     body.paintingLocation     || null,
+      defectReport: body.paintingDefectReport || null,
+      remarks:      body.paintingRemarks      || null
     },
 
-    // TILING & FLOORING
+    // ── TILING & FLOORING ──────────────────────────────────────────────────
     tilingFlooring: {
       isQualityOk:  toBool(body.tilingIsQualityOk),
       defectPhoto:  getFiles("tilingDefectPhoto"),
-      location:     body.tilingLocation    || null,
-      defectReport: body.tilingDefectReport || null
+      location:     body.tilingLocation     || null,
+      defectReport: body.tilingDefectReport || null,
+      remarks:      body.tilingRemarks      || null
     },
 
-    // FALSE CEILING
+    // ── FALSE CEILING ──────────────────────────────────────────────────────
     falseCeiling: {
       isQualityOk:  toBool(body.falseCeilingIsQualityOk),
       defectPhoto:  getFiles("falseCeilingDefectPhoto"),
-      location:     body.falseCeilingLocation    || null,
-      defectReport: body.falseCeilingDefectReport || null
+      location:     body.falseCeilingLocation     || null,
+      defectReport: body.falseCeilingDefectReport || null,
+      remarks:      body.falseCeilingRemarks      || null
     },
 
-    // PLUMBING SYSTEM
+    // ── PLUMBING SYSTEM ────────────────────────────────────────────────────
     plumbingSystem: {
       waterSupply: {
         isWorking:    toBool(body.plumbingWaterSupply),
@@ -85,10 +88,11 @@ export const createBuildingInspectionUsecase = async (
         defectPhoto:  getFiles("plumbingLeakagePhoto"),
         location:     body.plumbingLeakageLocation || null,
         defectReport: body.plumbingLeakageDefect   || null
-      }
+      },
+      remarks: body.plumbingRemarks || null
     },
 
-    // ELECTRICAL SYSTEM
+    // ── ELECTRICAL SYSTEM ──────────────────────────────────────────────────
     electricalSystem: {
       switchQuality: {
         isOk:        toBool(body.electricalSwitchQuality),
@@ -113,10 +117,11 @@ export const createBuildingInspectionUsecase = async (
       elcb: {
         isWorking:   body.electricalELCB || null,
         defectPhoto: getFiles("electricalELCBPhoto")
-      }
+      },
+      remarks: body.electricalRemarks || null
     },
 
-    // DOORS & WINDOWS
+    // ── DOORS & WINDOWS ────────────────────────────────────────────────────
     doorsWindows: {
       quality: {
         isOk:        toBool(body.dwQuality),
@@ -127,10 +132,11 @@ export const createBuildingInspectionUsecase = async (
         isProper:    toBool(body.dwOperation),
         remarks:     body.dwOperationRemarks || null,
         defectPhoto: getFiles("dwOperationPhoto")
-      }
+      },
+      remarks: body.dwRemarks || null
     },
 
-    // LIFTS
+    // ── LIFTS ──────────────────────────────────────────────────────────────
     lifts: {
       working: {
         isWorking:   toBool(body.liftWorking),
@@ -141,19 +147,21 @@ export const createBuildingInspectionUsecase = async (
         isWorking:   toBool(body.liftSafety),
         remarks:     body.liftSafetyRemarks || null,
         defectPhoto: getFiles("liftSafetyPhoto")
-      }
+      },
+      remarks: body.liftRemarks || null
     },
 
-    // FIRE FIGHTING SYSTEM
+    // ── FIRE FIGHTING SYSTEM ───────────────────────────────────────────────
     fireFightingSystem: {
       systems: Array.isArray(body.fireSystems)
         ? body.fireSystems
         : body.fireSystems
         ? [body.fireSystems]
-        : []
+        : [],
+      remarks: body.fireRemarks || null
     },
 
-    // TERRACE INSPECTION
+    // ── TERRACE INSPECTION ─────────────────────────────────────────────────
     terraceInspection: {
       roofTiles: {
         isProper:    toBool(body.terraceRoofTiles),
@@ -170,12 +178,13 @@ export const createBuildingInspectionUsecase = async (
       },
       leakageTest: {
         isDone:       toBool(body.terraceLeakageTest),
-        remarks:      body.terraceLeakageRemarks     || null,
+        remarks:      body.terraceLeakageRemarks    || null,
         defectPhoto:  getFiles("terraceLeakagePhoto"),
         resultPhoto:  getFiles("terraceLeakageResultPhoto"),
         testDate:     body.terraceTestDate ? new Date(body.terraceTestDate) : null,
         conductedBy:  body.terraceConductedBy || null
-      }
+      },
+      remarks: body.terraceRemarks || null
     },
 
     createdById: userId
@@ -189,18 +198,17 @@ export const getAllBuildingInspectionUsecase = async (projectId: string) => {
   return getAllBuildingInspectionDB(projectId);
 };
 
-// ─── GET BY ID ────────────────────────────────────────────────────────────
+// ─── GET LATEST BY PROJECT ID ─────────────────────────────────────────────
 export const getBuildingInspectionByProjectIdUsecase = async (
   projectId: string
 ) => {
-  const data =
-    await getBuildingInspectionByProjectIdDB(projectId);
+  const data = await getBuildingInspectionByProjectIdDB(projectId);
 
   if (!data || data.length === 0) {
     throw new Error("Building inspection record not found");
   }
 
-  return data;
+  return data[0]; // return the single latest record (not an array)
 };
 
 // ─── UPDATE ───────────────────────────────────────────────────────────────
@@ -219,15 +227,15 @@ export const updateBuildingInspectionUsecase = async (
       url: `${baseUrl}/uploads/${file.filename}`
     }));
 
-  // Only include a section if at least one of its fields is present in the request
   const hasAny = (...keys: string[]) => keys.some(k => body[k] !== undefined);
-  const hasFiles = (...fields: string[]) => fields.some(f => (files?.[f] || []).length > 0);
+  const hasFiles = (...fields: string[]) =>
+    fields.some(f => (files?.[f] || []).length > 0);
 
   const data: any = { updatedById: userId };
 
-  // STRUCTURE
+  // ── STRUCTURE ────────────────────────────────────────────────────────────
   if (
-    hasAny("structureAlignment", "structureLocation", "structureDefectReport") ||
+    hasAny("structureAlignment", "structureLocation", "structureDefectReport", "structureRemarks") ||
     hasFiles(
       "structureAlignmentPhoto", "structureConcreteCubeReport", "structureCementReport",
       "structureSteelReport", "structureWaterReport", "structureSandReport",
@@ -235,9 +243,10 @@ export const updateBuildingInspectionUsecase = async (
     )
   ) {
     data.structure = {
-      ...(body.structureAlignment !== undefined && { alignment: toBool(body.structureAlignment) }),
-      ...(body.structureLocation   !== undefined && { location:  body.structureLocation  || null }),
+      ...(body.structureAlignment    !== undefined && { alignment:    toBool(body.structureAlignment) }),
+      ...(body.structureLocation     !== undefined && { location:     body.structureLocation     || null }),
       ...(body.structureDefectReport !== undefined && { defectReport: body.structureDefectReport || null }),
+      ...(body.structureRemarks      !== undefined && { remarks:      body.structureRemarks      || null }),
       ...(hasFiles("structureAlignmentPhoto")     && { alignmentPhoto:     getFiles("structureAlignmentPhoto") }),
       ...(hasFiles("structureConcreteCubeReport") && { concreteCubeReport: getFiles("structureConcreteCubeReport") }),
       ...(hasFiles("structureCementReport")       && { cementReport:       getFiles("structureCementReport") }),
@@ -249,50 +258,54 @@ export const updateBuildingInspectionUsecase = async (
     };
   }
 
-  // PAINTING
+  // ── PAINTING ─────────────────────────────────────────────────────────────
   if (
-    hasAny("paintingIsQualityOk", "paintingLocation", "paintingDefectReport") ||
+    hasAny("paintingIsQualityOk", "paintingLocation", "paintingDefectReport", "paintingRemarks") ||
     hasFiles("paintingDefectPhoto")
   ) {
     data.painting = {
       ...(body.paintingIsQualityOk  !== undefined && { isQualityOk:  toBool(body.paintingIsQualityOk) }),
       ...(body.paintingLocation     !== undefined && { location:     body.paintingLocation     || null }),
       ...(body.paintingDefectReport !== undefined && { defectReport: body.paintingDefectReport || null }),
+      ...(body.paintingRemarks      !== undefined && { remarks:      body.paintingRemarks      || null }),
       ...(hasFiles("paintingDefectPhoto")         && { defectPhoto:  getFiles("paintingDefectPhoto") })
     };
   }
 
-  // TILING & FLOORING
+  // ── TILING & FLOORING ────────────────────────────────────────────────────
   if (
-    hasAny("tilingIsQualityOk", "tilingLocation", "tilingDefectReport") ||
+    hasAny("tilingIsQualityOk", "tilingLocation", "tilingDefectReport", "tilingRemarks") ||
     hasFiles("tilingDefectPhoto")
   ) {
     data.tilingFlooring = {
       ...(body.tilingIsQualityOk  !== undefined && { isQualityOk:  toBool(body.tilingIsQualityOk) }),
       ...(body.tilingLocation     !== undefined && { location:     body.tilingLocation     || null }),
       ...(body.tilingDefectReport !== undefined && { defectReport: body.tilingDefectReport || null }),
+      ...(body.tilingRemarks      !== undefined && { remarks:      body.tilingRemarks      || null }),
       ...(hasFiles("tilingDefectPhoto")           && { defectPhoto:  getFiles("tilingDefectPhoto") })
     };
   }
 
-  // FALSE CEILING
+  // ── FALSE CEILING ────────────────────────────────────────────────────────
   if (
-    hasAny("falseCeilingIsQualityOk", "falseCeilingLocation", "falseCeilingDefectReport") ||
+    hasAny("falseCeilingIsQualityOk", "falseCeilingLocation", "falseCeilingDefectReport", "falseCeilingRemarks") ||
     hasFiles("falseCeilingDefectPhoto")
   ) {
     data.falseCeiling = {
       ...(body.falseCeilingIsQualityOk  !== undefined && { isQualityOk:  toBool(body.falseCeilingIsQualityOk) }),
       ...(body.falseCeilingLocation     !== undefined && { location:     body.falseCeilingLocation     || null }),
       ...(body.falseCeilingDefectReport !== undefined && { defectReport: body.falseCeilingDefectReport || null }),
+      ...(body.falseCeilingRemarks      !== undefined && { remarks:      body.falseCeilingRemarks      || null }),
       ...(hasFiles("falseCeilingDefectPhoto")           && { defectPhoto:  getFiles("falseCeilingDefectPhoto") })
     };
   }
 
-  // PLUMBING SYSTEM
+  // ── PLUMBING SYSTEM ──────────────────────────────────────────────────────
   if (
     hasAny(
       "plumbingWaterSupply", "plumbingWaterSupplyLocation", "plumbingWaterSupplyDefect",
-      "plumbingLeakage",     "plumbingLeakageLocation",     "plumbingLeakageDefect"
+      "plumbingLeakage",     "plumbingLeakageLocation",     "plumbingLeakageDefect",
+      "plumbingRemarks"
     ) ||
     hasFiles("plumbingWaterSupplyPhoto", "plumbingLeakagePhoto")
   ) {
@@ -308,18 +321,19 @@ export const updateBuildingInspectionUsecase = async (
         ...(body.plumbingLeakageLocation !== undefined && { location:     body.plumbingLeakageLocation || null }),
         ...(body.plumbingLeakageDefect   !== undefined && { defectReport: body.plumbingLeakageDefect   || null }),
         ...(hasFiles("plumbingLeakagePhoto")           && { defectPhoto:  getFiles("plumbingLeakagePhoto") })
-      }
+      },
+      ...(body.plumbingRemarks !== undefined && { remarks: body.plumbingRemarks || null })
     };
   }
 
-  // ELECTRICAL SYSTEM
+  // ── ELECTRICAL SYSTEM ────────────────────────────────────────────────────
   if (
     hasAny(
       "electricalSwitchQuality", "electricalSwitchRemarks",
       "electricalPowerSupply",   "electricalPowerRemarks",
       "electricalVoltage",       "electricalVoltageRemarks",
       "electricalEarthingTest",  "electricalEarthingProper",
-      "electricalELCB"
+      "electricalELCB",          "electricalRemarks"
     ) ||
     hasFiles(
       "electricalSwitchPhoto", "electricalPowerPhoto", "electricalVoltagePhoto",
@@ -333,8 +347,8 @@ export const updateBuildingInspectionUsecase = async (
         ...(hasFiles("electricalSwitchPhoto")          && { defectPhoto: getFiles("electricalSwitchPhoto") })
       },
       powerSupply: {
-        ...(body.electricalPowerSupply !== undefined && { isProper:    toBool(body.electricalPowerSupply) }),
-        ...(body.electricalPowerRemarks !== undefined && { remarks:    body.electricalPowerRemarks || null }),
+        ...(body.electricalPowerSupply  !== undefined && { isProper:    toBool(body.electricalPowerSupply) }),
+        ...(body.electricalPowerRemarks !== undefined && { remarks:     body.electricalPowerRemarks || null }),
         ...(hasFiles("electricalPowerPhoto")          && { defectPhoto: getFiles("electricalPowerPhoto") })
       },
       voltageFluctuation: {
@@ -348,15 +362,16 @@ export const updateBuildingInspectionUsecase = async (
         ...(hasFiles("electricalEarthingPhoto")        && { defectPhoto:  getFiles("electricalEarthingPhoto") })
       },
       elcb: {
-        ...(body.electricalELCB !== undefined  && { isWorking:   body.electricalELCB || null }),
-        ...(hasFiles("electricalELCBPhoto")    && { defectPhoto: getFiles("electricalELCBPhoto") })
-      }
+        ...(body.electricalELCB !== undefined && { isWorking:   body.electricalELCB || null }),
+        ...(hasFiles("electricalELCBPhoto")  && { defectPhoto: getFiles("electricalELCBPhoto") })
+      },
+      ...(body.electricalRemarks !== undefined && { remarks: body.electricalRemarks || null })
     };
   }
 
-  // DOORS & WINDOWS
+  // ── DOORS & WINDOWS ──────────────────────────────────────────────────────
   if (
-    hasAny("dwQuality", "dwQualityRemarks", "dwOperation", "dwOperationRemarks") ||
+    hasAny("dwQuality", "dwQualityRemarks", "dwOperation", "dwOperationRemarks", "dwRemarks") ||
     hasFiles("dwQualityPhoto", "dwOperationPhoto")
   ) {
     data.doorsWindows = {
@@ -369,13 +384,14 @@ export const updateBuildingInspectionUsecase = async (
         ...(body.dwOperation        !== undefined && { isProper:    toBool(body.dwOperation) }),
         ...(body.dwOperationRemarks !== undefined && { remarks:     body.dwOperationRemarks || null }),
         ...(hasFiles("dwOperationPhoto")          && { defectPhoto: getFiles("dwOperationPhoto") })
-      }
+      },
+      ...(body.dwRemarks !== undefined && { remarks: body.dwRemarks || null })
     };
   }
 
-  // LIFTS
+  // ── LIFTS ─────────────────────────────────────────────────────────────────
   if (
-    hasAny("liftWorking", "liftWorkingRemarks", "liftSafety", "liftSafetyRemarks") ||
+    hasAny("liftWorking", "liftWorkingRemarks", "liftSafety", "liftSafetyRemarks", "liftRemarks") ||
     hasFiles("liftWorkingPhoto", "liftSafetyPhoto")
   ) {
     data.lifts = {
@@ -388,28 +404,33 @@ export const updateBuildingInspectionUsecase = async (
         ...(body.liftSafety        !== undefined && { isWorking:   toBool(body.liftSafety) }),
         ...(body.liftSafetyRemarks !== undefined && { remarks:     body.liftSafetyRemarks || null }),
         ...(hasFiles("liftSafetyPhoto")          && { defectPhoto: getFiles("liftSafetyPhoto") })
-      }
+      },
+      ...(body.liftRemarks !== undefined && { remarks: body.liftRemarks || null })
     };
   }
 
-  // FIRE FIGHTING SYSTEM
-  if (body.fireSystems !== undefined) {
+  // ── FIRE FIGHTING SYSTEM ──────────────────────────────────────────────────
+  if (body.fireSystems !== undefined || body.fireRemarks !== undefined) {
     data.fireFightingSystem = {
-      systems: Array.isArray(body.fireSystems)
-        ? body.fireSystems
-        : body.fireSystems
-        ? [body.fireSystems]
-        : []
+      ...(body.fireSystems !== undefined && {
+        systems: Array.isArray(body.fireSystems)
+          ? body.fireSystems
+          : body.fireSystems
+          ? [body.fireSystems]
+          : []
+      }),
+      ...(body.fireRemarks !== undefined && { remarks: body.fireRemarks || null })
     };
   }
 
-  // TERRACE INSPECTION
+  // ── TERRACE INSPECTION ────────────────────────────────────────────────────
   if (
     hasAny(
       "terraceRoofTiles", "terraceRoofTilesRemarks",
       "terraceDrainage",  "terraceDrainageRemarks",
       "terraceLeakageTest", "terraceLeakageRemarks",
-      "terraceTestDate",  "terraceConductedBy"
+      "terraceTestDate",  "terraceConductedBy",
+      "terraceRemarks"
     ) ||
     hasFiles(
       "terraceRoofTilesPhoto", "terraceDrainagePhoto",
@@ -435,9 +456,10 @@ export const updateBuildingInspectionUsecase = async (
         ...(body.terraceLeakageRemarks !== undefined && { remarks:      body.terraceLeakageRemarks || null }),
         ...(body.terraceTestDate       !== undefined && { testDate:     body.terraceTestDate ? new Date(body.terraceTestDate) : null }),
         ...(body.terraceConductedBy    !== undefined && { conductedBy:  body.terraceConductedBy || null }),
-        ...(hasFiles("terraceLeakagePhoto")        && { defectPhoto:  getFiles("terraceLeakagePhoto") }),
-        ...(hasFiles("terraceLeakageResultPhoto")  && { resultPhoto:  getFiles("terraceLeakageResultPhoto") })
-      }
+        ...(hasFiles("terraceLeakagePhoto")       && { defectPhoto: getFiles("terraceLeakagePhoto") }),
+        ...(hasFiles("terraceLeakageResultPhoto") && { resultPhoto: getFiles("terraceLeakageResultPhoto") })
+      },
+      ...(body.terraceRemarks !== undefined && { remarks: body.terraceRemarks || null })
     };
   }
 
