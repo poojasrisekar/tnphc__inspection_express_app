@@ -279,59 +279,129 @@ export const getProjectsByUserService = async (
     const totalAssignedStages =
       p.stages.length;
 
-    const completedStages = [
+    const completedStageNames: string[] = [];
 
-      p.landSiteInspection.length,
+    // LAND SITE
+    if (p.landSiteInspection.length > 0) {
+      completedStageNames.push(
+        "Land Site Inspection"
+      );
+    }
 
-      p.preConstructionInspections.length,
+    // PRE CONSTRUCTION
+    if (
+      p.preConstructionInspections.length > 0
+    ) {
+      completedStageNames.push(
+        "Pre Construction"
+      );
+    }
 
-      p.foundationProgresses.length,
+    // FOUNDATION
+    if (
+      p.foundationProgresses.length > 0 ||
+      p.foundationQualityChecks.length > 0
+    ) {
+      completedStageNames.push(
+        "Foundation"
+      );
+    }
 
-      p.foundationQualityChecks.length,
+    // PLINTH
+    if (p.plinthStages.length > 0) {
+      completedStageNames.push(
+        "Plinth"
+      );
+    }
 
-      p.plinthStages.length,
+    // SUPER STRUCTURE
+    if (
+      p.SuperStructureProgress.length > 0 ||
+      p.superStructureQuality
+    ) {
+      completedStageNames.push(
+        "Super Structure"
+      );
+    }
 
-      p.interiorsProgress.length,
+    // INTERIORS
+    if (
+      p.interiorsProgress.length > 0 ||
+      p.interiorsQuality
+    ) {
+      completedStageNames.push(
+        "Interiors"
+      );
+    }
 
-      p.interiorsQuality ? 1 : 0,
+    // EXTERIORS
+    if (
+      p.exteriorsProgress.length > 0 ||
+      p.exteriorsQuality
+    ) {
+      completedStageNames.push(
+        "Exteriors"
+      );
+    }
 
-      p.exteriorsProgress.length,
+    // BUILDING INSPECTION
+    if (p.BuildingInspection.length > 0) {
+      completedStageNames.push(
+        "Building Inspection"
+      );
+    }
 
-      p.exteriorsQuality ? 1 : 0,
+    // DEVELOPMENT WORK
+    if (p.DevelopmentWork.length > 0) {
+      completedStageNames.push(
+        "Development Work"
+      );
+    }
 
-      p.BuildingInspection.length,
+    // TAKEOVER BUILDING
+    if (
+      p.TakeoverBuildingInsepction.length > 0
+    ) {
+      completedStageNames.push(
+        "Takeover Building Inspection"
+      );
+    }
 
-      p.DevelopmentWork.length,
+    // TAKEOVER DEVELOPMENT
+    if (
+      p.TakeoverDevelopmentWork.length > 0
+    ) {
+      completedStageNames.push(
+        "Takeover Development Work"
+      );
+    }
 
-      p.TakeoverBuildingInsepction.length,
-
-      p.TakeoverDevelopmentWork.length,
-
-      p.SuperStructureProgress.length,
-
-      p.superStructureQuality ? 1 : 0
-
-    ].reduce((a, b) => a + b, 0);
+    const completedStages =
+      completedStageNames.length;
 
     const pendingStages =
       totalAssignedStages - completedStages > 0
         ? totalAssignedStages - completedStages
         : 0;
 
-    let projectStatus = "AssignedProjects";
+    let projectStatus =
+      "AssignedProjects";
 
     if (
       completedStages > 0 &&
       pendingStages > 0
     ) {
-      projectStatus = "OngoingProjects";
+      projectStatus =
+        "OngoingProjects";
     }
 
     if (
-      completedStages >= totalAssignedStages &&
+      completedStages >=
+        totalAssignedStages &&
       totalAssignedStages > 0
     ) {
-      projectStatus = "CompletedProjects";
+      projectStatus =
+        "CompletedProjects";
     }
 
     return {
@@ -359,7 +429,19 @@ export const getProjectsByUserService = async (
 
       completedStages,
 
+      completedStageNames,
+
       pendingStages,
+
+      pendingStageNames:
+        p.stages
+          .map((s) => s.name)
+          .filter(
+            (name) =>
+              !completedStageNames.includes(
+                name
+              )
+          ),
 
       inspectionDoneCount:
         completedStages,
@@ -460,167 +542,249 @@ export const deleteProjectService = async (id: string) => {
   });
 };
 
-export const getProjectDashboardService = async () => {
+export const getProjectDashboardService =
+  async () => {
 
-  const projects = await prisma.project.findMany({
-    where: {
-      isActive: true
-    },
+    const projects =
+      await prisma.project.findMany({
+        where: {
+          isActive: true
+        },
 
-    include: {
-      stages: true,
+        include: {
+          stages: true,
 
-      landSiteInspection: {
-        where: { isActive: true }
-      },
+          landSiteInspection: {
+            where: { isActive: true }
+          },
 
-      preConstructionInspections: {
-        where: { isActive: true }
-      },
+          preConstructionInspections: {
+            where: { isActive: true }
+          },
 
-      foundationProgresses: {
-        where: { isActive: true }
-      },
+          foundationProgresses: {
+            where: { isActive: true }
+          },
 
-      foundationQualityChecks: {
-        where: { isActive: true }
-      },
+          foundationQualityChecks: {
+            where: { isActive: true }
+          },
 
-      plinthStages: {
-        where: { isActive: true }
-      },
+          plinthStages: {
+            where: { isActive: true }
+          },
 
-      interiorsProgress: {
-        where: { isActive: true }
-      },
+          interiorsProgress: {
+            where: { isActive: true }
+          },
 
-      interiorsQuality: true,
+          interiorsQuality: true,
 
-      exteriorsProgress: {
-        where: { isActive: true }
-      },
+          exteriorsProgress: {
+            where: { isActive: true }
+          },
 
-      exteriorsQuality: true,
+          exteriorsQuality: true,
 
-      BuildingInspection: {
-        where: { isActive: true }
-      },
+          BuildingInspection: {
+            where: { isActive: true }
+          },
 
-      DevelopmentWork: {
-        where: { isActive: true }
-      },
+          DevelopmentWork: {
+            where: { isActive: true }
+          },
 
-      TakeoverBuildingInsepction: {
-        where: { isActive: true }
-      },
+          TakeoverBuildingInsepction: {
+            where: { isActive: true }
+          },
 
-      TakeoverDevelopmentWork: {
-        where: { isActive: true }
-      },
+          TakeoverDevelopmentWork: {
+            where: { isActive: true }
+          },
 
-      SuperStructureProgress: {
-        where: { isActive: true }
-      },
+          SuperStructureProgress: {
+            where: { isActive: true }
+          },
 
-      superStructureQuality: true
+          superStructureQuality: true
+        }
+      });
+
+    let assignedProjects = 0;
+
+    let ongoingProjects = 0;
+
+    let completedProjects = 0;
+
+    let totalInspections = 0;
+
+    let completedInspections = 0;
+
+    let pendingInspections = 0;
+
+    for (const p of projects) {
+
+      const totalStages =
+        p.stages.length;
+
+      const completedStageNames: string[] =
+        [];
+
+      if (
+        p.landSiteInspection.length > 0
+      ) {
+        completedStageNames.push(
+          "Land Site Inspection"
+        );
+      }
+
+      if (
+        p.preConstructionInspections
+          .length > 0
+      ) {
+        completedStageNames.push(
+          "Pre Construction"
+        );
+      }
+
+      if (
+        p.foundationProgresses
+          .length > 0 ||
+        p.foundationQualityChecks
+          .length > 0
+      ) {
+        completedStageNames.push(
+          "Foundation"
+        );
+      }
+
+      if (p.plinthStages.length > 0) {
+        completedStageNames.push(
+          "Plinth"
+        );
+      }
+
+      if (
+        p.SuperStructureProgress
+          .length > 0 ||
+        p.superStructureQuality
+      ) {
+        completedStageNames.push(
+          "Super Structure"
+        );
+      }
+
+      if (
+        p.interiorsProgress.length >
+          0 ||
+        p.interiorsQuality
+      ) {
+        completedStageNames.push(
+          "Interiors"
+        );
+      }
+
+      if (
+        p.exteriorsProgress.length >
+          0 ||
+        p.exteriorsQuality
+      ) {
+        completedStageNames.push(
+          "Exteriors"
+        );
+      }
+
+      if (
+        p.BuildingInspection.length >
+        0
+      ) {
+        completedStageNames.push(
+          "Building Inspection"
+        );
+      }
+
+      if (
+        p.DevelopmentWork.length > 0
+      ) {
+        completedStageNames.push(
+          "Development Work"
+        );
+      }
+
+      if (
+        p.TakeoverBuildingInsepction
+          .length > 0
+      ) {
+        completedStageNames.push(
+          "Takeover Building Inspection"
+        );
+      }
+
+      if (
+        p.TakeoverDevelopmentWork
+          .length > 0
+      ) {
+        completedStageNames.push(
+          "Takeover Development Work"
+        );
+      }
+
+      const doneStages =
+        completedStageNames.length;
+
+      const pending =
+        totalStages - doneStages > 0
+          ? totalStages - doneStages
+          : 0;
+
+      totalInspections +=
+        totalStages;
+
+      completedInspections +=
+        doneStages;
+
+      pendingInspections +=
+        pending;
+
+      if (doneStages === 0) {
+
+        assignedProjects++;
+
+      } else if (
+        doneStages > 0 &&
+        pending > 0
+      ) {
+
+        ongoingProjects++;
+
+      } else {
+
+        completedProjects++;
+
+      }
     }
-  });
 
-  let assignedProjects = 0;
-  let ongoingProjects = 0;
-  let completedProjects = 0;
+    return {
+      totalProjects:
+        projects.length,
 
-  let totalInspections = 0;
-  let completedInspections = 0;
-  let pendingInspections = 0;
+      assignedProjects,
 
-  for (const p of projects) {
+      ongoingProjects,
 
-    const totalStages =
-      p.stages.length;
+      completedProjects,
 
-    const doneStages = [
+      pendingProjects:
+        assignedProjects +
+        ongoingProjects,
 
-      p.landSiteInspection.length,
+      totalInspections,
 
-      p.preConstructionInspections.length,
+      completedInspections,
 
-      p.foundationProgresses.length,
-
-      p.foundationQualityChecks.length,
-
-      p.plinthStages.length,
-
-      p.interiorsProgress.length,
-
-      p.interiorsQuality ? 1 : 0,
-
-      p.exteriorsProgress.length,
-
-      p.exteriorsQuality ? 1 : 0,
-
-      p.BuildingInspection.length,
-
-      p.DevelopmentWork.length,
-
-      p.TakeoverBuildingInsepction.length,
-
-      p.TakeoverDevelopmentWork.length,
-
-      p.SuperStructureProgress.length,
-
-      p.superStructureQuality ? 1 : 0
-
-    ].reduce((a, b) => a + b, 0);
-
-    const pending =
-      totalStages - doneStages > 0
-        ? totalStages - doneStages
-        : 0;
-
-    totalInspections += totalStages;
-
-    completedInspections += doneStages;
-
-    pendingInspections += pending;
-
-    if (doneStages === 0) {
-
-      assignedProjects++;
-
-    } else if (
-      doneStages > 0 &&
-      pending > 0
-    ) {
-
-      ongoingProjects++;
-
-    } else {
-
-      completedProjects++;
-
-    }
-  }
-
-  return {
-    totalProjects: projects.length,
-
-    assignedProjects,
-
-    ongoingProjects,
-
-    completedProjects,
-
-    pendingProjects:
-      assignedProjects + ongoingProjects,
-
-    totalInspections,
-
-    completedInspections,
-
-    pendingInspections
+      pendingInspections
+    };
   };
-};
 export const getProjectByIdService = async (
   id: string
 ) => {
