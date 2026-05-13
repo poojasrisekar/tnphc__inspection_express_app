@@ -45,43 +45,43 @@ sumpPump: {
 
   sumpCapacity: toBool(body.sumpCapacity)
     ? {
-        value: true,
+        value: false,
         remarks: body.sumpCapacityRemarks || null,
         photos: getFiles("sumpCapacityPhotos"),
       }
-    : { value: false },
+    : { value: true },
 
   sumpQuality: toBool(body.sumpQuality)
     ? {
-        value: true,
+        value: false,
         remarks: body.sumpQualityRemarks || null,
         photos: getFiles("sumpQualityPhotos"),
       }
-    : { value: false },
+    : { value: true },
 
   pumpsAsPerSpec: toBool(body.pumpsAsPerSpec)
     ? {
-        value: true,
+        value: false,
         remarks: body.pumpsSpecRemarks || null,
         photos: getFiles("pumpsSpecPhotos"),
       }
-    : { value: false },
+    : { value: true },
 
   standbyPumps: toBool(body.standbyPumps)
     ? {
-        value: true,
+        value: false,
         remarks: body.standbyPumpsRemarks || null,
         photos: getFiles("standbyPumpsPhotos"),
       }
-    : { value: false },
+    : { value: true },
 
   pumpsWorking: toBool(body.pumpsWorking)
     ? {
-        value: true,
+        value: false,
         remarks: body.pumpsWorkingRemarks || null,
         photos: getFiles("pumpsWorkingPhotos"),
       }
-    : { value: false },
+    : { value: true },
 },
 
     // BOREWELL
@@ -91,11 +91,11 @@ borewell: {
 
   isWorking: toBool(body.borewellWorking)
     ? {
-        value: true,
+        value: false,
         remarks: body.borewellRemarks || null,
         photos: getFiles("borewellPhotos"),
       }
-    : { value: false },
+    : { value: true },
 
   waterQuality: body.waterQuality || null,
   labReport: getFiles("borewellLabReport"),
@@ -107,10 +107,10 @@ inspectionChamber: {
 
   isProper: toBool(body.inspectionChamberProper)
     ? {
-        value: true,
+        value: false,
         remarks: body.inspectionChamberRemarks || null,
       }
-    : { value: false },
+    : { value: true },
 },
 
 // STORM WATER DRAINS
@@ -119,10 +119,10 @@ stormWaterDrains: {
 
   isProper: toBool(body.stormWaterDrainsProper)
     ? {
-        value: true,
+        value: false,
         remarks: body.stormWaterDrainsRemarks || null,
       }
-    : { value: false },
+    : { value: true },
 },
 
     // SULLAGE DRAIN
@@ -131,10 +131,10 @@ sullageDrain: {
 
   isProper: toBool(body.sullageDrainProper)
     ? {
-        value: true,
+        value: false,
         remarks: body.sullageDrainRemarks || null,
       }
-    : { value: false },
+    : { value: true },
 },
 
    // ROAD
@@ -154,37 +154,37 @@ paverBlock: {
 
   isProper: toBool(body.paverBlockProper)
     ? {
-        value: true,
+        value: false,
         remarks: body.paverBlockRemarks || null,
       }
-    : { value: false },
+    : { value: true },
 },
 
    // COMPOUND WALL
 compoundWall: {
   quality: toBool(body.compoundWallQuality)
     ? {
-        value: true,
+        value: false,
         remarks: body.compoundWallQualityRemarks || null,
         photos: getFiles("compoundWallQualityPhotos"),
       }
-    : { value: false },
+    : { value: true },
 
   expansionJoints: toBool(body.compoundWallExpansionJoints)
     ? {
-        value: true,
+        value: false,
         remarks: body.compoundWallExpansionRemarks || null,
         photos: getFiles("compoundWallExpansionPhotos"),
       }
-    : { value: false },
+    : { value: true },
 
   airVents: toBool(body.compoundWallAirVents)
     ? {
-        value: true,
+        value: false,
         remarks: body.compoundWallAirVentsRemarks || null,
         photos: getFiles("compoundWallAirVentsPhotos"),
       }
-    : { value: false },
+    : { value: true },
 },
 
    // RAIN WATER HARVESTING
@@ -194,10 +194,10 @@ rainWaterHarvesting: {
 
   isProper: toBool(body.rainWaterProper)
     ? {
-        value: true,
+        value: false,
         remarks: body.rainWaterRemarks || null,
       }
-    : { value: false },
+    : { value: true },
 },
 
    // LANDSCAPING
@@ -206,10 +206,10 @@ landScaping: {
 
   isProper: toBool(body.landScapingProper)
     ? {
-        value: true,
+        value: false,
         remarks: body.landScapingRemarks || null,
       }
-    : { value: false },
+    : { value: true },
 },
 
    // OTHER DEFECTS
