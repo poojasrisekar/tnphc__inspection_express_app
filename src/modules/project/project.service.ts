@@ -198,7 +198,6 @@ export const getProjectsByUserService = async (
     isActive: true
   };
 
-  // ✅ FILTER USER PROJECTS
   if (userId) {
     whereCondition.assignedUserId = userId;
   }
@@ -207,11 +206,67 @@ export const getProjectsByUserService = async (
     where: whereCondition,
 
     include: {
+      district: true,
       officer: true,
       stages: true,
       department: true,
       specialUnit: true,
-      SuperStructure: true
+      assignedUser: true,
+      SuperStructure: true,
+
+      landSiteInspection: {
+        where: { isActive: true }
+      },
+
+      preConstructionInspections: {
+        where: { isActive: true }
+      },
+
+      foundationProgresses: {
+        where: { isActive: true }
+      },
+
+      foundationQualityChecks: {
+        where: { isActive: true }
+      },
+
+      plinthStages: {
+        where: { isActive: true }
+      },
+
+      interiorsProgress: {
+        where: { isActive: true }
+      },
+
+      interiorsQuality: true,
+
+      exteriorsProgress: {
+        where: { isActive: true }
+      },
+
+      exteriorsQuality: true,
+
+      BuildingInspection: {
+        where: { isActive: true }
+      },
+
+      DevelopmentWork: {
+        where: { isActive: true }
+      },
+
+      TakeoverBuildingInsepction: {
+        where: { isActive: true }
+      },
+
+      TakeoverDevelopmentWork: {
+        where: { isActive: true }
+      },
+
+      SuperStructureProgress: {
+        where: { isActive: true }
+      },
+
+      superStructureQuality: true
     },
 
     orderBy: {
@@ -219,33 +274,113 @@ export const getProjectsByUserService = async (
     }
   });
 
-  return projects.map((p) => ({
-    id: p.id,
+  return projects.map((p) => {
 
-    projectName: p.projectName,
+    const totalAssignedStages =
+      p.stages.length;
 
-    locationName: p.locationName,
+    const completedStages = [
 
-    officerName: p.officer?.name ?? null,
+      p.landSiteInspection.length,
 
-    unitName:
-      p.department?.name ||
-      p.specialUnit?.name ||
-      null,
+      p.preConstructionInspections.length,
 
-    stageCount: p.stages.length,
+      p.foundationProgresses.length,
 
-    selectedStageIds: p.selectedStageIds,
+      p.foundationQualityChecks.length,
 
-    superStructure: p.SuperStructure.map((b) => ({
-      blockName: b.blockName,
-      totalFloors: b.totalFloors
-    })),
+      p.plinthStages.length,
 
-    status: p.status,
+      p.interiorsProgress.length,
 
-    createdAt: p.createdAt
-  }));
+      p.interiorsQuality ? 1 : 0,
+
+      p.exteriorsProgress.length,
+
+      p.exteriorsQuality ? 1 : 0,
+
+      p.BuildingInspection.length,
+
+      p.DevelopmentWork.length,
+
+      p.TakeoverBuildingInsepction.length,
+
+      p.TakeoverDevelopmentWork.length,
+
+      p.SuperStructureProgress.length,
+
+      p.superStructureQuality ? 1 : 0
+
+    ].reduce((a, b) => a + b, 0);
+
+    const pendingStages =
+      totalAssignedStages - completedStages > 0
+        ? totalAssignedStages - completedStages
+        : 0;
+
+    let projectStatus = "AssignedProjects";
+
+    if (
+      completedStages > 0 &&
+      pendingStages > 0
+    ) {
+      projectStatus = "OngoingProjects";
+    }
+
+    if (
+      completedStages >= totalAssignedStages &&
+      totalAssignedStages > 0
+    ) {
+      projectStatus = "CompletedProjects";
+    }
+
+    return {
+      id: p.id,
+
+      projectName: p.projectName,
+
+      locationName: p.locationName,
+
+      districtName:
+        p.district?.name ?? null,
+
+      officerName:
+        p.officer?.name ?? null,
+
+      assignedUserName:
+        p.assignedUser?.userName ?? null,
+
+      unitName:
+        p.department?.name ||
+        p.specialUnit?.name ||
+        null,
+
+      totalAssignedStages,
+
+      completedStages,
+
+      pendingStages,
+
+      inspectionDoneCount:
+        completedStages,
+
+      inspectionPendingCount:
+        pendingStages,
+
+      selectedStageIds:
+        p.selectedStageIds,
+
+      superStructure:
+        p.SuperStructure.map((b) => ({
+          blockName: b.blockName,
+          totalFloors: b.totalFloors
+        })),
+
+      status: projectStatus,
+
+      createdAt: p.createdAt
+    };
+  });
 };
 
 export const updateProjectService = async (id: string, data: any) => {
@@ -326,56 +461,164 @@ export const deleteProjectService = async (id: string) => {
 };
 
 export const getProjectDashboardService = async () => {
-  const [
-    totalProjects,
-    assignedProjects,
-    ongoingProjects,
-    completedProjects,
-    totalBlocks,
-    inProgressBlocks,
-    completedBlocks
-  ] = await Promise.all([
-    prisma.project.count({ where: { isActive: true } }),
 
-    prisma.project.count({
-      where: { isActive: true, status: "AssignedProjects" }
-    }),
+  const projects = await prisma.project.findMany({
+    where: {
+      isActive: true
+    },
 
-    prisma.project.count({
-      where: { isActive: true, status: "OngoingProjects" }
-    }),
+    include: {
+      stages: true,
 
-    prisma.project.count({
-      where: { isActive: true, status: "CompletedProjects" }
-    }),
+      landSiteInspection: {
+        where: { isActive: true }
+      },
 
-    prisma.superStructure.count({
-      where: { isActive: true }
-    }),
+      preConstructionInspections: {
+        where: { isActive: true }
+      },
 
-    prisma.superStructureProgress.count({
-      where: {
-        isActive: true,
-        status: superStructureStatus.IN_PROGRESS
-      }
-    }),
+      foundationProgresses: {
+        where: { isActive: true }
+      },
 
-    prisma.superStructureProgress.count({
-      where: {
-        isActive: true,
-        status: superStructureStatus.COMPLETED
-      }
-    })
-  ]);
+      foundationQualityChecks: {
+        where: { isActive: true }
+      },
+
+      plinthStages: {
+        where: { isActive: true }
+      },
+
+      interiorsProgress: {
+        where: { isActive: true }
+      },
+
+      interiorsQuality: true,
+
+      exteriorsProgress: {
+        where: { isActive: true }
+      },
+
+      exteriorsQuality: true,
+
+      BuildingInspection: {
+        where: { isActive: true }
+      },
+
+      DevelopmentWork: {
+        where: { isActive: true }
+      },
+
+      TakeoverBuildingInsepction: {
+        where: { isActive: true }
+      },
+
+      TakeoverDevelopmentWork: {
+        where: { isActive: true }
+      },
+
+      SuperStructureProgress: {
+        where: { isActive: true }
+      },
+
+      superStructureQuality: true
+    }
+  });
+
+  let assignedProjects = 0;
+  let ongoingProjects = 0;
+  let completedProjects = 0;
+
+  let totalInspections = 0;
+  let completedInspections = 0;
+  let pendingInspections = 0;
+
+  for (const p of projects) {
+
+    const totalStages =
+      p.stages.length;
+
+    const doneStages = [
+
+      p.landSiteInspection.length,
+
+      p.preConstructionInspections.length,
+
+      p.foundationProgresses.length,
+
+      p.foundationQualityChecks.length,
+
+      p.plinthStages.length,
+
+      p.interiorsProgress.length,
+
+      p.interiorsQuality ? 1 : 0,
+
+      p.exteriorsProgress.length,
+
+      p.exteriorsQuality ? 1 : 0,
+
+      p.BuildingInspection.length,
+
+      p.DevelopmentWork.length,
+
+      p.TakeoverBuildingInsepction.length,
+
+      p.TakeoverDevelopmentWork.length,
+
+      p.SuperStructureProgress.length,
+
+      p.superStructureQuality ? 1 : 0
+
+    ].reduce((a, b) => a + b, 0);
+
+    const pending =
+      totalStages - doneStages > 0
+        ? totalStages - doneStages
+        : 0;
+
+    totalInspections += totalStages;
+
+    completedInspections += doneStages;
+
+    pendingInspections += pending;
+
+    if (doneStages === 0) {
+
+      assignedProjects++;
+
+    } else if (
+      doneStages > 0 &&
+      pending > 0
+    ) {
+
+      ongoingProjects++;
+
+    } else {
+
+      completedProjects++;
+
+    }
+  }
 
   return {
-    totalProjects,
+    totalProjects: projects.length,
+
     assignedProjects,
+
     ongoingProjects,
+
     completedProjects,
-    totalBlocks,
-    inProgressBlocks,
-    completedBlocks
+
+    pendingProjects:
+      assignedProjects + ongoingProjects,
+
+    totalInspections,
+
+    completedInspections,
+
+    pendingInspections
   };
 };
 export const getProjectByIdService = async (
