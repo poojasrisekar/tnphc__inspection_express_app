@@ -63,7 +63,7 @@ router.get(
 
 // ✅ UPDATE PROJECT
 router.put(
-  "/updateProject/:id",
+  "/:id",
   validateRequest(updateProjectSchema, "body"),
   updateProjectController
 );
@@ -71,7 +71,7 @@ router.put(
 
 // ✅ DELETE PROJECT
 router.patch(
-  "/deleteProject/:id",
+  "/:id",
   validateRequest(deleteProjectSchema, "params"),
   deleteProjectController
 );

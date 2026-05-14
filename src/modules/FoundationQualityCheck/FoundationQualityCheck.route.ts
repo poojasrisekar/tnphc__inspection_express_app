@@ -32,7 +32,7 @@ const uploadFields = upload.fields([
 ]);
 
 router.post(
-  "/createFoundationQualityCheck",
+  "/",
   uploadFields,
   validateRequest(createFoundationQualityCheckSchema),
   createFoundationQualityCheck
@@ -44,19 +44,19 @@ router.get(
 );
 
 router.get(
-  "/getFoundationQualityCheck/:projectId",
+  "/:projectId",
   getFoundationQualityCheckById
 );
 
 router.put(
-  "/updateFoundationQualityCheck/:id",
+  "/:id",
   uploadFields,
   validateRequest(updateFoundationQualityCheckSchema),
   updateFoundationQualityCheck
 );
 
 router.delete(
-  "/deleteFoundationQualityCheck/:id",
+  "/:id",
   deleteFoundationQualityCheck
 );
 

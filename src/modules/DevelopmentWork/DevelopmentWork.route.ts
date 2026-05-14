@@ -41,26 +41,26 @@ const uploadFields = upload.fields([
 ]);
 
 router.post(
-  "/createDevelopmentWork",
+  "/",
   uploadFields,
   validateRequest(createDevelopmentWorkSchema),
   createDevelopmentWork
 );
 
 router.get("/getAllDevelopmentWork/:projectId", getAllDevelopmentWork);
-router.get("/getDevelopmentWorkByid/:id",           getDevelopmentWorkById);
+router.get("/:id",           getDevelopmentWorkById);
 router.get(
-  "/getDevelopmentWork/:projectId",
+  "/:projectId",
   getDevelopmentWorkByProjectId
 );
 
 router.put(
-  "/updateDevelopmentWork/:id",
+  "/:id",
   uploadFields,
   validateRequest(updateDevelopmentWorkSchema),
   updateDevelopmentWork
 );
 
-router.delete("/deleteDevelopmentWork/:id", deleteDevelopmentWork);
+router.delete("/:id", deleteDevelopmentWork);
 
 export default router;

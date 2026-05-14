@@ -63,7 +63,7 @@ const uploadFields = upload.fields([
 ]);
 
 router.post(
-  "/createBuildingInspection",
+  "/",
   uploadFields,
   validateRequest(createBuildingInspectionSchema),
   createBuildingInspection
@@ -72,12 +72,12 @@ router.post(
 router.get("/getAllBuildingInspection/:projectId", getAllBuildingInspection);
 
 router.get(
-  "/getBuildingInspection/:projectId",
+  "/:projectId",
   getBuildingInspectionByProjectId
 );
 
 router.put(
-  "/updateBuildingInspection/:id",
+  "/:id",
   uploadFields,
   validateRequest(updateBuildingInspectionSchema),
   updateBuildingInspection
