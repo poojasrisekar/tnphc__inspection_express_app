@@ -1,49 +1,56 @@
 import { Request, Response } from "express";
+
 import {
   createPreConstructionUsecase,
-   getAllPreConstructionUsecase,
-  getPreConstructionByIdUsecase
+  getAllPreConstructionUsecase,
+  getPreConstructionByIdUsecase,
+  updatePreConstructionUsecase
 } from "./PreConstruction.usecase";
 
-const getFiles = (files: any, field: string, baseUrl: string) => {
-  return (files?.[field] || []).map((file: any) => ({
-    fileName: file.filename,
-    url: `${baseUrl}/uploads/${file.filename}`
-  }));
-};
-
-export const createPreConstruction = async (req: Request, res: Response) => {
+export const createPreConstruction = async (
+  req: Request,
+  res: Response
+) => {
   try {
     const userId = (req as any).user?.id;
-    console.log('--------------------->>> REQ',req.body)
+
     const result = await createPreConstructionUsecase(
       req.body,
       req.files,
-      req
+      req,
+      userId
     );
 
     res.status(201).json({
       success: true,
-      message: "Created",
+      message: "Created successfully",
       data: result
     });
 
   } catch (err: any) {
-    res.status(400).json({ success: false, message: err.message });
+    res.status(400).json({
+      success: false,
+      message: err.message
+    });
   }
 };
 
-
-export const getAllPreConstruction = async (req: Request, res: Response) => {
+export const getAllPreConstruction = async (
+  req: Request,
+  res: Response
+) => {
   try {
     const { projectId } = req.query;
 
-    const result = await getAllPreConstructionUsecase(projectId as string);
+    const result = await getAllPreConstructionUsecase(
+      projectId as string
+    );
 
     res.status(200).json({
       success: true,
       data: result
     });
+
   } catch (err: any) {
     res.status(400).json({
       success: false,
@@ -59,12 +66,16 @@ export const getPreConstructionById = async (
   try {
     let { projectId } = req.params;
 
+    // FIX TYPESCRIPT ERROR
     if (Array.isArray(projectId)) {
       projectId = projectId[0];
     }
 
     if (!projectId) {
-      throw new Error("Project Id is required");
+      return res.status(400).json({
+        success: false,
+        message: "Project Id is required"
+      });
     }
 
     const result =
@@ -77,6 +88,52 @@ export const getPreConstructionById = async (
 
   } catch (err: any) {
     res.status(404).json({
+      success: false,
+      message: err.message
+    });
+  }
+};
+
+export const updatePreConstruction = async (
+  req: Request,
+  res: Response
+) => {
+  try {
+    let { id } = req.params;
+
+    // FIX TYPESCRIPT ERROR
+    if (Array.isArray(id)) {
+      id = id[0];
+    }
+
+    const userId = (req as any).user?.id;
+
+    if (!id) {
+      return res.status(400).json({
+        success: false,
+        message: "PreConstruction ID is required"
+      });
+    }
+
+    const result = await updatePreConstructionUsecase(
+      id,
+      req.body,
+      req.files,
+      req,
+      userId
+    );
+
+    res.status(200).json({
+      success: true,
+      message: "Updated successfully",
+      data: result
+    });
+
+  } catch (err: any) {
+    const isNotFound =
+      err.message === "PreConstruction record not found";
+
+    res.status(isNotFound ? 404 : 400).json({
       success: false,
       message: err.message
     });
