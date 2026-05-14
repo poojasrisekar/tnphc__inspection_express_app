@@ -28,7 +28,7 @@ const photoUpload = upload.fields([
 
 // CREATE
 router.post(
-  "/createPreConstruction",
+  "/",
   photoUpload,
   validateRequest(createPreConstructionSchema),
   createPreConstruction
@@ -36,7 +36,7 @@ router.post(
 
 // UPDATE
 router.put(
-  "/updatePreConstruction/:id",
+  "/:id",
   photoUpload,
   validateRequest(updatePreConstructionSchema),
   updatePreConstruction
@@ -50,7 +50,7 @@ router.get(
 
 // GET BY PROJECT ID
 router.get(
-  "/getPreConstruction/:projectId",
+  "/:projectId",
   getPreConstructionById
 );
 

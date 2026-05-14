@@ -21,7 +21,7 @@ const uploadFields = upload.fields([
 ]);
 
 router.post(
-  "/createFoundationProgress",
+  "/",
   uploadFields,
   validateRequest(createFoundationProgressSchema),
   createFoundationProgress
@@ -30,17 +30,17 @@ router.post(
 router.get("/getAllFoundationProgress/:projectId", getAllFoundationProgress);
 
 router.get(
-  "/getFoundationProgress/:projectId",
+  "/:projectId",
   getFoundationProgressById
 );
 
 router.put(
-  "/updateFoundationProgress/:id",
+  "/:id",
   uploadFields,
   validateRequest(updateFoundationProgressSchema),
   updateFoundationProgress
 );
 
-router.delete("/deleteFoundationProgress/:id", deleteFoundationProgress);
+router.delete("/:id", deleteFoundationProgress);
 
 export default router;

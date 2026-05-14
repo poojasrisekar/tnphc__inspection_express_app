@@ -44,7 +44,7 @@ const handleMulterError = (
 
 // ✅ CREATE
 router.post(
-  "/createLandSiteInspection",
+  "/",
   inspectionUpload,
   handleMulterError,
   validateRequest(createLandSiteInspectionSchema),
@@ -53,21 +53,21 @@ router.post(
 
 // ✅ GET ALL
 router.get(
-  "/getLandSiteInspection",
+  "/",
   validateRequest(listLandSiteInspectionSchema, "query"),
   getAllInspection
 );
 
 // ✅ GET ONE
 router.get(
-  "/getLandSiteInspection/:id",
+  "/:id",
   validateRequest(getLandSiteInspectionSchema, "params"),
   getInspectionById
 );
 
 // ✅ UPDATE
 router.put(
-  "/landSiteInspections/:id",
+  "/:id",
   inspectionUpload,
   handleMulterError,
   validateRequest(updateLandSiteInspectionParamsSchema, "params"),
