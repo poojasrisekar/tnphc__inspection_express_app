@@ -5,12 +5,10 @@ import { pageConfig } from "../../utils/query.helper";
 export const getAdminDashboardReportService =
   async ({
     pageNumber,
-    pageSize,
-    search
+    pageSize
   }: {
     pageNumber?: string;
     pageSize?: string;
-    search?: string;
   }) => {
 
     const {
@@ -23,23 +21,14 @@ export const getAdminDashboardReportService =
       pageSize
     });
 
-    const whereCondition: any = {
-      isActive: true
-    };
-
-    if (search) {
-      whereCondition.projectName = {
-        contains: search,
-        mode: "insensitive"
-      };
-    }
-
     const [projects, totalRecords] =
       await Promise.all([
 
         prisma.project.findMany({
 
-          where: whereCondition,
+          where: {
+            isActive: true
+          },
 
           include: {
 
@@ -47,18 +36,21 @@ export const getAdminDashboardReportService =
 
             officer: true,
 
+            // 🔹 LAND
             landSiteInspection: {
               where: {
                 isActive: true
               }
             },
 
+            // 🔹 PRE CONSTRUCTION
             preConstructionInspections: {
               where: {
                 isActive: true
               }
             },
 
+            // 🔹 FOUNDATION
             foundationProgresses: {
               where: {
                 isActive: true
@@ -71,12 +63,14 @@ export const getAdminDashboardReportService =
               }
             },
 
+            // 🔹 PLINTH
             plinthStages: {
               where: {
                 isActive: true
               }
             },
 
+            // 🔹 SUPER STRUCTURE
             SuperStructure: {
               where: {
                 isActive: true
@@ -91,6 +85,7 @@ export const getAdminDashboardReportService =
 
             superStructureQuality: true,
 
+            // 🔹 INTERIORS
             interiorsProgress: {
               where: {
                 isActive: true
@@ -99,6 +94,7 @@ export const getAdminDashboardReportService =
 
             interiorsQuality: true,
 
+            // 🔹 EXTERIORS
             exteriorsProgress: {
               where: {
                 isActive: true
@@ -107,12 +103,14 @@ export const getAdminDashboardReportService =
 
             exteriorsQuality: true,
 
+            // 🔹 DEVELOPMENT
             DevelopmentWork: {
               where: {
                 isActive: true
               }
             },
 
+            // 🔹 TAKEOVER
             TakeoverBuildingInsepction: {
               where: {
                 isActive: true
@@ -135,72 +133,58 @@ export const getAdminDashboardReportService =
         }),
 
         prisma.project.count({
-          where: whereCondition
+          where: {
+            isActive: true
+          }
         })
       ]);
 
     const formattedProjects =
       projects.map((project) => {
 
-        let currentStage =
-          "NOT_STARTED";
+        // 🔹 CURRENT STAGE
 
-        if (
-          project.exteriorsQuality
-        ) {
-          currentStage =
-            "EXTERIORS";
+        let currentStage = "NOT_STARTED";
+
+        if (project.exteriorsQuality) {
+          currentStage = "EXTERIORS";
+        }
+
+        else if (project.interiorsQuality) {
+          currentStage = "INTERIORS";
+        }
+
+        else if (project.superStructureQuality) {
+          currentStage = "SUPER_STRUCTURE";
         }
 
         else if (
-          project.interiorsQuality
+          project.plinthStages.length > 0
         ) {
-          currentStage =
-            "INTERIORS";
+          currentStage = "PLINTH";
         }
 
         else if (
-          project.superStructureQuality
+          project.foundationQualityChecks.length > 0 ||
+          project.foundationProgresses.length > 0
         ) {
-          currentStage =
-            "SUPER_STRUCTURE";
+          currentStage = "FOUNDATION";
         }
 
         else if (
-          project.plinthStages.length >
-          0
+          project.preConstructionInspections.length > 0
         ) {
-          currentStage =
-            "PLINTH";
+          currentStage = "PRE_CONSTRUCTION";
         }
 
         else if (
-          project.foundationQualityChecks
-            .length > 0 ||
-          project.foundationProgresses
-            .length > 0
-        ) {
-          currentStage =
-            "FOUNDATION";
-        }
-
-        else if (
-          project
-            .preConstructionInspections
-            .length > 0
-        ) {
-          currentStage =
-            "PRE_CONSTRUCTION";
-        }
-
-        else if (
-          project
-            .landSiteInspection
-            .length > 0
+          project.landSiteInspection.length > 0
         ) {
           currentStage =
             "LAND_SITE_INSPECTION";
         }
+
+        // 🔹 STATUS
 
         let status = "PENDING";
 
@@ -212,51 +196,33 @@ export const getAdminDashboardReportService =
 
         else if (
 
-          project.landSiteInspection
-            .length > 0 ||
+          project.landSiteInspection.length > 0 ||
 
-          project
-            .preConstructionInspections
-            .length > 0 ||
+          project.preConstructionInspections.length > 0 ||
 
-          project
-            .foundationProgresses
-            .length > 0 ||
+          project.foundationProgresses.length > 0 ||
 
-          project
-            .foundationQualityChecks
-            .length > 0 ||
+          project.foundationQualityChecks.length > 0 ||
 
-          project.plinthStages
-            .length > 0 ||
+          project.plinthStages.length > 0 ||
 
-          project
-            .SuperStructureProgress
-            .length > 0 ||
+          project.SuperStructureProgress.length > 0 ||
 
-          project
-            .interiorsProgress
-            .length > 0 ||
+          project.interiorsProgress.length > 0 ||
 
-          project
-            .exteriorsProgress
-            .length > 0 ||
+          project.exteriorsProgress.length > 0 ||
 
-          project.DevelopmentWork
-            .length > 0 ||
+          project.DevelopmentWork.length > 0 ||
 
-          project
-            .TakeoverBuildingInsepction
-            .length > 0 ||
+          project.TakeoverBuildingInsepction.length > 0 ||
 
-          project
-            .TakeoverDevelopmentWork
-            .length > 0
+          project.TakeoverDevelopmentWork.length > 0
 
         ) {
-          status =
-            "IN_PROGRESS";
+          status = "IN_PROGRESS";
         }
+
+        // 🔹 SUPER STRUCTURE FLOOR DETAILS
 
         const totalFloors =
           project.SuperStructure.reduce(
@@ -266,9 +232,49 @@ export const getAdminDashboardReportService =
           );
 
         const completedFloors =
-          project
-            .SuperStructureProgress
-            .length;
+          project.SuperStructureProgress.length;
+
+        // 🔹 BLOCK DETAILS
+
+        const blocks =
+          project.SuperStructure.map((block) => {
+
+            const progressList =
+              project.SuperStructureProgress.filter(
+                (p) =>
+                  p.blockName ===
+                  block.blockName
+              );
+
+            return {
+
+              blockName:
+                block.blockName,
+
+              totalFloors:
+                block.totalFloors,
+
+              floors:
+                block.floors ?? [],
+
+              completedFloors:
+                progressList.length,
+
+              currentFloor:
+                progressList.length,
+
+              status:
+                progressList.length === 0
+                  ? "NOT_STARTED"
+                  : progressList.length ===
+                    block.totalFloors
+                  ? "COMPLETED"
+                  : "IN_PROGRESS",
+
+              isStarted:
+                progressList.length > 0
+            };
+          });
 
         return {
 
@@ -294,39 +300,195 @@ export const getAdminDashboardReportService =
           latestUpdatedAt:
             project.updatedAt,
 
-          totalFloors,
+          // 🔹 STAGES
 
-          completedFloors
+          stages: {
+
+            landCheck: {
+              started:
+                project.landSiteInspection.length > 0,
+
+              completed:
+                project.landSiteInspection.length > 0
+            },
+
+            preConstruction: {
+              started:
+                project.preConstructionInspections.length > 0,
+
+              completed:
+                project.preConstructionInspections.length > 0
+            },
+
+            foundation: {
+              started:
+                project.foundationProgresses.length > 0 ||
+                project.foundationQualityChecks.length > 0,
+
+              completed:
+                project.foundationQualityChecks.length > 0
+            },
+
+            plinth: {
+              started:
+                project.plinthStages.length > 0,
+
+              completed:
+                project.plinthStages.length > 0
+            },
+
+            superStructure: {
+
+              started:
+                project.SuperStructureProgress.length > 0,
+
+              completed:
+                !!project.superStructureQuality,
+
+              totalBlocks:
+                project.SuperStructure.length,
+
+              totalFloors,
+
+              completedFloors,
+
+              blocks
+            },
+
+            interiors: {
+
+              started:
+                project.interiorsProgress.length > 0,
+
+              completed:
+                !!project.interiorsQuality,
+
+              totalBlocks:
+                project.SuperStructure.length,
+
+              blocks:
+                project.SuperStructure.map((block) => {
+
+                  const progressList =
+                    project.interiorsProgress.filter(
+                      (p) =>
+                        p.block ===
+                        block.blockName
+                    );
+
+                  return {
+
+                    blockName:
+                      block.blockName,
+
+                    totalFloors:
+                      block.totalFloors,
+
+                    completedFloors:
+                      progressList.length,
+
+                    status:
+                      progressList.length === 0
+                        ? "NOT_STARTED"
+                        : progressList.length ===
+                          block.totalFloors
+                        ? "COMPLETED"
+                        : "IN_PROGRESS"
+                  };
+                })
+            },
+
+            exteriors: {
+
+              started:
+                project.exteriorsProgress.length > 0,
+
+              completed:
+                !!project.exteriorsQuality,
+
+              totalBlocks:
+                project.SuperStructure.length,
+
+              blocks:
+                project.SuperStructure.map((block) => {
+
+                  const progressList =
+                    project.exteriorsProgress.filter(
+                      (p) =>
+                        p.block ===
+                        block.blockName
+                    );
+
+                  return {
+
+                    blockName:
+                      block.blockName,
+
+                    totalFloors:
+                      block.totalFloors,
+
+                    completedFloors:
+                      progressList.length,
+
+                    status:
+                      progressList.length === 0
+                        ? "NOT_STARTED"
+                        : progressList.length ===
+                          block.totalFloors
+                        ? "COMPLETED"
+                        : "IN_PROGRESS"
+                  };
+                })
+            },
+
+            developmentWork: {
+
+              started:
+                project.DevelopmentWork.length > 0,
+
+              completed:
+                project.DevelopmentWork.length > 0
+            },
+
+            takeOver: {
+
+              started:
+                project.TakeoverBuildingInsepction.length > 0 ||
+                project.TakeoverDevelopmentWork.length > 0,
+
+              completed:
+                project.TakeoverBuildingInsepction.length > 0 ||
+                project.TakeoverDevelopmentWork.length > 0
+            }
+          }
         };
       });
 
+    // 🔹 SUMMARY
+
+    const totalProjects =
+      totalRecords;
+
     const completedProjects =
       formattedProjects.filter(
-        (p) =>
-          p.status ===
-          "COMPLETED"
+        (p) => p.status === "COMPLETED"
       ).length;
 
     const inProgressProjects =
       formattedProjects.filter(
-        (p) =>
-          p.status ===
-          "IN_PROGRESS"
+        (p) => p.status === "IN_PROGRESS"
       ).length;
 
     const pendingProjects =
       formattedProjects.filter(
-        (p) =>
-          p.status ===
-          "PENDING"
+        (p) => p.status === "PENDING"
       ).length;
 
     return {
 
       summary: {
 
-        totalProjects:
-          totalRecords,
+        totalProjects,
 
         completedProjects,
 
@@ -346,7 +508,6 @@ export const getAdminDashboardReportService =
 
       pageSize: limit,
 
-      projects:
-        formattedProjects
+      projects: formattedProjects
     };
   };

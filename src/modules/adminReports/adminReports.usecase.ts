@@ -16,6 +16,6 @@ export const getAdminDashboardReportUsecase =
     return getAdminDashboardReportService({
       pageNumber,
       pageSize,
-      search
+      // search
     });
   };
