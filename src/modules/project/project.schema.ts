@@ -39,31 +39,59 @@ export const createProjectSchema = Joi.object({
 .or("departmentId", "specialUnitId");
 
 export const updateProjectSchema = Joi.object({
+
   districtId: Joi.string().optional(),
+
   departmentId: Joi.string().optional(),
+
   specialUnitId: Joi.string().optional(),
+
   officerId: Joi.string().optional(),
+
   locationName: Joi.string().optional(),
+
   projectName: Joi.string().optional(),
+
   assignedUserId: Joi.string().optional(),
 
- 
-  stageId: Joi.array().items(Joi.string().required()).optional(),
-
-  status: Joi.string()
-    .valid("AssignedProjects", "TotalProjects", "OngoingProjects", "CompletedProjects")
+  stageId: Joi.array()
+    .items(Joi.string().required())
     .optional(),
 
-  
+  status: Joi.string()
+    .valid(
+      "AssignedProjects",
+      "TotalProjects",
+      "OngoingProjects",
+      "CompletedProjects"
+    )
+    .optional(),
+
   superStructure: Joi.array()
     .items(
       Joi.object({
-        blockName: Joi.string().required(),
-        totalFloors: Joi.number().integer().min(1).required()
+
+        blockName:
+          Joi.string().required(),
+
+        totalFloors:
+          Joi.number()
+            .integer()
+            .min(1)
+            .required(),
+
+        floors: Joi.array()
+          .items(
+            Joi.string().required()
+          )
+          .min(1)
+          .required()
       })
     )
     .optional()
-});
+
+})
+.or("departmentId", "specialUnitId");
 
 export const getProjectByIdSchema = Joi.object({
   id: Joi.string().uuid().required()
