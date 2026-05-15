@@ -190,6 +190,10 @@ export const getAllProjectsService = async (query: any) => {
   };
 };
 
+// ===============================================
+// getProjectsByUserService
+// ===============================================
+
 export const getProjectsByUserService = async ({
   userId,
   pageNumber,
@@ -479,8 +483,18 @@ export const getProjectsByUserService = async ({
 
       superStructure:
         p.SuperStructure.map((b) => ({
+
           blockName: b.blockName,
-          totalFloors: b.totalFloors
+
+          totalFloors: b.totalFloors,
+
+          floors: b.floors || [],
+
+          completedFloors:
+            p.SuperStructureProgress.filter(
+              (sp) =>
+                sp.blockName === b.blockName
+            ).length
         })),
 
       status: projectStatus,
@@ -505,65 +519,200 @@ export const getProjectsByUserService = async ({
   };
 };
 
-export const updateProjectService = async (id: string, data: any) => {
-  return prisma.$transaction(async (tx) => {
-    if (data.officerId) {
-      const officerExists = await tx.officer.findUnique({
-        where: { id: data.officerId }
-      });
-      if (!officerExists) throw new Error("Invalid officerId");
-    }
+export const updateProjectService = async (
+  id: string,
+  data: any
+) => {
 
-    
-    if (data.assignedUserId) {
-      const userExists = await tx.user.findUnique({
-        where: { id: data.assignedUserId }
-      });
-      if (!userExists) throw new Error("Invalid assignedUserId");
-    }
+  return prisma.$transaction(
+    async (tx) => {
 
-    let stageData = {};
-    if (Array.isArray(data.stageId)) {
-      stageData = {
-        stages: { set: data.stageId.map((id: string) => ({ id })) }
-      };
-    }
+      // ✅ CHECK PROJECT EXISTS
+      const existingProject =
+        await tx.project.findUnique({
+          where: { id }
+        });
 
-    const project = await tx.project.update({
-      where: { id },
-      data: {
-        districtId: data.districtId,
-        departmentId: data.departmentId,
-        specialUnitId: data.specialUnitId,
-        officerId: data.officerId,
-        locationName: data.locationName,
-        projectName: data.projectName,
-        status: data.status,
-
-        
-        assignedUserId: data.assignedUserId,
-        selectedStageIds: data.stageId,
-
-        ...stageData,
-        updatedById: data.updatedById
+      if (!existingProject) {
+        throw new Error(
+          `Project with id "${id}" does not exist.`
+        );
       }
-    });
 
-    if (Array.isArray(data.superStructure)) {
-      await tx.superStructure.deleteMany({ where: { projectId: id } });
+      // ✅ VALIDATE OFFICER
+      if (data.officerId) {
 
-      await tx.superStructure.createMany({
-        data: data.superStructure.map((b: any) => ({
-          projectId: id,
-          blockName: b.blockName,
-          totalFloors: b.totalFloors,
-          updatedById: data.updatedById
-        }))
-      });
+        const officerExists =
+          await tx.officer.findUnique({
+            where: {
+              id: data.officerId
+            }
+          });
+
+        if (!officerExists) {
+          throw new Error(
+            "Invalid officerId"
+          );
+        }
+      }
+
+      // ✅ VALIDATE USER
+      if (data.assignedUserId) {
+
+        const userExists =
+          await tx.user.findUnique({
+            where: {
+              id: data.assignedUserId
+            }
+          });
+
+        if (!userExists) {
+          throw new Error(
+            "Invalid assignedUserId"
+          );
+        }
+      }
+
+      // ✅ VALIDATE UNIT
+      if (
+        !data.departmentId &&
+        !data.specialUnitId &&
+        !existingProject.departmentId &&
+        !existingProject.specialUnitId
+      ) {
+        throw new Error(
+          "At least one of departmentId or specialUnitId is required"
+        );
+      }
+
+      // ✅ STAGE UPDATE
+      let stageData = {};
+
+      if (
+        Array.isArray(data.stageId)
+      ) {
+
+        stageData = {
+          stages: {
+            set: data.stageId.map(
+              (id: string) => ({
+                id
+              })
+            )
+          }
+        };
+      }
+
+      // ✅ UPDATE PROJECT
+      const project =
+        await tx.project.update({
+
+          where: { id },
+
+          data: {
+
+            districtId:
+              data.districtId,
+
+            departmentId:
+              data.departmentId,
+
+            specialUnitId:
+              data.specialUnitId,
+
+            officerId:
+              data.officerId,
+
+            locationName:
+              data.locationName,
+
+            projectName:
+              data.projectName,
+
+            assignedUserId:
+              data.assignedUserId,
+
+            selectedStageIds:
+              data.stageId,
+
+            status:
+              data.status,
+
+            ...stageData,
+
+            updatedById:
+              data.updatedById
+          }
+        });
+
+      // ✅ SUPER STRUCTURE UPDATE
+      if (
+        Array.isArray(
+          data.superStructure
+        )
+      ) {
+
+        // DELETE OLD BLOCKS
+        await tx.superStructure.deleteMany({
+          where: {
+            projectId: id
+          }
+        });
+
+        // VALIDATE + CREATE NEW
+        const superStructureData =
+          data.superStructure.map(
+            (b: any) => {
+
+              if (
+                !Array.isArray(
+                  b.floors
+                ) ||
+                b.floors.length === 0
+              ) {
+
+                throw new Error(
+                  `Floors required for block ${b.blockName}`
+                );
+              }
+
+              if (
+                b.totalFloors !==
+                b.floors.length
+              ) {
+
+                throw new Error(
+                  `totalFloors mismatch in block ${b.blockName}`
+                );
+              }
+
+              return {
+
+                projectId: id,
+
+                blockName:
+                  b.blockName,
+
+                totalFloors:
+                  b.totalFloors,
+
+                floors:
+                  b.floors,
+
+                updatedById:
+                  data.updatedById
+              };
+            }
+          );
+
+        await tx.superStructure.createMany({
+          data: superStructureData
+        });
+      }
+
+      return project;
     }
-
-    return project;
-  });
+  );
 };
 
 export const deleteProjectService = async (id: string) => {
