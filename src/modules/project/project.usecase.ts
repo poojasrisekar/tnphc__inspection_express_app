@@ -112,8 +112,8 @@ export const deleteProjectUsecase = async (
 
 
 // ✅ DASHBOARD
-export const getProjectDashboardUsecase = async () => {
-
-  return getProjectDashboardService();
-
+export const getProjectDashboardUsecase = async (
+  userId?: string
+) => {
+  return getProjectDashboardService(userId);
 };
