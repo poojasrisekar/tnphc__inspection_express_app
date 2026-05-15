@@ -190,9 +190,27 @@ export const getAllProjectsService = async (query: any) => {
   };
 };
 
-export const getProjectsByUserService = async (
-  userId?: string
-) => {
+export const getProjectsByUserService = async ({
+  userId,
+  pageNumber,
+  pageSize,
+  search
+}: {
+  userId?: string;
+  pageNumber?: string;
+  pageSize?: string;
+  search?: string;
+}) => {
+
+  const {
+    skip,
+    take,
+    pageNumber: currentPage,
+    pageSize: limit
+  } = pageConfig({
+    pageNumber,
+    pageSize
+  });
 
   const whereCondition: any = {
     isActive: true
@@ -202,93 +220,109 @@ export const getProjectsByUserService = async (
     whereCondition.assignedUserId = userId;
   }
 
-  const projects = await prisma.project.findMany({
-    where: whereCondition,
+  if (search) {
+    whereCondition.projectName = {
+      contains: search,
+      mode: "insensitive"
+    };
+  }
 
-    include: {
-      district: true,
-      officer: true,
-      stages: true,
-      department: true,
-      specialUnit: true,
-      assignedUser: true,
-      SuperStructure: true,
+  const [projects, totalRecords] =
+    await Promise.all([
 
-      landSiteInspection: {
-        where: { isActive: true }
-      },
+      prisma.project.findMany({
+        where: whereCondition,
 
-      preConstructionInspections: {
-        where: { isActive: true }
-      },
+        include: {
+          district: true,
+          officer: true,
+          stages: true,
+          department: true,
+          specialUnit: true,
+          assignedUser: true,
+          SuperStructure: true,
 
-      foundationProgresses: {
-        where: { isActive: true }
-      },
+          landSiteInspection: {
+            where: { isActive: true }
+          },
 
-      foundationQualityChecks: {
-        where: { isActive: true }
-      },
+          preConstructionInspections: {
+            where: { isActive: true }
+          },
 
-      plinthStages: {
-        where: { isActive: true }
-      },
+          foundationProgresses: {
+            where: { isActive: true }
+          },
 
-      interiorsProgress: {
-        where: { isActive: true }
-      },
+          foundationQualityChecks: {
+            where: { isActive: true }
+          },
 
-      interiorsQuality: true,
+          plinthStages: {
+            where: { isActive: true }
+          },
 
-      exteriorsProgress: {
-        where: { isActive: true }
-      },
+          interiorsProgress: {
+            where: { isActive: true }
+          },
 
-      exteriorsQuality: true,
+          interiorsQuality: true,
 
-      BuildingInspection: {
-        where: { isActive: true }
-      },
+          exteriorsProgress: {
+            where: { isActive: true }
+          },
 
-      DevelopmentWork: {
-        where: { isActive: true }
-      },
+          exteriorsQuality: true,
 
-      TakeoverBuildingInsepction: {
-        where: { isActive: true }
-      },
+          BuildingInspection: {
+            where: { isActive: true }
+          },
 
-      TakeoverDevelopmentWork: {
-        where: { isActive: true }
-      },
+          DevelopmentWork: {
+            where: { isActive: true }
+          },
 
-      SuperStructureProgress: {
-        where: { isActive: true }
-      },
+          TakeoverBuildingInsepction: {
+            where: { isActive: true }
+          },
 
-      superStructureQuality: true
-    },
+          TakeoverDevelopmentWork: {
+            where: { isActive: true }
+          },
 
-    orderBy: {
-      createdAt: "desc"
-    }
-  });
+          SuperStructureProgress: {
+            where: { isActive: true }
+          },
 
-  return projects.map((p) => {
+          superStructureQuality: true
+        },
+
+        orderBy: {
+          createdAt: "desc"
+        },
+
+        skip,
+        take
+      }),
+
+      prisma.project.count({
+        where: whereCondition
+      })
+    ]);
+
+  const data = projects.map((p) => {
 
     const totalAssignedStages =
       p.stages.length;
 
     const completedStageNames: string[] = [];
 
-    // LAND SITE
     if (p.landSiteInspection.length > 0) {
       completedStageNames.push(
         "Land Site Inspection"
       );
     }
 
-    // PRE CONSTRUCTION
     if (
       p.preConstructionInspections.length > 0
     ) {
@@ -297,7 +331,6 @@ export const getProjectsByUserService = async (
       );
     }
 
-    // FOUNDATION
     if (
       p.foundationProgresses.length > 0 ||
       p.foundationQualityChecks.length > 0
@@ -307,14 +340,12 @@ export const getProjectsByUserService = async (
       );
     }
 
-    // PLINTH
     if (p.plinthStages.length > 0) {
       completedStageNames.push(
         "Plinth"
       );
     }
 
-    // SUPER STRUCTURE
     if (
       p.SuperStructureProgress.length > 0 ||
       p.superStructureQuality
@@ -324,7 +355,6 @@ export const getProjectsByUserService = async (
       );
     }
 
-    // INTERIORS
     if (
       p.interiorsProgress.length > 0 ||
       p.interiorsQuality
@@ -334,7 +364,6 @@ export const getProjectsByUserService = async (
       );
     }
 
-    // EXTERIORS
     if (
       p.exteriorsProgress.length > 0 ||
       p.exteriorsQuality
@@ -344,21 +373,18 @@ export const getProjectsByUserService = async (
       );
     }
 
-    // BUILDING INSPECTION
     if (p.BuildingInspection.length > 0) {
       completedStageNames.push(
         "Building Inspection"
       );
     }
 
-    // DEVELOPMENT WORK
     if (p.DevelopmentWork.length > 0) {
       completedStageNames.push(
         "Development Work"
       );
     }
 
-    // TAKEOVER BUILDING
     if (
       p.TakeoverBuildingInsepction.length > 0
     ) {
@@ -367,7 +393,6 @@ export const getProjectsByUserService = async (
       );
     }
 
-    // TAKEOVER DEVELOPMENT
     if (
       p.TakeoverDevelopmentWork.length > 0
     ) {
@@ -463,6 +488,21 @@ export const getProjectsByUserService = async (
       createdAt: p.createdAt
     };
   });
+
+  return {
+    totalRecords,
+
+    totalPages:
+      Math.ceil(
+        totalRecords / limit
+      ),
+
+    currentPage,
+
+    pageSize: limit,
+
+    data
+  };
 };
 
 export const updateProjectService = async (id: string, data: any) => {

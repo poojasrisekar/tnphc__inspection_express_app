@@ -3,7 +3,19 @@ import {
 } from "./adminReports.service";
 
 export const getAdminDashboardReportUsecase =
-  async () => {
+  async ({
+    pageNumber,
+    pageSize,
+    search
+  }: {
+    pageNumber?: string;
+    pageSize?: string;
+    search?: string;
+  }) => {
 
-    return getAdminDashboardReportService();
+    return getAdminDashboardReportService({
+      pageNumber,
+      pageSize,
+      search
+    });
   };

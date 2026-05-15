@@ -221,12 +221,26 @@ export const getProjectsByUserController = async (
         ? req.params.userId
         : undefined;
 
+    const pageNumber =
+      req.query.pageNumber as string | undefined;
+
+    const pageSize =
+      req.query.pageSize as string | undefined;
+
+    const search =
+      req.query.search as string | undefined;
+
     const result =
-      await getProjectsByUserUsecase(userId);
+      await getProjectsByUserUsecase({
+        userId,
+        pageNumber,
+        pageSize,
+        search
+      });
 
     res.status(200).json({
       success: true,
-      data: result
+      ...result
     });
 
   } catch (error: any) {

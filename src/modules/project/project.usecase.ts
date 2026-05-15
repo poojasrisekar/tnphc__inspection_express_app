@@ -68,11 +68,24 @@ export const getProjectByIdUsecase = async (
 
 
 // ✅ GET USER PROJECTS
-export const getProjectsByUserUsecase = async (
-  userId?: string
-) => {
+export const getProjectsByUserUsecase = async ({
+  userId,
+  pageNumber,
+  pageSize,
+  search
+}: {
+  userId?: string;
+  pageNumber?: string;
+  pageSize?: string;
+  search?: string;
+}) => {
 
-  return await getProjectsByUserService(userId);
+  return await getProjectsByUserService({
+    userId,
+    pageNumber,
+    pageSize,
+    search
+  });
 
 };
 
