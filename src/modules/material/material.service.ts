@@ -1,4 +1,6 @@
+import { isAsyncFunction } from "node:util/types";
 import prisma from "../../shared/prisma";
+import { getInteriorsQualityByProjectService } from "../InteriorsStage/InteriorsStage.service";
 
 export const createMaterialService = async (data: any) => {
   const existing = await prisma.material.findFirst({
@@ -89,6 +91,7 @@ export const deleteMaterialService = async (id: string) => {
       isActive: false,
     },
   });
+  console.log("Material with id", id, "marked as inactive");
 };
 
 export const listMaterialsService = async (query: any) => {

@@ -80,6 +80,7 @@ export const deleteMaterial = async (
     const id = String(req.params.id);
 
     await usecase.deleteMaterialUsecase(id);
+    console.log("Deleted material with id:", id);
 
     return res.status(200).json({
       success: true,

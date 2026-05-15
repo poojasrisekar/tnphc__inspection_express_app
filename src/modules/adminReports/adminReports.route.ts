@@ -11,4 +11,8 @@ router.get(
   getAdminDashboardReportController
 );
 
+router.get(
+  "/dashboard/:userId",
+  getAdminDashboardReportController
+)
 export default router;

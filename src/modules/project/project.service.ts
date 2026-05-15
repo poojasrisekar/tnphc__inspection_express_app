@@ -979,7 +979,7 @@ export const getProjectByIdService = async (
 ) => {
 
   const project = await prisma.project.findUnique({
-    where: { id },
+    where: { id },  // ← findUnique can't add isActive here directly
 
     include: {
       district: true,
@@ -993,67 +993,37 @@ export const getProjectByIdService = async (
     }
   });
 
-  if (!project) {
+  // ✅ ADD THIS CHECK — reject deleted projects
+  if (!project || !project.isActive) {
     throw new Error("Project not found");
   }
 
   return {
     id: project.id,
     code: project.code,
-
     projectName: project.projectName,
-
     locationName: project.locationName,
-
     status: project.status,
-
-    districtName:
-      project.district?.name ?? null,
-
-    specialUnitName:
-      project.specialUnit?.name ?? null,
-
-    departmentName:
-      project.department?.name ?? null,
-
-    officerName:
-      project.officer?.name ?? null,
-
-    assignedUserId:
-      project.assignedUserId,
-
-    assignedUserName:
-      project.assignedUser?.userName ?? null,
-
-    selectedStageIds:
-      project.selectedStageIds,
-
-    stageNames:
-      project.stages.map((s) => s.name),
-
-    blocks:
-      project.SuperStructure.map((b) => {
-
-        const progress =
-          project.SuperStructureProgress.find(
-            (p) => p.blockName === b.blockName
-          );
-
-        return {
-          blockName: b.blockName,
-
-          totalFloors: b.totalFloors,
-
-          currentFloor:
-            progress?.floorName ?? null,
-
-          status:
-            progress?.status ?? "NOT_STARTED"
-        };
-      }),
-
+    districtName: project.district?.name ?? null,
+    specialUnitName: project.specialUnit?.name ?? null,
+    departmentName: project.department?.name ?? null,
+    officerName: project.officer?.name ?? null,
+    assignedUserId: project.assignedUserId,
+    assignedUserName: project.assignedUser?.userName ?? null,
+    selectedStageIds: project.selectedStageIds,
+    stageNames: project.stages.map((s) => s.name),
+    blocks: project.SuperStructure.map((b) => {
+      const progress = project.SuperStructureProgress.find(
+        (p) => p.blockName === b.blockName
+      );
+      return {
+        blockName: b.blockName,
+        totalFloors: b.totalFloors,
+        currentFloor: progress?.floorName ?? null,
+        status: progress?.status ?? "NOT_STARTED"
+      };
+    }),
     createdAt: project.createdAt,
-
     updatedAt: project.updatedAt
   };
 };
