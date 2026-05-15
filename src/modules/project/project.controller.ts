@@ -188,24 +188,22 @@ export const getProjectDashboardController = async (
   req: Request,
   res: Response
 ) => {
-
   try {
+    // ✅ optional userId from params
+    const userId = req.params.userId as string | undefined;
 
-    const data = await getProjectDashboardUsecase();
+    const data = await getProjectDashboardUsecase(userId);
 
     res.status(200).json({
       success: true,
       message: "Dashboard data fetched successfully",
       data
     });
-
   } catch (error: any) {
-
     res.status(500).json({
       success: false,
       message: error.message
     });
-
   }
 };
 

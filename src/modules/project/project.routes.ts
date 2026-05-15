@@ -76,6 +76,11 @@ router.patch(
   deleteProjectController
 );
 
+router.get(
+  "/getProjectDashboard/:userId",
+  getProjectDashboardController
+);
+
 
 // ✅ PROJECT DASHBOARD
 router.get(
